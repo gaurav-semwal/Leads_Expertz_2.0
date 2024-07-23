@@ -4,14 +4,14 @@ import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Colors } from '../../Comman/Styles';
 
-const Userlist = ({ navigation }) => {
+const Promtescreen = ({ navigation }) => {
     const navigateToAddUser = () => {
         navigation.navigate('Add User');
     };
 
     const [itemsPerPage] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
-    const [widthArr] = useState([100, 150, 150, 100, 150, 100, 100, 100]);
+    const [widthArr] = useState([100, 150, 150, 100, 150, 100]);
 
     const upcomingBirthdays = [
         { id: 1, name: 'John Doe', email: 'johndoe@example.com', phone: '123-456-7890', status: 'Active', role: 'Admin', tmid: 101, action: '1', promte: '2' },
@@ -90,7 +90,7 @@ const Userlist = ({ navigation }) => {
                     <View>
                         <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
                             <Row
-                                data={['Name', 'Email', 'Phone', 'Status', 'Role', 'TM ID', 'Actions', 'Promote']}
+                                data={['Name', 'Email', 'Phone', 'Status', 'Role', 'TM ID']}
                                 widthArr={widthArr}
                                 style={styles.header}
                                 textStyle={[styles.text, { color: '#000' }]}
@@ -106,7 +106,7 @@ const Userlist = ({ navigation }) => {
     );
 };
 
-export default Userlist;
+export default Promtescreen;
 
 const styles = StyleSheet.create({
     container: {

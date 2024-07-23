@@ -12,6 +12,8 @@ import SmartLeadSegmentation from '../Screens/SmartLeadSegmentation;';
 import CompanyHierarchy from '../Screens/CompanyHierarchy;';
 import Settingsscreen from '../Screens/Settingsscreen';
 
+import Promtescreen from '../Screens/Staff Managment/Promtescreen';
+import Categoryscreen from '../Screens/Inventory/Categoryscreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
