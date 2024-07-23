@@ -9,6 +9,7 @@ import Drawercontent from './Drawercontent';
 import Adduser from '../Screens/Staff Managment/Adduser';
 import Userlist from '../Screens/Staff Managment/Userlist';
 
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -56,6 +57,7 @@ const Stacknavigation = () => {
               fontWeight: 'bold',
             },
           }} />
+
         </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>

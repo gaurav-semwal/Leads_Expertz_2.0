@@ -49,6 +49,7 @@ const DrawerContent = (props) => {
                         <Text style={styles.subMenuText}>Add users</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.subMenuItem}  onPress={() => props.navigation.navigate('User List')}>
+
                         <Ionicons name="person" size={20} color="#666" style={styles.icon} />
                         <Text style={styles.subMenuText}>Users List</Text>
                     </TouchableOpacity>
