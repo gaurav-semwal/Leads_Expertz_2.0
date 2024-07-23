@@ -6,6 +6,8 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import Loginscreen from '../Authentication/Loginscreen';
 import Homescreen from '../Screens/Homescreen';
 import Drawercontent from './Drawercontent';
+import Adduser from '../Screens/Staff Managment/Adduser';
+import Userlist from '../Screens/Staff Managment/Userlist';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -34,6 +36,26 @@ const Stacknavigation = () => {
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Loginscreen} options={{ headerShown: false }} />
           <Stack.Screen name="AppDrawer" component={DrawerNavigation} options={{ headerShown: false }} />
+          <Stack.Screen name="Add User" component={Adduser} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+          <Stack.Screen name="User List" component={Userlist} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
         </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>

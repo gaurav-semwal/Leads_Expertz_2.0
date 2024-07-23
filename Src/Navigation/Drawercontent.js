@@ -44,11 +44,11 @@ const DrawerContent = (props) => {
         if (activeSubMenu === index) {
             return (
                 <View style={styles.subMenu}>
-                    <TouchableOpacity style={styles.subMenuItem}>
+                    <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Add User')} >
                         <Ionicons name="person" size={20} color="#666" style={styles.icon} />
                         <Text style={styles.subMenuText}>Add users</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.subMenuItem}>
+                    <TouchableOpacity style={styles.subMenuItem}  onPress={() => props.navigation.navigate('User List')}>
                         <Ionicons name="person" size={20} color="#666" style={styles.icon} />
                         <Text style={styles.subMenuText}>Users List</Text>
                     </TouchableOpacity>
