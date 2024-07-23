@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         width:'85%',
         alignItems: 'center',
         backgroundColor:Colors.Button,
-        borderRadius:50,
+        borderRadius:10,
         justifyContent: 'center',
         alignSelf: 'center',
         bottom: '40%',

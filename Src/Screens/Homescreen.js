@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import Leadshomegrid from '../Components/Leadshomegrid';
+
 
 const Homescreen = () => {
     const [selectedValue, setSelectedValue] = useState('');
@@ -15,7 +17,8 @@ const Homescreen = () => {
                     <Picker.Item label="All" value="All" />
                     <Picker.Item label="Self" value="Self" />
                     <Picker.Item label="Team" value="Team" />
-                </Picker>
+                </Picker>  
+
             </View>
             <View style={styles.button}>
                 <View style={styles.buttoncontainer}>
@@ -25,6 +28,9 @@ const Homescreen = () => {
                 <Text style={styles.text}>Add Quick Lead</Text>
                 </View>
             </View>
+
+
+            <Leadshomegrid/>
         </View>
     );
 };
