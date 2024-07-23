@@ -8,6 +8,9 @@ import Homescreen from '../Screens/Homescreen';
 import Drawercontent from './Drawercontent';
 import Adduser from '../Screens/Staff Managment/Adduser';
 import Userlist from '../Screens/Staff Managment/Userlist';
+import SmartLeadSegmentation from '../Screens/SmartLeadSegmentation;';
+import CompanyHierarchy from '../Screens/CompanyHierarchy;';
+import Settingsscreen from '../Screens/Settingsscreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -16,16 +19,20 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigation = () => {
   return (
     <Drawer.Navigator drawerContent={props => <Drawercontent {...props} />}>
-      <Drawer.Screen name="Dashboard" component={Homescreen} options={{
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: '#625bc5',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }} />
+      <Drawer.Screen
+        name="Dashboard"
+        component={Homescreen}
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#625bc5',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
     </Drawer.Navigator>
   );
 };
@@ -37,27 +44,38 @@ const Stacknavigation = () => {
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Loginscreen} options={{ headerShown: false }} />
           <Stack.Screen name="AppDrawer" component={DrawerNavigation} options={{ headerShown: false }} />
-          <Stack.Screen name="Add User" component={Adduser} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} />
-          <Stack.Screen name="User List" component={Userlist} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} />
+          <Stack.Screen name="CompanyHierarchy" component={CompanyHierarchy} options={{ headerShown: false }} />
+          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{ headerShown: false }} />
+          <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
 
+          <Stack.Screen
+            name="Add User"
+            component={Adduser}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="User List"
+            component={Userlist}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
         </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>
