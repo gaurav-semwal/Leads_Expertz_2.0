@@ -13,7 +13,9 @@ import CompanyHierarchy from '../Screens/CompanyHierarchy;';
 import Settingsscreen from '../Screens/Settingsscreen';
 
 import Promtescreen from '../Screens/Staff Managment/Promtescreen';
-import Categoryscreen from '../Screens/Inventory/Categoryscreen';
+import Category from '../Screens/Inventory/Category';
+import SubCategory from '../Screens/Inventory/SubCategory';
+import Inventory from '../Screens/Inventory/Inventory';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -49,6 +51,39 @@ const Stacknavigation = () => {
           <Stack.Screen name="CompanyHierarchy" component={CompanyHierarchy} options={{ headerShown: false }} />
           <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{ headerShown: false }} />
           <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
+          <Stack.Screen name="Category" component={Category}   options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen name="SubCategory" component={SubCategory}   options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+              <Stack.Screen name="Inventory" component={Inventory}   options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
 
           <Stack.Screen
             name="Add User"

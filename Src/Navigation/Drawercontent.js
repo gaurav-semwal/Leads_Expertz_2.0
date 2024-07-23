@@ -355,7 +355,7 @@ const DrawerContent = props => {
     if (inventoryActiveSubMenu === index) {
       return (
         <View style={styles.subMenu}>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Category')}            >
             <MaterialCommunityIcons
               name="file"
               size={20}
@@ -364,7 +364,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Category</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem}  onPress={() => props.navigation.navigate('SubCategory')}              >
             <MaterialCommunityIcons
               name="file"
               size={20}
@@ -373,7 +373,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Sub-Category</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem}   onPress={() => props.navigation.navigate('Inventory')}>
             <MaterialCommunityIcons
               name="file"
               size={20}
