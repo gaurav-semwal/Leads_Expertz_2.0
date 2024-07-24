@@ -29,6 +29,15 @@ import Category from '../Screens/Inventory/Category';
 import SubCategory from '../Screens/Inventory/SubCategory';
 import Inventory from '../Screens/Inventory/Inventory';
 import Promtescreen from '../Screens/Staff Managment/Promtescreen';
+import Notreachable from '../Screens/Lead Managment/Others/Notreachable';
+import Wrongnumber from '../Screens/Lead Managment/Others/Wrongnumber';
+import Channelpartners from '../Screens/Lead Managment/Others/Channelpartners';
+import Notinterested from '../Screens/Lead Managment/Others/Notinterested';
+import Notpicked from '../Screens/Lead Managment/Others/Notpicked';
+import Lost from '../Screens/Lead Managment/Others/Lost';
+import Leadtransfer from '../Screens/Leadtransfer';
+import Allleads from '../Screens/Lead Managment/Allleads';
+import Searchleads from '../Screens/Lead Managment/Searchleads';
 
 
 const Stack = createNativeStackNavigator();
@@ -72,9 +81,18 @@ const Stacknavigation = () => {
                 fontWeight: 'bold',
               },
             }}/>
-          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{ headerShown: false }} />
+          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation}  options={{
+              headerShown: true,
 
-
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+  
+              },
+            }}/>
           <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
           <Stack.Screen name="Category" component={Category}   options={{
               headerShown: true,
@@ -325,6 +343,132 @@ const Stacknavigation = () => {
            <Stack.Screen
             name="Cancelled"
             component={Cancelled}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+             <Stack.Screen
+            name="Not Reachable"
+            component={Notreachable}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="Wrong Number"
+            component={Wrongnumber}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="Channel Partners"
+            component={Channelpartners}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="Not Interested"
+            component={Notinterested}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="Not Picked"
+            component={Notpicked}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="Lost"
+            component={Lost}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+               <Stack.Screen
+            name="Lead Transfer"
+            component={Leadtransfer}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+            <Stack.Screen
+            name="All Leads"
+            component={Allleads}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Search Leads"
+            component={Searchleads}
             options={{
               headerShown: true,
               headerStyle: {

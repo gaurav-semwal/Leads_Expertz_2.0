@@ -4,8 +4,9 @@ import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const Allocatelead = () => {
+const Leadtransfer = () => {
   const [selectedValue, setSelectedValue] = useState('');
+  const [status, setstatus] = useState('');
   const [itemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns
@@ -73,6 +74,8 @@ const Allocatelead = () => {
   return (
     <View style={styles.container}>
       <View style={styles.top}>
+        <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>From</Text>
         <View style={styles.dropdowncontainer1}>
           <Picker
             selectedValue={selectedValue}
@@ -84,34 +87,50 @@ const Allocatelead = () => {
             <Picker.Item label="Team" value="Team" />
           </Picker>
         </View>
+        </View>
+     
+        <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Status</Text>
+        <View style={styles.dropdowncontainer1}>
+          <Picker
+            selectedValue={status}
+            onValueChange={(itemValue, itemIndex) => setstatus(itemValue)}
+          >
+            <Picker.Item label="Select User" value="" />
+            <Picker.Item label="All" value="All" />
+            <Picker.Item label="Self" value="Self" />
+            <Picker.Item label="Team" value="Team" />
+          </Picker>
+        </View>
+        </View>
+
         <TouchableOpacity style={styles.buttoncontainer1}>
           <Text style={styles.text1}>Search</Text>
         </TouchableOpacity>
       </View>
 
-      <View>
-        <ScrollView horizontal>
-          <View>
-            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-              <Row
-                data={['S.No', 'Lead Id', 'Source', 'Campaign', 'Classification', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
-                widthArr={widthArr}
-                style={styles.header}
-                textStyle={[styles.text, { color: '#000' }]}
-              />
-              {renderTableRows()}
-            </Table>
-          </View>
-        </ScrollView>
+<View>
+<ScrollView horizontal>
+        <View>
+          <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+            <Row
+              data={['S.No', 'Lead Id', 'Source', 'Campaign', 'Classification', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
+              widthArr={widthArr}
+              style={styles.header}
+              textStyle={[styles.text, { color: '#000' }]}
+            />
+            {renderTableRows()}
+          </Table>
+        </View>
+      </ScrollView>
 
-        {renderPagination()}
-
-      </View>
+      {renderPagination()}
+</View>
     </View>
   );
 };
 
-export default Allocatelead;
+export default Leadtransfer;
 
 const styles = StyleSheet.create({
   container: {
@@ -127,7 +146,7 @@ const styles = StyleSheet.create({
     borderColor: '#625bc5',
     marginTop: 6,
     margin: 10,
-    width: '70%',
+    width: '80%',
   },
   buttoncontainer1: {
     height: 38,
@@ -141,7 +160,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   top: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     marginBottom: 10,
   },
