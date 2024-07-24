@@ -3,13 +3,14 @@ import { StyleSheet, View, Text, Pressable, ScrollView, TouchableOpacity } from 
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Colors } from '../../Comman/Styles';
+import {Picker} from '@react-native-picker/picker'
+
 
 const Promtescreen = ({ navigation }) => {
     const navigateToAddUser = () => {
         navigation.navigate('Add User');
     };
-
-    const [itemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [widthArr] = useState([100, 150, 150, 100, 150, 100]);
 
@@ -83,6 +84,23 @@ const Promtescreen = ({ navigation }) => {
                 <Pressable style={styles.newuser} onPress={navigateToAddUser}>
                     <Text style={styles.text1}>New User</Text>
                 </Pressable>
+            </View>
+
+            <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="500" value={500} />
+                        <Picker.Item label="All" value={upcomingBirthdays.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
             </View>
 
             <View>
@@ -168,5 +186,22 @@ const styles = StyleSheet.create({
     iconhere1:{
         backgroundColor:'green',
         padding:4
-    }
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10
+    },
+    pickerWrapper: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        width: 109, 
+        overflow: 'hidden'
+    },
+    picker: {
+        height: 25, 
+        color: '#000' 
+    },
 });

@@ -3,15 +3,18 @@ import { StyleSheet, View, Text, Pressable, ScrollView, TouchableOpacity } from 
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Colors } from '../../Comman/Styles';
+import {Picker} from '@react-native-picker/picker'
+
 
 const SubCategory = ({ navigation }) => {
     const navigateToAddUser = () => {
         navigation.navigate('Add User');
     };
 
-    const [itemsPerPage] = useState(5);
+    
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [widthArr] = useState([100, 150, 150, 100]);  // Updated width array to match columns
+    const [widthArr] = useState([100, 150, 150, 100]);  
 
     const upcomingBirthdays = [
         { id: 1, name: 'Gaurav Semwal', email: 'gauravsemwal@example.com', phone: '123-456-7890', status: 'Active', role: 'Admin', action: 'View Details' },
@@ -56,10 +59,10 @@ const SubCategory = ({ navigation }) => {
             <Row
                 key={rowData.id}
                 data={[
-                    (startIndex + index + 1).toString(),  // S.No
-                    rowData.name,  // Name
-                    rowData.role,  // Type (assuming 'role' is used as 'Type')
-                    rowData.action  // Action
+                    (startIndex + index + 1).toString(),  
+                    rowData.name,  
+                    rowData.role,  
+                    rowData.action  
                 ]}
                 widthArr={widthArr}
                 style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
@@ -75,6 +78,23 @@ const SubCategory = ({ navigation }) => {
                 <Pressable style={styles.newuser} onPress={navigateToAddUser}>
                     <Text style={styles.text1}>New User</Text>
                 </Pressable>
+            </View>
+
+            <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="500" value={500} />
+                        <Picker.Item label="All" value={upcomingBirthdays.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
             </View>
 
             <View>
@@ -147,6 +167,23 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 14,
+        color: '#000'
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10
+    },
+    pickerWrapper: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        width: 109, 
+        overflow: 'hidden' 
+    },
+    picker: {
+        height: 25,
         color: '#000'
     },
 });

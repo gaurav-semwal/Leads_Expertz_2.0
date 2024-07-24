@@ -12,8 +12,6 @@ import SmartLeadSegmentation from '../Screens/SmartLeadSegmentation;';
 import CompanyHierarchy from '../Screens/CompanyHierarchy;';
 import Settingsscreen from '../Screens/Settingsscreen';
 
-import Promtescreen from '../Screens/Staff Managment/Promtescreen';
-import Categoryscreen from '../Screens/Inventory/Categoryscreen';
 import Addlead from '../Screens/Lead Managment/Addlead';
 import Allocatelead from '../Screens/Lead Managment/Allocatelead';
 import Newleads from '../Screens/Lead Managment/Newleads';
@@ -30,6 +28,7 @@ import Cancelled from '../Screens/Lead Managment/Cancelled';
 import Category from '../Screens/Inventory/Category';
 import SubCategory from '../Screens/Inventory/SubCategory';
 import Inventory from '../Screens/Inventory/Inventory';
+import Promtescreen from '../Screens/Staff Managment/Promtescreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -130,6 +129,20 @@ const Stacknavigation = () => {
           <Stack.Screen
             name="User List"
             component={Userlist}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+              <Stack.Screen
+            name="PromoteList"
+            component={Promtescreen}
             options={{
               headerShown: true,
               headerStyle: {

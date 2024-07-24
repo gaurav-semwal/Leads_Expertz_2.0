@@ -3,15 +3,16 @@ import { StyleSheet, View, Text, Pressable, ScrollView, TouchableOpacity } from 
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Colors } from '../../Comman/Styles';
+import {Picker} from '@react-native-picker/picker'
 
 const Inventory = ({ navigation }) => {
     const navigateToAddUser = () => {
         navigation.navigate('Add User');
     };
 
-    const [itemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10); 
     const [currentPage, setCurrentPage] = useState(1);
-    const [widthArr] = useState([50, 100, 150, 150, 150, 200, 100, 100, 100, 100, 100, 100, 100, 100,100]);
+    const [widthArr] = useState([50, 100, 150, 150, 150, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
 
     const upcomingBirthdays = [
         { id: 1, type: 'Type1', categoryName: 'Category1', subCategoryName: 'SubCategory1', propertyName: 'Property1', description: 'Description1', location: 'Location1', size: 'Size1', price: 'Price1', image1: 'Image1', image2: 'Image2', image3: 'Image3', image4: 'Image4', image5: 'Image5', action: 'Action1' },
@@ -56,21 +57,21 @@ const Inventory = ({ navigation }) => {
             <Row
                 key={rowData.id}
                 data={[
-                    (startIndex + index + 1).toString(),  // S.No
-                    rowData.type,  // Type
-                    rowData.categoryName,  // Category Name
-                    rowData.subCategoryName,  // Sub Category Name
-                    rowData.propertyName,  // Property Name
-                    rowData.description,  // Description
-                    rowData.location,  // Location
-                    rowData.size,  // Size
-                    rowData.price,  // Price
-                    rowData.image1,  // Image 1
-                    rowData.image2,  // Image 2
-                    rowData.image3,  // Image 3
-                    rowData.image4,  // Image 4
-                    rowData.image5,  // Image 5
-                    rowData.action  // Action
+                    (startIndex + index + 1).toString(),
+                    rowData.type, 
+                    rowData.categoryName,  
+                    rowData.subCategoryName,  
+                    rowData.propertyName,  
+                    rowData.description,  
+                    rowData.location,
+                    rowData.size, 
+                    rowData.price,  
+                    rowData.image1, 
+                    rowData.image2,
+                    rowData.image3, 
+                    rowData.image4, 
+                    rowData.image5,
+                    rowData.action  
                 ]}
                 widthArr={widthArr}
                 style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
@@ -86,6 +87,24 @@ const Inventory = ({ navigation }) => {
                 <Pressable style={styles.newuser} onPress={navigateToAddUser}>
                     <Text style={styles.text1}>New Item</Text>
                 </Pressable>
+            </View>
+
+        
+            <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="500" value={500} />
+                        <Picker.Item label="All" value={upcomingBirthdays.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
             </View>
 
             <View>
@@ -160,6 +179,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 14,
         color: '#000'
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10
+    },
+    pickerWrapper: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        width: 109, 
+        overflow: 'hidden'
+    },
+    picker: {
+        height: 25, 
+        color: '#000' 
     },
     icon: {
         alignItems: 'center',
