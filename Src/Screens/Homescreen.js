@@ -3,7 +3,6 @@ import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Leadshomegrid from '../Components/Leadshomegrid';
 
-
 const Homescreen = () => {
     const [selectedValue, setSelectedValue] = useState('');
 

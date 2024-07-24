@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -6,7 +6,7 @@ import HomeScheduletable from './HomeScheduletable';
 
 const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState([]); 
   const [itemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [widthArr] = useState([100, 150, 150, 100, 150]); 
@@ -21,21 +21,28 @@ const Homescreentable = () => {
     { id: 2, agentName: 'Michael Johnson', applicantName: 'Sarah Johnson', appContact: '234-567-8901', appCity: 'Houston', birthday: '1995-02-10' },
   ];
 
+  // useEffect to set initial state when component mounts
+  useEffect(() => {
+    setTableData(upcomingBirthdays); // Set table data to upcoming birthdays initially
+  }, []);
+
+  // Function to handle button press and set active button and corresponding table data
   const onPressButton = (type) => {
     setActiveButton(type);
     setCurrentPage(1);
     switch (type) {
       case 'Upcoming Birthday':
-        setTableData(upcomingBirthdays); 
+        setTableData(upcomingBirthdays); // Set table data to upcoming birthdays
         break;
       case 'Upcoming Anniversary':
-        setTableData(upcomingAnniversaries);
+        setTableData(upcomingAnniversaries); // Set table data to upcoming anniversaries
         break;
       default:
-        setTableData(upcomingBirthdays);
+        setTableData(upcomingBirthdays); // Default to upcoming birthdays
     }
   };
 
+  // Function to render pagination UI
   const renderPagination = () => {
     const totalPages = Math.ceil(tableData.length / itemsPerPage);
 
@@ -62,6 +69,7 @@ const Homescreentable = () => {
     );
   };
 
+  // Function to render table rows based on current page and items per page
   const renderTableRows = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -69,7 +77,7 @@ const Homescreentable = () => {
 
     return dataToDisplay.map((rowData, index) => (
       <Row
-        key={index} 
+        key={index}
         data={[
           rowData.agentName,
           rowData.applicantName,
@@ -87,6 +95,7 @@ const Homescreentable = () => {
   return (
     <View style={styles.container}>
       <View style={styles.body}>
+        {/* Pressable buttons to switch between upcoming birthdays and anniversaries */}
         <Pressable
           style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
           onPress={() => onPressButton('Upcoming Birthday')}
@@ -101,8 +110,8 @@ const Homescreentable = () => {
         </Pressable>
       </View>
 
-<View>
-<ScrollView horizontal>
+      {/* Table to display data */}
+      <ScrollView horizontal>
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -115,11 +124,12 @@ const Homescreentable = () => {
           </Table>
         </View>
       </ScrollView>
-      {renderPagination()}
-</View>
 
-<HomeScheduletable/>
-     
+      {/* Pagination controls */}
+      {renderPagination()}
+
+      {/* Additional component */}
+      <HomeScheduletable />
     </View>
   );
 };
@@ -130,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    padding:10
+    padding: 10,
   },
   button: {
     borderWidth: 1,
@@ -141,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     backgroundColor: '#e6ebf5',
-    marginVertical: 10
+    marginVertical: 10,
   },
   body: {
     flexDirection: 'row',
@@ -151,12 +161,12 @@ const styles = StyleSheet.create({
   text: {
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 14 ,
-    padding:6
+    fontSize: 14,
+    padding: 6,
   },
   row: {
     height: 40,
-    backgroundColor: '#E7E6E1'
+    backgroundColor: '#E7E6E1',
   },
   pagination: {
     flexDirection: 'row',
@@ -164,11 +174,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   pageButton: {
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   pageText: {
     color: '#625bc5',
     fontWeight: 'bold',
-    fontSize: 16 
-  }
+    fontSize: 16,
+  },
 });
