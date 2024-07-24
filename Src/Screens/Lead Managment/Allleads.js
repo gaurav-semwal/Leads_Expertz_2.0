@@ -1,0 +1,288 @@
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity,Pressable } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { Table, Row } from 'react-native-table-component';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { TextInput } from 'react-native-paper';
+
+const Allleads = () => {
+  const [selectedValue, setSelectedValue] = useState('');
+  const [status, setstatus] = useState('');
+  const [itemsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dob, setdob] = useState();
+  const [doa, setdoa] = useState();
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDatedob, setSelectedDatedob] = useState('');
+  const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns
+
+  const upcomingBirthdays = [
+    { id: 1, sno: 1, leadid: 12, source: 'Online', campaign: 'hdnd', classification: 'Admin', status: 'online', name: 'Isack', phone: '9876545', email: 'alicesmith@example.com', leaddate: '12-9-200' },
+    { id: 2, sno: 2, leadid: 13, source: 'Offline', campaign: 'abc', classification: 'User', status: 'offline', name: 'John Doe', phone: '9876545', email: 'johndoe@example.com', leaddate: '11-8-200' },
+    { id: 3, sno: 3, leadid: 14, source: 'Online', campaign: 'xyz', classification: 'Admin', status: 'online', name: 'Jane Smith', phone: '9876545', email: 'janesmith@example.com', leaddate: '10-7-200' },
+    { id: 4, sno: 4, leadid: 15, source: 'Offline', campaign: 'pqr', classification: 'User', status: 'offline', name: 'Michael Johnson', phone: '9876545', email: 'michael@example.com', leaddate: '9-6-200' },
+  ];
+
+  const addleads = () => {
+    setShowCalendarModal(true);
+};
+
+const addleadsdob = () => {
+    setShowCalendar(true);
+};
+
+  const handleDateSelect = async (date) => {
+    setSelectedDate(date);
+    setShowCalendarModal(false);
+
+    if (date) {
+        setSelectedDate(date);
+        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+    }
+};
+
+const handleDateSelectdob = async (date) => {
+    setSelectedDatedob(date);
+    setShowCalendar(false);
+
+    if (date) {
+        setSelectedDatedob(date);
+        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+    }
+};
+
+  const renderPagination = () => {
+    const totalPages = Math.ceil(upcomingBirthdays.length / itemsPerPage);
+
+    return (
+      <View style={styles.pagination}>
+        <TouchableOpacity
+          style={styles.pageButton}
+          disabled={currentPage === 1}
+          onPress={() => setCurrentPage(currentPage - 1)}
+        >
+          <AntDesign name="left" color="#625bc5" size={25} />
+        </TouchableOpacity>
+        <Text style={styles.pageText}>
+          {currentPage} / {totalPages}
+        </Text>
+        <TouchableOpacity
+          style={styles.pageButton}
+          disabled={currentPage === totalPages}
+          onPress={() => setCurrentPage(currentPage + 1)}
+        >
+          <AntDesign name="right" color="#625bc5" size={25} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderTableRows = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const dataToDisplay = upcomingBirthdays.slice(startIndex, endIndex);
+
+    return dataToDisplay.map((rowData) => (
+      <Row
+        key={rowData.id}
+        data={[
+          rowData.sno.toString(),
+          rowData.leadid.toString(),
+          rowData.source,
+          rowData.campaign,
+          rowData.classification,
+          rowData.status,
+          rowData.name,
+          rowData.phone.toString(),
+          rowData.email,
+          rowData.leaddate,
+        ]}
+        widthArr={widthArr}
+        style={[styles.row, { backgroundColor: rowData.id % 2 === 0 ? '#F7F6E7' : '#E7E6E1' }]}
+        textStyle={styles.text}
+      />
+    ));
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.top}>
+        <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>From</Text>
+        <View style={styles.dropdowncontainer1}>
+          <Picker
+            selectedValue={selectedValue}
+            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+          >
+            <Picker.Item label="Select User" value="" />
+            <Picker.Item label="All" value="All" />
+            <Picker.Item label="Self" value="Self" />
+            <Picker.Item label="Team" value="Team" />
+          </Picker>
+        </View>
+        </View>
+     
+        <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text>Status</Text>
+        <View style={styles.dropdowncontainer1}>
+          <Picker
+            selectedValue={status}
+            onValueChange={(itemValue, itemIndex) => setstatus(itemValue)}
+          >
+            <Picker.Item label="Select User" value="" />
+            <Picker.Item label="All" value="All" />
+            <Picker.Item label="Self" value="Self" />
+            <Picker.Item label="Team" value="Team" />
+          </Picker>
+        </View>
+        </View>
+
+        <View style={styles.dob}>
+                    <View style={{ width: '49%' }}>
+                        <View >
+                            <TextInput
+                                label="DOB"
+                                value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
+                                onChangeText={(text) => setdob(text)}
+                                style={[styles.textinputdob, { paddingLeft: 10,bottom:10 }]}
+                                mode="outlined"
+                                maxLength={10}
+                            />
+                            <Pressable
+                                style={{
+                                    position: 'absolute',
+                                    top: 10,
+                                    right: 16,
+                                    width: 40,
+                                    height: 40,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={addleadsdob}>
+                                <AntDesign name="calendar" color="#625bc5" size={25} />
+                            </Pressable>
+                        </View>
+                    </View>
+
+                    <View style={{ width: '49%' }}>
+                        <TextInput
+                            label="To"
+                            value={selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''}
+                            onChangeText={(text) => setdoa(text)}
+                            style={[styles.textinputdob, { paddingLeft: 10,bottom:10 }]}
+                            mode="outlined"
+                            maxLength={10}
+                            editable={false}
+                        />
+                        <Pressable
+                            style={{
+                                position: 'absolute',
+                                top: 10,
+                                right: 16,
+                                width: 40,
+                                height: 40,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                            onPress={addleads}>
+                            <AntDesign name="calendar" color="#625bc5" size={25} />
+                        </Pressable>
+                    </View>
+                </View>
+
+        <TouchableOpacity style={styles.buttoncontainer1}>
+          <Text style={styles.text1}>Search</Text>
+        </TouchableOpacity>
+      </View>
+
+<View>
+<ScrollView horizontal>
+        <View>
+          <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+            <Row
+              data={['S.No', 'Lead Id', 'Source', 'Campaign', 'Classification', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
+              widthArr={widthArr}
+              style={styles.header}
+              textStyle={[styles.text, { color: '#000' }]}
+            />
+            {renderTableRows()}
+          </Table>
+        </View>
+      </ScrollView>
+
+      {renderPagination()}
+</View>
+    </View>
+  );
+};
+
+export default Allleads;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 10,
+  },
+  dropdowncontainer1: {
+    borderWidth: 1,
+    height: 48,
+    justifyContent: 'center',
+    borderRadius: 5,
+    borderColor: '#625bc5',
+    marginTop: 6,
+    margin: 10,
+    width: '80%',
+  },
+  dob: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10
+},
+  buttoncontainer1: {
+    height: 38,
+    width: '20%',
+    borderRadius: 10,
+    backgroundColor: '#625bc5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text1: {
+    color: 'white',
+  },
+  textinputdob:{
+    marginLeft:10
+  },
+  top: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  pageButton: {
+    marginHorizontal: 10,
+  },
+  pageText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#625bc5',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  row: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#000',
+  },
+});

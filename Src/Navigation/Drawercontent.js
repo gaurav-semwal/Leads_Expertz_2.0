@@ -238,14 +238,14 @@ const DrawerContent = props => {
 
           <TouchableOpacity
             style={styles.drawerItemsingle}
-            onPress={() => props.navigation.navigate('Dashboard')}>
+            onPress={() => props.navigation.navigate('All Leads')}>
             <Entypo name="folder" size={20} color="#333" style={styles.icon} />
             <Text style={styles.label}>All Leads</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.drawerItemsingle}
-            onPress={() => props.navigation.navigate('Dashboard')}>
+            onPress={() => props.navigation.navigate('Search Leads')}>
             <Fontisto
               name="search"
               size={20}
@@ -264,7 +264,7 @@ const DrawerContent = props => {
     if (otherActiveSubMenu === index) {
       return (
         <View style={styles.subMenu}>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Not Reachable')}>
             <Ionicons
               name="person"
               size={20}
@@ -273,7 +273,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Not Reachable</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Wrong Number')}>
             <Ionicons
               name="person"
               size={20}
@@ -282,7 +282,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Wwrong Number</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Channel Partners')}>
             <Ionicons
               name="person"
               size={20}
@@ -291,7 +291,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Channel Partner</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Not Interested')}>
             <Ionicons
               name="person"
               size={20}
@@ -300,7 +300,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Not Interested</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Not Picked')}>
             <Ionicons
               name="person"
               size={20}
@@ -309,7 +309,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Not Picked</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Lost')}>
             <Ionicons
               name="person"
               size={20}
@@ -504,7 +504,7 @@ const DrawerContent = props => {
 
       <TouchableOpacity
         style={styles.drawerItemsingle}
-        onPress={() => props.navigation.navigate('Dashboard')}>
+        onPress={() => props.navigation.navigate('Lead Transfer')}>
         <Fontisto
           name="arrow-swap"
           size={20}
