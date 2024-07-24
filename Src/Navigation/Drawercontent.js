@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Image,
@@ -7,7 +7,7 @@ import {
   Text,
   Modal,
 } from 'react-native';
-import {DrawerContentScrollView} from '@react-navigation/drawer';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -103,7 +103,7 @@ const DrawerContent = props => {
     if (leadActiveSubMenu === index) {
       return (
         <View style={styles.subMenu}>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Add Lead')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -112,7 +112,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Add Lead</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Allocate Leads')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -121,7 +121,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Allocate Lead</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('New Leads')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -130,7 +130,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>New Leads</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Sales Manage')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -139,7 +139,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Sales Manager Leads</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Sales Manage')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -148,7 +148,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Pending Leads</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Processing Lead')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -157,7 +157,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Processing Leads</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Interested Lead')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -165,8 +165,8 @@ const DrawerContent = props => {
               style={styles.icon}
             />
             <Text style={styles.subMenuText}>Interested Leads</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          </TouchableOpacity >
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Call Scheduled')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -175,7 +175,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Call Schedule</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Visit Scheduled')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -184,7 +184,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Visit Schedule</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Visit Done')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -193,7 +193,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Visit Done</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Booked')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -202,7 +202,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Booked</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Completed')}>
             <Ionicons
               name="folder-outline"
               size={20}
@@ -211,7 +211,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Completed</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Cancelled')}>
             <Ionicons
               name="folder-outline"
               size={20}
