@@ -6,6 +6,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Colors } from '../../Comman/Styles';
 import { Picker } from '@react-native-picker/picker';
 
+
 const Interestedlead = () => {
     const navigation = useNavigation();
     const [selectedValue, setSelectedValue] = useState('');
@@ -29,7 +30,8 @@ const Interestedlead = () => {
     const [tableHead] = useState(['S.No', 'Lead ID', 'Agent Name', 'Source', 'Campaign', 'Status', 'Name', 'City', 'Classification', 'Lead Date', 'Followup Date', 'Last Comment', 'Action']);
     const [widthArr] = useState([50, 80, 80, 60, 100, 100, 100, 100, 100, 100, 150, 150, 100]);
     const [tableData, setTableData] = useState(callScheduleData);
-    const [itemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10); 
+
     const [currentPage, setCurrentPage] = useState(1);
 
     const onPressButton = (type) => {
@@ -163,6 +165,23 @@ const Interestedlead = () => {
             </View>
 
             <View>
+
+            <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={50} />
+                        <Picker.Item label="500" value={100} />
+                        <Picker.Item label="All" value={500} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
+                </View>
                 <ScrollView horizontal={true}>
                     <View>
                         <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
@@ -260,6 +279,24 @@ const styles = StyleSheet.create({
         backgroundColor: '#625bc5',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10,
+        marginBottom:20
+    },
+    pickerWrapper: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        width: 110, 
+        overflow: 'hidden'
+    },
+    picker: {
+        height: 25, 
+        color: '#000' 
     },
 });
 

@@ -139,7 +139,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Sales Manager Leads</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Sales Manage')}>
+          <TouchableOpacity style={styles.subMenuItem} onPress={() => props.navigation.navigate('Pending Lead')}>
             <Ionicons
               name="folder-outline"
               size={20}
