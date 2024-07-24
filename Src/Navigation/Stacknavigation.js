@@ -27,6 +27,10 @@ import Visitdone from '../Screens/Lead Managment/Visitdone';
 import Booked from '../Screens/Lead Managment/Booked';
 import Completed from '../Screens/Lead Managment/Completed';
 import Cancelled from '../Screens/Lead Managment/Cancelled';
+import Category from '../Screens/Inventory/Category';
+import SubCategory from '../Screens/Inventory/SubCategory';
+import Inventory from '../Screens/Inventory/Inventory';
+
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -70,14 +74,45 @@ const Stacknavigation = () => {
               },
             }}/>
           <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{ headerShown: false }} />
-          <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true,
+
+
+          <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
+          <Stack.Screen name="Category" component={Category}   options={{
+              headerShown: true,
+
               headerStyle: {
                 backgroundColor: '#625bc5',
               },
               headerTintColor: '#fff',
               headerTitleStyle: {
                 fontWeight: 'bold',
-              }, }} />
+  
+              },
+            }}
+          />
+            <Stack.Screen name="SubCategory" component={SubCategory}   options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+              <Stack.Screen name="Inventory" component={Inventory}   options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+
           <Stack.Screen
             name="Add User"
             component={Adduser}
