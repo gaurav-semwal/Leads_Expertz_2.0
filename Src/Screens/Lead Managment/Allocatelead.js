@@ -6,7 +6,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Allocatelead = () => {
   const [selectedValue, setSelectedValue] = useState('');
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10); 
+
   const [currentPage, setCurrentPage] = useState(1);
   const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns
 
@@ -88,6 +89,40 @@ const Allocatelead = () => {
           <Text style={styles.text1}>Search</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="500" value={500} />
+                        <Picker.Item label="All" value={upcomingBirthdays.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
+            </View>
+
+      <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="500" value={500} />
+                        <Picker.Item label="All" value={upcomingBirthdays.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
+            </View>
 
       <View>
         <ScrollView horizontal>
@@ -172,4 +207,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 10,
+    marginBottom:20
+},
+pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 5,
+    marginHorizontal: 10,
+    width: 110, 
+    overflow: 'hidden'
+},
+picker: {
+    height: 25, 
+    color: '#000' 
+},
 });
