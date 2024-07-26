@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
   body: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
   },
   text: {
     textAlign: 'center',

@@ -1,278 +1,354 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   Pressable,
-  ScrollView,
-  TouchableOpacity,
+  FlatList,
+  Text,
+  Image,
+  TouchableOpacity
 } from 'react-native';
-import {Table, Row} from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Colors} from '../../Comman/Styles';
-import {Picker} from '@react-native-picker/picker';
 
-const Userlist = ({navigation}) => {
-  const navigateToAddUser = () => {
-    navigation.navigate('Add User');
+const dummyData = [
+  {
+    id: 1,
+    name: 'John Doe',
+    mobile: '1234567890',
+    status: 'Pending',
+    source: 'Website',
+    comments: 'Interested in our product',
+    created_date: '2024-07-26',
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    mobile: '0987654321',
+    status: 'Contacted',
+    source: 'Referral',
+    comments: 'Asked for more details',
+    created_date: '2024-07-25',
+  },
+];
+
+const Userlist = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
   };
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [widthArr] = useState([100, 150, 150, 100, 150, 100, 100, 100]);
 
-  const upcomingBirthdays = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      phone: '123-456-7890',
-      status: 'Active',
-      role: 'Admin',
-      tmid: 101,
-      action: '1',
-      promte: '2',
-    },
-    {
-      id: 2,
-      name: 'Alice Smith',
-      email: 'alicesmith@example.com',
-      phone: '987-654-3210',
-      status: 'Inactive',
-      role: 'User',
-      tmid: 102,
-      action: '1',
-      promte: '2',
-    },
-    {
-      id: 3,
-      name: 'Bob Johnson',
-      email: 'bjohnson@example.com',
-      phone: '555-555-5555',
-      status: 'Active',
-      role: 'Manager',
-      tmid: 103,
-      action: '1',
-      promte: '2',
-    },
-    {
-      id: 4,
-      name: 'Emily Brown',
-      email: 'emilybrown@example.com',
-      phone: '111-222-3333',
-      status: 'Active',
-      role: 'User',
-      tmid: 104,
-      action: '1',
-      promte: '2',
-    },
-    {
-      id: 5,
-      name: 'Michael Davis',
-      email: 'mdavis@example.com',
-      phone: '999-888-7777',
-      status: 'Inactive',
-      role: 'Admin',
-      tmid: 105,
-      action: '1',
-      promte: '2',
-    },
-  ];
+  const leadedit = (item) => {
+    console.log('Edit lead:', item);
+  };
 
-  const renderPagination = () => {
-    const totalPages = Math.ceil(upcomingBirthdays.length / itemsPerPage);
+  const openModal = (item) => {
+    console.log('Open modal:', item);
+  };
 
-    return (
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === 1}
-          onPress={() => setCurrentPage(currentPage - 1)}>
-          <AntDesign name="left" color="#625bc5" size={25} />
-        </TouchableOpacity>
-        <Text style={styles.pageText}>
-          {currentPage} / {totalPages}
-        </Text>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === totalPages}
-          onPress={() => setCurrentPage(currentPage + 1)}>
-          <AntDesign name="right" color="#625bc5" size={25} />
-        </TouchableOpacity>
+  const handlePhonePress = (phone) => {
+    console.log('Phone press:', phone);
+  };
+
+  const editlead = (item) => {
+    console.log('Edit lead:', item);
+  };
+
+  const handleRecordNotes = (item) => {
+    console.log('Record notes:', item);
+  };
+
+  const Item = ({ item }) => (
+    <Pressable>
+      <View style={styles.leadContainer}>
+        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
+            <Text style={styles.editButtonText}>User Edit</Text>
+          </Pressable>
+          <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
+            <Text style={styles.editButtonText1}>{item.status}</Text>   
+          </Pressable>
+        </View> */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+            <View style={styles.profileContainer}>
+              {/* <Image style={styles.profileImage} source={require('../Assets/Images/profile.jpg')} /> */}
+            </View>
+            <View style={{ marginLeft: 10 }}>
+              <Text style={styles.leadTitle}>{item.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.leadInfo}>{item.mobile}</Text>
+                <TouchableOpacity onPress={() => handlePhonePress(item.mobile)}>
+                  <View style={{ marginLeft: 10 }}>
+                    <AntDesign name="phone" size={20} color="black" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <Pressable onPress={() => editlead(item)}>
+            <AntDesign name="edit" size={25} color="black" />
+          </Pressable>
+        </View>
+        <View style={{ marginTop: 10 }}>
+          <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+          <Text style={styles.leadInfo1}>Source: {item.source}</Text>
+          <Text style={styles.leadInfo1}>Comments: {item.comments}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.leadInfo1}>Date: {item.created_date}</Text>
+          </View>
+        </View>
       </View>
-    );
-  };
+    </Pressable>
+  );
 
-  const renderTableRows = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const dataToDisplay = upcomingBirthdays.slice(startIndex, endIndex);
-
-    return dataToDisplay.map((rowData, index) => (
-      <Row
-        key={rowData.id}
-        data={[
-          rowData.name,
-          rowData.email,
-          rowData.phone,
-          rowData.status,
-          rowData.role,
-          rowData.tmid,
-          <Pressable style={styles.icon}>
-            <AntDesign
-              name="edit"
-              size={20}
-              color="black"
-              style={styles.iconhere}
-            />
-          </Pressable>,
-          <Pressable style={styles.icon}>
-            <AntDesign
-              name="edit"
-              size={20}
-              color="white"
-              style={styles.iconhere1}
-            />
-          </Pressable>,
-        ]}
-        widthArr={widthArr}
-        style={[styles.row, index % 2 && {backgroundColor: '#F7F6E7'}]}
-        textStyle={styles.text}
-      />
-    ));
+  const onPressPlusButton = () => {
+    navigation.navigate('Add User');
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.text}>Manage User</Text>
-        <Pressable style={styles.newuser} onPress={navigateToAddUser}>
-          <Text style={styles.text1}>New User</Text>
+      <FlatList
+        data={dummyData}
+        renderItem={({ item }) => <Item item={item} />}
+        keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 150 }}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+      />
+      <View style={styles.plusButtonContainer}>
+        <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+          <AntDesign name="plus" size={28} color="#dbdad3" />
         </Pressable>
-      </View>
-
-      <View style={styles.pickerContainer}>
-        <Text style={styles.text}>Show</Text>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={itemsPerPage}
-            style={styles.picker}
-            onValueChange={itemValue => setItemsPerPage(itemValue)}>
-            <Picker.Item label="10" value={10} />
-            <Picker.Item label="100" value={100} />
-            <Picker.Item label="500" value={500} />
-            <Picker.Item label="All" value={upcomingBirthdays.length} />
-          </Picker>
-        </View>
-        <Text style={styles.text}>Entries</Text>
-      </View>
-
-      <View>
-        <ScrollView horizontal>
-          <View>
-            <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-              <Row
-                data={[
-                  'Name',
-                  'Email',
-                  'Phone',
-                  'Status',
-                  'Role',
-                  'TM ID',
-                  'Actions',
-                  'Promote',
-                ]}
-                widthArr={widthArr}
-                style={styles.header}
-                textStyle={[styles.text, {color: '#000'}]}
-              />
-              {renderTableRows()}
-            </Table>
-          </View>
-        </ScrollView>
-        {renderPagination()}
       </View>
     </View>
   );
 };
-
-export default Userlist;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
+  leadContainer: {
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
   },
-  text: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
-  },
-  text1: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  newuser: {
-    backgroundColor: Colors.Button,
+  editButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 5,
     padding: 5,
   },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginTop: 10,
+  editButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
-  pageButton: {
-    marginHorizontal: 10,
+  editButton1: {
+    backgroundColor: '#2196F3',
+    borderRadius: 5,
+    padding: 5,
   },
-  pageText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#625bc5',
+  editButtonText1: {
+    color: '#fff',
   },
-  row: {
+  profileContainer: {
+    width: 40,
     height: 40,
-    backgroundColor: '#E7E6E1',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  leadTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  leadInfo: {
+    fontSize: 14,
+    color: '#555',
+  },
+  leadInfo1: {
+    fontSize: 12,
+    color: '#888',
+  },
+  recordButton: {
+    backgroundColor: '#FFC107',
+    borderRadius: 5,
+    padding: 5,
+  },
+  recordButtonText: {
+    color: '#fff',
+  },
+  plusButtonContainer: {
+    position: 'absolute',
+    backgroundColor: '#625bc5',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+    alignSelf: 'flex-end',
+    bottom: 20,
+    right: 20,
+  },
+  plusButton: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leadContainer: {
+    padding: 10,
+    borderRadius: 6,
+    borderColor: '#ede8e8',
+    borderWidth: 1,
+    backgroundColor: '#ede8e8',
+    marginBottom: 10
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#625bc5',
+    padding: 5,
+    borderRadius: 4,
+  },
+  editButton1: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#929496',
+    padding: 5,
+    borderRadius: 4,
+  },
+  editButtonText: {
+    color: '#fff',
+  },
+  editButtonText1: {
+    color: '#fff',
+  },
+  leadTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  leadInfo: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  leadInfo1: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  recordButton: {
+    backgroundColor: '#929496',
+    padding: 5,
+    borderRadius: 4,
+    alignSelf: 'flex-end',
+  },
+  recordButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#fff',
+  },
+  modalText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'black',
+  },
+  closeButton: {
+    backgroundColor: '#625bc5',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  text: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#000',
+  modalView: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 5,
+    width: '90%',
   },
-  icon: {
+  modalheading: {
+    width: '100%',
     alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  iconhere: {
-    backgroundColor: 'yellow',
-    padding: 4,
-  },
-  iconhere1: {
-    backgroundColor: 'green',
-    padding: 4,
-  },
-  pickerContainer: {
+  modalHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
     alignItems: 'center',
-    margin: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 5,
-    marginHorizontal: 10,
-    width: 109,
-    overflow: 'hidden',
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 5,
   },
-  picker: {
-    height: 25,
-    color: '#000',
+  commentsContainer: {
+    height:'30%',
+    padding:10
   },
 });
+
+export default Userlist;

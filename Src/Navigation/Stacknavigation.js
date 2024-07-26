@@ -11,7 +11,6 @@ import Userlist from '../Screens/Staff Managment/Userlist';
 import SmartLeadSegmentation from '../Screens/SmartLeadSegmentation;';
 import CompanyHierarchy from '../Screens/CompanyHierarchy;';
 import Settingsscreen from '../Screens/Settingsscreen';
-
 import Addlead from '../Screens/Lead Managment/Addlead';
 import Allocatelead from '../Screens/Lead Managment/Allocatelead';
 import Newleads from '../Screens/Lead Managment/Newleads';
@@ -38,17 +37,61 @@ import Lost from '../Screens/Lead Managment/Others/Lost';
 import Leadtransfer from '../Screens/Leadtransfer';
 import Allleads from '../Screens/Lead Managment/Allleads';
 import Searchleads from '../Screens/Lead Managment/Searchleads';
-
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
+
+const BottomTabNavigation = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          switch (route.name) {
+            case 'Home':
+              iconName = 'home';
+              break;
+            case 'Settings':
+              iconName = 'cogs';
+              break;
+            case 'All Leads':
+              iconName = 'list';
+              break;
+              case 'User List':
+                iconName = 'users';
+                break;
+            default:
+              iconName = 'question';
+          }
+
+          return <FontAwesome name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={Homescreen} options={{ headerShown: false }} />
+      <Tab.Screen  name="All Leads" component={Allleads} options={{
+        headerShown: false,
+      }} />
+       <Tab.Screen name="User List" component={Userlist} options={{
+        headerShown: false,
+      }} />
+       <Tab.Screen name="Settings" component={Settingsscreen} options={{
+        headerShown: false,
+      }} />
+    </Tab.Navigator>
+  );
+};
 
 const DrawerNavigation = () => {
   return (
     <Drawer.Navigator drawerContent={props => <Drawercontent {...props} />}>
       <Drawer.Screen
         name="Dashboard"
-        component={Homescreen}
+        component={BottomTabNavigation}
         options={{
           headerShown: true,
           headerStyle: {
@@ -71,63 +114,63 @@ const Stacknavigation = () => {
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Loginscreen} options={{ headerShown: false }} />
           <Stack.Screen name="AppDrawer" component={DrawerNavigation} options={{ headerShown: false }} />
-          <Stack.Screen name="CompanyHierarchy" component={CompanyHierarchy}   options={{
-              headerShown: true,
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}/>
-          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation}  options={{
-              headerShown: true,
+          <Stack.Screen name="CompanyHierarchy" component={CompanyHierarchy} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{
+            headerShown: true,
 
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-  
-              },
-            }}/>
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+
+            },
+          }} />
           <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
-          <Stack.Screen name="Category" component={Category}   options={{
-              headerShown: true,
+          <Stack.Screen name="Category" component={Category} options={{
+            headerShown: true,
 
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-  
-              },
-            }}
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+
+            },
+          }}
           />
-            <Stack.Screen name="SubCategory" component={SubCategory}   options={{
-              headerShown: true,
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
+          <Stack.Screen name="SubCategory" component={SubCategory} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
           />
-              <Stack.Screen name="Inventory" component={Inventory}   options={{
-              headerShown: true,
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
+          <Stack.Screen name="Inventory" component={Inventory} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
           />
 
           <Stack.Screen
@@ -158,7 +201,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-              <Stack.Screen
+          <Stack.Screen
             name="PromoteList"
             component={Promtescreen}
             options={{
@@ -172,7 +215,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Add Lead"
             component={Addlead}
             options={{
@@ -186,7 +229,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Allocate Leads"
             component={Allocatelead}
             options={{
@@ -200,7 +243,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-               <Stack.Screen
+          <Stack.Screen
             name="New Leads"
             component={Newleads}
             options={{
@@ -214,7 +257,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Sales Manage"
             component={Salesmanagerlead}
             options={{
@@ -242,7 +285,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Processing Lead"
             component={Processinglead}
             options={{
@@ -256,7 +299,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Interested Lead"
             component={Interestedlead}
             options={{
@@ -270,7 +313,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Call Scheduled"
             component={Callschedule}
             options={{
@@ -284,7 +327,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Visit Scheduled"
             component={Visitschedule}
             options={{
@@ -326,7 +369,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Completed"
             component={Completed}
             options={{
@@ -340,7 +383,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Cancelled"
             component={Cancelled}
             options={{
@@ -354,7 +397,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-             <Stack.Screen
+          <Stack.Screen
             name="Not Reachable"
             component={Notreachable}
             options={{
@@ -368,7 +411,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Wrong Number"
             component={Wrongnumber}
             options={{
@@ -382,7 +425,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Channel Partners"
             component={Channelpartners}
             options={{
@@ -396,7 +439,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Not Interested"
             component={Notinterested}
             options={{
@@ -410,7 +453,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Not Picked"
             component={Notpicked}
             options={{
@@ -424,7 +467,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="Lost"
             component={Lost}
             options={{
@@ -438,7 +481,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-               <Stack.Screen
+          <Stack.Screen
             name="Lead Transfer"
             component={Leadtransfer}
             options={{
@@ -452,7 +495,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-            <Stack.Screen
+          <Stack.Screen
             name="All Leads"
             component={Allleads}
             options={{
