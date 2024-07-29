@@ -1,42 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Pressable,
   FlatList,
   Text,
+  TouchableOpacity,
   Image,
-  TouchableOpacity
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
-const dummyData = [
-  {
-    id: 1,
-    name: 'John Doe',
-    mobile: '1234567890',
-    status: 'Pending',
-    source: 'Website',
-    comments: 'Interested in our product',
-    created_date: '2024-07-26',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    mobile: '0987654321',
-    status: 'Contacted',
-    source: 'Referral',
-    comments: 'Asked for more details',
-    created_date: '2024-07-25',
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Get_User } from '../../../Api/authApi';
+import Toast from 'react-native-toast-message';
 
 const Userlist = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
+  const [userData, setUserData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+const fetchAvatars = async (users) => {
+  const avatarPromises = users.map(async (user) => {
+    try {
+      const response = await fetch('https://random-data-api.com/api/v2/users');
+      const text = await response.text(); 
+      try {
+        const data = JSON.parse(text); 
+        return { ...user, avatar: data.avatar };
+      } catch {
+        console.error('Error: Response not in JSON format');
+        return { ...user, avatar: null };
+      }
+    } catch (error) {
+      console.error('Error fetching avatar:', error);
+      return { ...user, avatar: null };
+    }
+  });
+  return Promise.all(avatarPromises);
+};
+
+  const fetchData = async () => {
+    try {
+      const response = await Get_User();
+      console.log(response);
+      if (response.msg === 'Load successfully.') {
+        const usersWithAvatars = await fetchAvatars(response.data);
+        setUserData(usersWithAvatars);
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    }
+  };
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    fetchData().finally(() => setRefreshing(false));
   };
 
   const leadedit = (item) => {
@@ -55,25 +83,17 @@ const Userlist = ({ navigation }) => {
     console.log('Edit lead:', item);
   };
 
-  const handleRecordNotes = (item) => {
-    console.log('Record notes:', item);
-  };
-
   const Item = ({ item }) => (
     <Pressable>
       <View style={styles.leadContainer}>
-        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
-            <Text style={styles.editButtonText}>User Edit</Text>
-          </Pressable>
-          <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
-            <Text style={styles.editButtonText1}>{item.status}</Text>   
-          </Pressable>
-        </View> */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={styles.profileContainer}>
-              {/* <Image style={styles.profileImage} source={require('../Assets/Images/profile.jpg')} /> */}
+              <Image 
+                style={styles.profileImage} 
+                source={{ uri: item.avatar || 'https://via.placeholder.com/150' }} // Use placeholder if avatar is null
+                onError={(e) => console.error('Error loading image:', e.nativeEvent.error)}
+              />
             </View>
             <View style={{ marginLeft: 10 }}>
               <Text style={styles.leadTitle}>{item.name}</Text>
@@ -93,10 +113,9 @@ const Userlist = ({ navigation }) => {
         </View>
         <View style={{ marginTop: 10 }}>
           <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
-          <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-          <Text style={styles.leadInfo1}>Comments: {item.comments}</Text>
+          <Text style={styles.leadInfo1}>Role: {item.role}</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.leadInfo1}>Date: {item.created_date}</Text>
+            <Text style={styles.leadInfo1}>Created Date: {item.created_date}</Text>
           </View>
         </View>
       </View>
@@ -104,13 +123,13 @@ const Userlist = ({ navigation }) => {
   );
 
   const onPressPlusButton = () => {
-    navigation.navigate('Add User');
+    navigation.navigate('Add User'); 
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={dummyData}
+        data={userData}
         renderItem={({ item }) => <Item item={item} />}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
@@ -144,23 +163,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 3,
   },
-  editButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 5,
-    padding: 5,
-  },
-  editButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  editButton1: {
-    backgroundColor: '#2196F3',
-    borderRadius: 5,
-    padding: 5,
-  },
-  editButtonText1: {
-    color: '#fff',
-  },
   profileContainer: {
     width: 40,
     height: 40,
@@ -183,14 +185,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
   },
-  recordButton: {
-    backgroundColor: '#FFC107',
-    borderRadius: 5,
-    padding: 5,
-  },
-  recordButtonText: {
-    color: '#fff',
-  },
   plusButtonContainer: {
     position: 'absolute',
     backgroundColor: '#625bc5',
@@ -209,145 +203,6 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  leadContainer: {
-    padding: 10,
-    borderRadius: 6,
-    borderColor: '#ede8e8',
-    borderWidth: 1,
-    backgroundColor: '#ede8e8',
-    marginBottom: 10
-  },
-  editButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#625bc5',
-    padding: 5,
-    borderRadius: 4,
-  },
-  editButton1: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#929496',
-    padding: 5,
-    borderRadius: 4,
-  },
-  editButtonText: {
-    color: '#fff',
-  },
-  editButtonText1: {
-    color: '#fff',
-  },
-  leadTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  leadInfo: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  leadInfo1: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  recordButton: {
-    backgroundColor: '#929496',
-    padding: 5,
-    borderRadius: 4,
-    alignSelf: 'flex-end',
-  },
-  recordButtonText: {
-    color: '#fff',
-    textAlign: 'center',
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#fff',
-  },
-  modalText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: 'black',
-  },
-  closeButton: {
-    backgroundColor: '#625bc5',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  centeredView: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 5,
-    width: '90%',
-  },
-  modalheading: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 5,
-  },
-  commentsContainer: {
-    height:'30%',
-    padding:10
   },
 });
 

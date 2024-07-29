@@ -55,7 +55,7 @@ export const Login_Api = async (email, password) => {
   }
 };
 
-export const Add_User = async (name, mobile, email, password,role) => {
+export const Add_User = async (name, mobile, email, password, role) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     console.log('Token:', token);
@@ -73,7 +73,6 @@ export const Add_User = async (name, mobile, email, password,role) => {
     formdata.append('email', email);
     formdata.append('password', password);
     formdata.append('role', role);
-
 
     const requestOptions = {
       method: 'POST',
@@ -99,7 +98,7 @@ export const Add_User = async (name, mobile, email, password,role) => {
   }
 };
 
-export const Get_User = async id => {
+  export const Get_User = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       console.log('Token:', token);
@@ -110,18 +109,14 @@ export const Get_User = async id => {
   
       const myHeaders = new Headers();
       myHeaders.append('token', token);
-   
-      const formdata = new FormData();
-      formdata.append('customer_id', id);
   
       const requestOptions = {
         method: 'POST',
         headers: myHeaders,
         redirect: 'follow',
-        body: formdata,
       };
   
-      const response = await fetch(`${base_url}get-sale`, requestOptions);
+      const response = await fetch(`${base_url}get-user`, requestOptions);
   
       if (!response.ok) {
         const errorText = await response.text();
@@ -134,6 +129,45 @@ export const Get_User = async id => {
       return result;
     } catch (error) {
       console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+  
+  export const Get_Role = async (email, password) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('Token:', token);
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append('token', token);
+  
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
+  
+      const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formData,
+        redirect: 'follow',
+      };
+  
+      const response = await fetch(`${base_url}get-role`, requestOptions);
+      console.log(response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log('Login Result:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('Login Error:', error);
       throw error;
     }
   };
