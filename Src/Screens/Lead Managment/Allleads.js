@@ -1,217 +1,220 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity,Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Pressable,FlatList } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { TextInput } from 'react-native-paper';
 
 const Allleads = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
-  const [itemsPerPage] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
   const [dob, setdob] = useState();
   const [doa, setdoa] = useState();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDatedob, setSelectedDatedob] = useState('');
-  const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns
-
-  const upcomingBirthdays = [
-    { id: 1, sno: 1, leadid: 12, source: 'Online', campaign: 'hdnd', classification: 'Admin', status: 'online', name: 'Isack', phone: '9876545', email: 'alicesmith@example.com', leaddate: '12-9-200' },
-    { id: 2, sno: 2, leadid: 13, source: 'Offline', campaign: 'abc', classification: 'User', status: 'offline', name: 'John Doe', phone: '9876545', email: 'johndoe@example.com', leaddate: '11-8-200' },
-    { id: 3, sno: 3, leadid: 14, source: 'Online', campaign: 'xyz', classification: 'Admin', status: 'online', name: 'Jane Smith', phone: '9876545', email: 'janesmith@example.com', leaddate: '10-7-200' },
-    { id: 4, sno: 4, leadid: 15, source: 'Offline', campaign: 'pqr', classification: 'User', status: 'offline', name: 'Michael Johnson', phone: '9876545', email: 'michael@example.com', leaddate: '9-6-200' },
-  ];
 
   const addleads = () => {
     setShowCalendarModal(true);
-};
+  };
 
-const addleadsdob = () => {
+  const addleadsdob = () => {
     setShowCalendar(true);
-};
+  };
 
-  const handleDateSelect = async (date) => {
-    setSelectedDate(date);
-    setShowCalendarModal(false);
+  const dummyData = [
+    {
+      id: 1,
+      name: 'John Doe',
+      mobile: '1234567890',
+      status: 'Pending',
+      source: 'Website',
+      comments: 'Interested in our product',
+      created_date: '2024-07-26',
+    },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      mobile: '0987654321',
+      status: 'Contacted',
+      source: 'Referral',
+      comments: 'Asked for more details',
+      created_date: '2024-07-25',
+    },
+  ];
 
-    if (date) {
-        setSelectedDate(date);
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-    }
-};
+  const [refreshing, setRefreshing] = useState(false);
 
-const handleDateSelectdob = async (date) => {
-    setSelectedDatedob(date);
-    setShowCalendar(false);
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
 
-    if (date) {
-        setSelectedDatedob(date);
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-    }
-};
+  const leadedit = (item) => {
+    console.log('Edit lead:', item);
+  };
 
-  const renderPagination = () => {
-    const totalPages = Math.ceil(upcomingBirthdays.length / itemsPerPage);
+  const openModal = (item) => {
+    console.log('Open modal:', item);
+  };
 
-    return (
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === 1}
-          onPress={() => setCurrentPage(currentPage - 1)}
-        >
-          <AntDesign name="left" color="#625bc5" size={25} />
-        </TouchableOpacity>
-        <Text style={styles.pageText}>
-          {currentPage} / {totalPages}
-        </Text>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === totalPages}
-          onPress={() => setCurrentPage(currentPage + 1)}
-        >
-          <AntDesign name="right" color="#625bc5" size={25} />
-        </TouchableOpacity>
+  const handlePhonePress = (phone) => {
+    console.log('Phone press:', phone);
+  };
+
+  const editlead = (item) => {
+    console.log('Edit lead:', item);
+  };
+
+  const handleRecordNotes = (item) => {
+    console.log('Record notes:', item);
+  };
+
+  const Item = ({ item }) => (
+    <Pressable>
+      <View style={styles.leadContainer}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
+            <Text style={styles.editButtonText}>Lead Edit</Text>
+          </Pressable>
+          <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
+            <Text style={styles.editButtonText1}>{item.status}</Text>
+          </Pressable>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+            <View style={styles.profileContainer}>
+              {/* <Image style={styles.profileImage} source={require('../Assets/Images/profile.jpg')} /> */}
+            </View>
+            <View style={{ marginLeft: 10 }}>
+              <Text style={styles.leadTitle}>{item.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.leadInfo}>{item.mobile}</Text>
+                <TouchableOpacity onPress={() => handlePhonePress(item.mobile)}>
+                  <View style={{ marginLeft: 10 }}>
+                    <AntDesign name="phone" size={20} color="black" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <Pressable onPress={() => editlead(item)}>
+            <AntDesign name="edit" size={25} color="black" />
+          </Pressable>
+        </View>
+        <View style={{ marginTop: 10 }}>
+          <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+          <Text style={styles.leadInfo1}>Source: {item.source}</Text>
+          <Text style={styles.leadInfo1}>Comments: {item.comments}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.leadInfo1}>Date: {item.created_date}</Text>
+          </View>
+        </View>
       </View>
-    );
-  };
-
-  const renderTableRows = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const dataToDisplay = upcomingBirthdays.slice(startIndex, endIndex);
-
-    return dataToDisplay.map((rowData) => (
-      <Row
-        key={rowData.id}
-        data={[
-          rowData.sno.toString(),
-          rowData.leadid.toString(),
-          rowData.source,
-          rowData.campaign,
-          rowData.classification,
-          rowData.status,
-          rowData.name,
-          rowData.phone.toString(),
-          rowData.email,
-          rowData.leaddate,
-        ]}
-        widthArr={widthArr}
-        style={[styles.row, { backgroundColor: rowData.id % 2 === 0 ? '#F7F6E7' : '#E7E6E1' }]}
-        textStyle={styles.text}
-      />
-    ));
-  };
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-        <View style={{flexDirection:'row',alignItems:'center'}}>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+          <View style={{ width: '49%' }}>
             <Text>From</Text>
-        <View style={styles.dropdowncontainer1}>
-          <Picker
-            selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-          >
-            <Picker.Item label="Select User" value="" />
-            <Picker.Item label="All" value="All" />
-            <Picker.Item label="Self" value="Self" />
-            <Picker.Item label="Team" value="Team" />
-          </Picker>
-        </View>
-        </View>
-     
-        <View style={{flexDirection:'row',alignItems:'center'}}>
+            <View style={styles.dropdowncontainer1}>
+              <Picker
+                selectedValue={selectedValue}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+              >
+                <Picker.Item label="Select User" value="" />
+                <Picker.Item label="All" value="All" />
+                <Picker.Item label="Self" value="Self" />
+                <Picker.Item label="Team" value="Team" />
+              </Picker>
+            </View>
+          </View>
+
+          <View style={{ width: '49%', }}>
             <Text>Status</Text>
-        <View style={styles.dropdowncontainer1}>
-          <Picker
-            selectedValue={status}
-            onValueChange={(itemValue, itemIndex) => setstatus(itemValue)}
-          >
-            <Picker.Item label="Select User" value="" />
-            <Picker.Item label="All" value="All" />
-            <Picker.Item label="Self" value="Self" />
-            <Picker.Item label="Team" value="Team" />
-          </Picker>
-        </View>
+            <View style={styles.dropdowncontainer1}>
+              <Picker
+                selectedValue={status}
+                onValueChange={(itemValue, itemIndex) => setstatus(itemValue)}
+              >
+                <Picker.Item label="Select Status" value="" />
+                <Picker.Item label="All" value="All" />
+                <Picker.Item label="Self" value="Self" />
+                <Picker.Item label="Team" value="Team" />
+              </Picker>
+            </View>
+          </View>
         </View>
 
         <View style={styles.dob}>
-                    <View style={{ width: '49%' }}>
-                        <View >
-                            <TextInput
-                                label="DOB"
-                                value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
-                                onChangeText={(text) => setdob(text)}
-                                style={[styles.textinputdob, { paddingLeft: 10,bottom:10 }]}
-                                mode="outlined"
-                                maxLength={10}
-                            />
-                            <Pressable
-                                style={{
-                                    position: 'absolute',
-                                    top: 10,
-                                    right: 16,
-                                    width: 40,
-                                    height: 40,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                                onPress={addleadsdob}>
-                                <AntDesign name="calendar" color="#625bc5" size={25} />
-                            </Pressable>
-                        </View>
-                    </View>
+          <View style={{ width: '49%' }}>
+            <View >
+              <TextInput
+                label="DOB"
+                value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
+                onChangeText={(text) => setdob(text)}
+                style={[styles.textinputdob, {}]}
+                mode="outlined"
+                maxLength={10}
+              />
+              <Pressable
+                style={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 16,
+                  width: 40,
+                  height: 40,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={addleadsdob}>
+                <AntDesign name="calendar" color="#625bc5" size={25} />
+              </Pressable>
+            </View>
+          </View>
 
-                    <View style={{ width: '49%' }}>
-                        <TextInput
-                            label="To"
-                            value={selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''}
-                            onChangeText={(text) => setdoa(text)}
-                            style={[styles.textinputdob, { paddingLeft: 10,bottom:10 }]}
-                            mode="outlined"
-                            maxLength={10}
-                            editable={false}
-                        />
-                        <Pressable
-                            style={{
-                                position: 'absolute',
-                                top: 10,
-                                right: 16,
-                                width: 40,
-                                height: 40,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                            onPress={addleads}>
-                            <AntDesign name="calendar" color="#625bc5" size={25} />
-                        </Pressable>
-                    </View>
-                </View>
+          <View style={{ width: '49%' }}>
+            <TextInput
+              label="To"
+              value={selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''}
+              onChangeText={(text) => setdoa(text)}
+              style={[styles.textinputdob, {}]}
+              mode="outlined"
+              maxLength={10}
+              editable={false}
+            />
+            <Pressable
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 16,
+                width: 40,
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={addleads}>
+              <AntDesign name="calendar" color="#625bc5" size={25} />
+            </Pressable>
+          </View>
+        </View>
 
         <TouchableOpacity style={styles.buttoncontainer1}>
           <Text style={styles.text1}>Search</Text>
         </TouchableOpacity>
       </View>
 
-<View>
-<ScrollView horizontal>
-        <View>
-          <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-            <Row
-              data={['S.No', 'Lead Id', 'Source', 'Campaign', 'Classification', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
-              widthArr={widthArr}
-              style={styles.header}
-              textStyle={[styles.text, { color: '#000' }]}
-            />
-            {renderTableRows()}
-          </Table>
-        </View>
-      </ScrollView>
-
-      {renderPagination()}
-</View>
+      <FlatList
+        data={dummyData}
+        renderItem={({ item }) => <Item item={item} />}
+        keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 10 }}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+      />
     </View>
   );
 };
@@ -231,27 +234,26 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: '#625bc5',
     marginTop: 6,
-    margin: 10,
-    width: '80%',
   },
   dob: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10
-},
+    marginTop: 10,
+    width: '100%'
+  },
   buttoncontainer1: {
     height: 38,
-    width: '20%',
+    width: '40%',
     borderRadius: 10,
     backgroundColor: '#625bc5',
     alignItems: 'center',
     justifyContent: 'center',
+    top: 10
   },
   text1: {
     color: 'white',
   },
-  textinputdob:{
-    marginLeft:10
+  textinputdob: {
   },
   top: {
     flexDirection: 'column',
@@ -284,5 +286,144 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     color: '#000',
+  },
+  leadContainer: {
+    padding: 10,
+    borderRadius: 6,
+    borderColor: '#ede8e8',
+    borderWidth: 1,
+    backgroundColor: '#ede8e8',
+    marginBottom: 10
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#625bc5',
+    padding: 5,
+    borderRadius: 4,
+  },
+  editButton1: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#929496',
+    padding: 5,
+    borderRadius: 4,
+  },
+  editButtonText: {
+    color: '#fff',
+  },
+  editButtonText1: {
+    color: '#fff',
+  },
+  leadTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  leadInfo: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  leadInfo1: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  recordButton: {
+    backgroundColor: '#929496',
+    padding: 5,
+    borderRadius: 4,
+    alignSelf: 'flex-end',
+  },
+  recordButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#fff',
+  },
+  modalText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'black',
+  },
+  closeButton: {
+    backgroundColor: '#625bc5',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalView: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 5,
+    width: '90%',
+  },
+  modalheading: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 5,
+  },
+  commentsContainer: {
+    height:'30%',
+    padding:10
   },
 });

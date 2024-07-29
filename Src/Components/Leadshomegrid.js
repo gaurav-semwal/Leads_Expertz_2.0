@@ -39,9 +39,10 @@ const Leadshomegrid = () => {
 
     return (
         <View style={styles.container}>
-            <View style={{ height: '60%' }}>
+            <View>
                 <FlatList
                     data={data}
+                    horizontal
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     showsVerticalScrollIndicator={false}
@@ -98,8 +99,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,
         elevation: 5,
-        height: 70,
-        width: 70,
+        height: 50,
+        width: 50,
         alignItems: 'center',
         justifyContent: 'center',
     },
