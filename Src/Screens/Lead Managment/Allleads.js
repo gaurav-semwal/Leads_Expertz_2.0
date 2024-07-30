@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Pressable,FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { TextInput } from 'react-native-paper';
+import { Get_Lead } from '../../../Api/authApi';
+import moment from 'moment';
 
 const Allleads = () => {
   const [selectedValue, setSelectedValue] = useState('');
@@ -11,6 +13,26 @@ const Allleads = () => {
   const [doa, setdoa] = useState();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDatedob, setSelectedDatedob] = useState('');
+  const [leadData, setLeadData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    getlead();
+  }, []);
+
+  const getlead = async () => {
+    try {
+      const response = await Get_Lead();
+      console.log(response);
+      if (response.msg === 'Load successfully') {
+        setLeadData(response.data);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+      // Handle error
+    }
+  };
 
   const addleads = () => {
     setShowCalendarModal(true);
@@ -19,29 +41,6 @@ const Allleads = () => {
   const addleadsdob = () => {
     setShowCalendar(true);
   };
-
-  const dummyData = [
-    {
-      id: 1,
-      name: 'John Doe',
-      mobile: '1234567890',
-      status: 'Pending',
-      source: 'Website',
-      comments: 'Interested in our product',
-      created_date: '2024-07-26',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      mobile: '0987654321',
-      status: 'Contacted',
-      source: 'Referral',
-      comments: 'Asked for more details',
-      created_date: '2024-07-25',
-    },
-  ];
-
-  const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -87,8 +86,8 @@ const Allleads = () => {
             <View style={{ marginLeft: 10 }}>
               <Text style={styles.leadTitle}>{item.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo}>{item.mobile}</Text>
-                <TouchableOpacity onPress={() => handlePhonePress(item.mobile)}>
+                <Text style={styles.leadInfo}>{item.phone}</Text>
+                <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
                   <View style={{ marginLeft: 10 }}>
                     <AntDesign name="phone" size={20} color="black" />
                   </View>
@@ -103,9 +102,9 @@ const Allleads = () => {
         <View style={{ marginTop: 10 }}>
           <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
           <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-          <Text style={styles.leadInfo1}>Comments: {item.comments}</Text>
+          <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.leadInfo1}>Date: {item.created_date}</Text>
+            <Text style={styles.leadInfo1}>Date: {moment(item.lead_date).format('YYYY-MM-DD')}</Text>
           </View>
         </View>
       </View>
@@ -115,7 +114,6 @@ const Allleads = () => {
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
           <View style={{ width: '49%' }}>
             <Text>From</Text>
@@ -132,7 +130,7 @@ const Allleads = () => {
             </View>
           </View>
 
-          <View style={{ width: '49%', }}>
+          <View style={{ width: '49%' }}>
             <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
@@ -150,7 +148,7 @@ const Allleads = () => {
 
         <View style={styles.dob}>
           <View style={{ width: '49%' }}>
-            <View >
+            <View>
               <TextInput
                 label="DOB"
                 value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
@@ -207,7 +205,7 @@ const Allleads = () => {
       </View>
 
       <FlatList
-        data={dummyData}
+        data={leadData}
         renderItem={({ item }) => <Item item={item} />}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
@@ -423,7 +421,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   commentsContainer: {
-    height:'30%',
-    padding:10
+    height: '30%',
+    padding: 10
   },
 });
