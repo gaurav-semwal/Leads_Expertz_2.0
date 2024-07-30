@@ -12,6 +12,7 @@ import {TextInput} from 'react-native-paper';
 import Button from '../../Components/Button';
 import {Picker} from '@react-native-picker/picker';
 import {
+    Add_Lead,
   Get_Campaigns,
   Get_Category,
   Get_City,
@@ -21,6 +22,7 @@ import {
   Get_Sub_Category,
 } from '../../../Api/authApi';
 import Toast from 'react-native-toast-message';
+import validator from 'validator';
 
 const Addlead = ({navigation}) => {
   const [mobilenumner, setmobilenumber] = useState('');
@@ -248,6 +250,62 @@ const Addlead = ({navigation}) => {
     }
   };
 
+  const Submit = async () => {
+    console.log(  
+        type,
+        category_id,
+        sub_category_id,
+        source,
+        campaign,
+        classification,
+        project_id,
+        city,
+        state,
+        address,
+        name,
+        email,
+        phone,
+        whatsapp_no,)
+    try {
+      const response = await Add_Lead(
+        type,
+        category_id,
+        sub_category_id,
+        source,
+        campaign,
+        classification,
+        project_id,
+        city,
+        state,
+        address,
+        name,
+        email,
+        phone,
+        whatsapp_no,
+      );
+
+      console.log(response)
+  
+      if (response.result.msg === "Save successfully") {
+        Toast.show({
+          text1: response.msg,
+          type: 'success',
+        });
+        navigation.navigate('Home');
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: response.msg,
+        type: 'error',
+      });
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.form}>
@@ -485,7 +543,7 @@ const Addlead = ({navigation}) => {
         </View>
       </View>
 
-      <Pressable style={{top: 20}} onPress={handleaddleads}>
+      <Pressable style={{top: 20}} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 
