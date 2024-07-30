@@ -171,3 +171,239 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
+
+  export const Get_State = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-state`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_City = async (state) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("state", state);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-city`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Category = async (typeId) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("type", typeId);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-category`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Sub_Category = async (category_id) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("category_id", category_id);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-sub-category`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Source = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-source`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Campaigns   = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-campaign`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Project = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-project`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };

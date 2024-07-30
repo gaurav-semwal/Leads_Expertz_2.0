@@ -12,14 +12,17 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Get_User } from '../../../Api/authApi';
 import Toast from 'react-native-toast-message';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Userlist = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState([]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, []),
+  );
 
 const fetchAvatars = async (users) => {
   const avatarPromises = users.map(async (user) => {
