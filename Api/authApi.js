@@ -407,3 +407,66 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
+
+  export const Add_Lead = async (
+    type, category_id, sub_category_id, source, campaign, classification, project_id, city,state, address, name, email, phone, whatsapp_no
+  ) => {
+    console.log('----->',type, category_id, sub_category_id, source, campaign, classification, project_id, city,state, address,   name, email, phone, whatsapp_no);
+    try {
+      const isValid = await isValidToken();
+      if (!isValid) {
+        console.log('invaid')
+        throw new Error('Invalid or expired token');
+      }
+  
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('Token:', token);
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+  
+      const formdata = new FormData();
+      formdata.append("type", type);
+      formdata.append("category_id", category_id);
+      formdata.append("sub_category_id", sub_category_id);
+      formdata.append("source", source);
+      formdata.append("campaign", campaign);
+      formdata.append("classification", classification);
+      formdata.append("project_id", project_id);
+      formdata.append("city", city);
+      formdata.append("state", state);
+      formdata.append("address", address);
+      formdata.append("name", name);
+      formdata.append("email", email);
+      formdata.append("phone", phone);
+      formdata.append("whatsapp_no", whatsapp_no);
+  
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}add-lead`, requestOptions);
+      console.log('Response:', response);
+      
+      const statusCode = response.status;
+      console.log('Status Code:', statusCode);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${statusCode}`);
+      }
+  
+      const result = await response.json();
+      console.log('Result:', result);
+  
+      return { statusCode, result };
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  };
