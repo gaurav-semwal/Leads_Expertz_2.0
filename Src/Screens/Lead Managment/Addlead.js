@@ -48,7 +48,7 @@ const Addlead = ({navigation}) => {
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
   const [showCalendarModal, setShowCalendarModal] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [whatsapp, setwhatsapp] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState('');
 
@@ -115,17 +115,9 @@ const Addlead = ({navigation}) => {
       if (response.msg === 'Load successfully.') {
         setCategory(response.data);
       } else {
-        Toast.show({
-          text1: response.msg || 'Failed to load categories.',
-          type: 'error',
-        });
       }
     } catch (error) {
       console.log(error);
-      Toast.show({
-        text1: 'Error loading categories.',
-        type: 'error',
-      });
     }
   };
 
@@ -157,61 +149,28 @@ const Addlead = ({navigation}) => {
     }
   };
 
-  const getCategory = async () => {
-    try {
-      const response = await Get_Category();
-      console.log('Type Dekh', response);
-      if (response.msg === 'Load successfully.') {
-        setCategory(response.data);
-      } else {
-        Toast.show({
-          text1: response.msg || 'Failed to load categories.',
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      Toast.show({
-        text1: 'Error loading categories.',
-        type: 'error',
-      });
-    }
-  };
-
   const getSubcategory = async category_id => {
     try {
       const response = await Get_Sub_Category(category_id);
-      console.log('subbbbbb', response);
       if (response.msg === 'Load successfully.') {
         setSubcategory(response.data);
       } else {
-        Toast.show({
-          text1: response.msg || 'Failed to load subcategories.',
-          type: 'error',
-        });
       }
     } catch (error) {
       console.log(error);
-      Toast.show({
-        text1: 'Error loading subcategories.',
-        type: 'error',
-      });
     }
   };
 
   const getsource = async () => {
     try {
       const response = await Get_Source();
+      console.log(response)
       if (response.msg === 'Load successfully.') {
         setsource(response.data);
       } else {
       }
     } catch (error) {
       console.log(error);
-      Toast.show({
-        text1: response.msg,
-        type: 'error',
-      });
     } finally {
     }
   };
@@ -252,36 +211,36 @@ const Addlead = ({navigation}) => {
 
   const Submit = async () => {
     console.log(  
-        type,
-        category_id,
-        sub_category_id,
-        source,
-        campaign,
+        selectedtype,
+        selectedCategory,
+        selectedSubcategory,
+        selectedSource,
+        selectedcampigns,
         classification,
-        project_id,
-        city,
-        state,
+        selectedproject,
+        selectedState,
+        selectedCity,
         address,
-        name,
+        fullname,
         email,
-        phone,
-        whatsapp_no,)
+        mobilenumner,
+        whatsapp,)
     try {
       const response = await Add_Lead(
-        type,
-        category_id,
-        sub_category_id,
-        source,
-        campaign,
+        selectedtype,
+        selectedCategory,
+        selectedSubcategory,
+        selectedSource,
+        selectedcampigns,
         classification,
-        project_id,
-        city,
-        state,
+        selectedproject,
+        selectedState,
+        selectedCity,
         address,
-        name,
+        fullname,
         email,
-        phone,
-        whatsapp_no,
+        mobilenumner,
+        whatsapp
       );
 
       console.log(response)
@@ -409,8 +368,6 @@ const Addlead = ({navigation}) => {
               onValueChange={handletypeChange}>
               <Picker.Item label="Select Type" value="" />
               <Picker.Item label="Residential" value="residential" />
-              <Picker.Item label="Self" value="self" />
-              <Picker.Item label="Team" value="team" />
             </Picker>
           </View>
         </View>
@@ -450,9 +407,8 @@ const Addlead = ({navigation}) => {
               style={styles.picker}
               onValueChange={handleclassificationChange}>
               <Picker.Item label="Select Classification" value="" />
-              {classification.map((src, index) => (
-                <Picker.Item key={index} label={src.name} value={src.id} />
-              ))}
+              <Picker.Item label="Hot" value="residential" />
+              <Picker.Item label="Cold" value="residential" />
             </Picker>
           </View>
         </View>
@@ -539,6 +495,17 @@ const Addlead = ({navigation}) => {
             onChangeText={text => setcomments(text)}
             style={[styles.textinput]}
             mode="outlined"
+          />
+        </View>
+
+        <View>
+          <TextInput
+            label="Enter Whatsapp number"
+            value={whatsapp}
+            onChangeText={text => setwhatsapp(text)}
+            style={[styles.textinput]}
+            mode="outlined"
+            keyboardType='numeric'
           />
         </View>
       </View>
