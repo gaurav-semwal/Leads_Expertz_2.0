@@ -240,7 +240,7 @@ export const Add_User = async (name, mobile, email, password, role) => {
     }
   };
 
-  export const Get_Category = async (typeId) => {
+  export const Get_Category = async (type) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
   
@@ -252,7 +252,7 @@ export const Add_User = async (name, mobile, email, password, role) => {
       myHeaders.append("token", token);
 
       const formdata = new FormData();
-      formdata.append("type", typeId);
+      formdata.append("type", type);
       
       const requestOptions = {
         method: "POST",
@@ -503,6 +503,149 @@ export const Add_User = async (name, mobile, email, password, role) => {
     }
   };
 
+  export const Get_Status = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-status`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Birthday = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-birthday`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+
+  export const Update_Lead = async (
+    source,campaign,city,state,name,email,remind_date,remind_time,status,comment,project,category_type,category_id,sub_category_id,conv_type,project_id,prop_size,final_price,app_name,app_contact,app_city,app_dob,app_doa,whatsapp,address,lead_id
+  ) => {
+    console.log('---->',  source,campaign,city,state,name,email,remind_date,remind_time,status,comment,project,category_type,category_id,sub_category_id,conv_type,project_id,prop_size,final_price,app_name,app_contact,app_city,app_dob,app_doa,whatsapp,address,lead_id);
+    try {
+      const isValid = await isValidToken();
+      if (!isValid) {
+        console.log('invaid')
+        throw new Error('Invalid or expired token');
+      }
+  
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('Token:', token);
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+  
+      const formdata = new FormData();
+      formdata.append("source", source);
+      formdata.append("campaign", campaign);
+      formdata.append("city", city);
+      formdata.append("state", state);
+      formdata.append("name", name);
+      formdata.append("email", email);
+      formdata.append("remind_date", remind_date);
+      formdata.append("remind_time", remind_time);
+      formdata.append("classification", classification);
+      formdata.append("status", status);
+      formdata.append("comment", comment);
+      formdata.append("project", project);
+      formdata.append("category_type", category_type);
+      formdata.append("category_id", category_id);
+      formdata.append("sub_category_id", sub_category_id);
+      formdata.append("conv_type", conv_type);
+      formdata.append("project_id", project_id);
+      formdata.append("prop_size", prop_size);
+      formdata.append("final_price", final_price);
+      formdata.append("app_name", app_name);
+      formdata.append("app_contact", app_contact);
+      formdata.append("app_city", app_city);
+      formdata.append("app_dob", app_dob);
+      formdata.append("app_doa", app_doa);
+      formdata.append("whatsapp", whatsapp);
+      formdata.append("address", address);
+      formdata.append("lead_id", lead_id);
+  
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}update-lead`, requestOptions);
+      console.log('Response:', response);
+      
+      const statusCode = response.status;
+      console.log('Status Code:', statusCode);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${statusCode}`);
+      }
+  
+      const result = await response.json();
+      console.log('Result:', result);
+  
+      return { statusCode, result };
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  };
+ 
+
+
   export const Add_Category = async (type,name) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -646,37 +789,6 @@ export const Add_User = async (name, mobile, email, password, role) => {
     }
   };
 
-  export const Get_Status = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-  
-      if (!token) {
-        throw new Error('Token not found');
-      }
-  
-      const myHeaders = new Headers();
-      myHeaders.append("token", token);
-      
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow"
-      };
-  
-      const response = await fetch(`${base_url}get-status`, requestOptions);
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      const result = await response.json();
-  
-      return result;
-    } catch (error) {
-      console.error('API Request Error:', error);
-      throw error;
-    }
-  };
 
   export const Get_Lead_Data = async (leadid) => {
     try {

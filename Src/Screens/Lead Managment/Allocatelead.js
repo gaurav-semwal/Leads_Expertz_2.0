@@ -8,7 +8,7 @@ const Allocatelead = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10); 
   const [currentPage, setCurrentPage] = useState(1);
-  const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns
+  const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns 
 
   const upcomingBirthdays = [
     { id: 1, sno: 1, leadid: 12, source: 'Online', campaign: 'hdnd', classification: 'Admin', status: 'online', name: 'Isack', phone: '9876545', email: 'alicesmith@example.com', leaddate: '12-9-200' },

@@ -24,25 +24,25 @@ const Userlist = ({ navigation }) => {
     }, []),
   );
 
-const fetchAvatars = async (users) => {
-  const avatarPromises = users.map(async (user) => {
-    try {
-      const response = await fetch('https://random-data-api.com/api/v2/users');
-      const text = await response.text(); 
+  const fetchAvatars = async (users) => {
+    const avatarPromises = users.map(async (user) => {
       try {
-        const data = JSON.parse(text); 
-        return { ...user, avatar: data.avatar };
-      } catch {
-        console.error('Error: Response not in JSON format');
+        const response = await fetch('https://random-data-api.com/api/v2/users');
+        const text = await response.text(); 
+        try {
+          const data = JSON.parse(text); 
+          return { ...user, avatar: data.avatar };
+        } catch {
+          console.error('Error: Response not in JSON format');
+          return { ...user, avatar: null };
+        }
+      } catch (error) {
+        console.error('Error fetching avatar:', error);
         return { ...user, avatar: null };
       }
-    } catch (error) {
-      console.error('Error fetching avatar:', error);
-      return { ...user, avatar: null };
-    }
-  });
-  return Promise.all(avatarPromises);
-};
+    });
+    return Promise.all(avatarPromises);
+  };
 
   const fetchData = async () => {
     try {
@@ -70,70 +70,64 @@ const fetchAvatars = async (users) => {
     fetchData().finally(() => setRefreshing(false));
   };
 
-  const leadedit = (item) => {
-    console.log('Edit lead:', item);
-  };
-
-  const openModal = (item) => {
-    console.log('Open modal:', item);
-  };
-
   const handlePhonePress = (phone) => {
     console.log('Phone press:', phone);
   };
 
-  const editlead = (item) => {
-    console.log('Edit lead:', item);
-  };
-
-  const Item = ({ item }) => (
-    <Pressable>
-      <View style={styles.leadContainer}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <View style={styles.profileContainer}>
-              <Image 
-                style={styles.profileImage} 
-                source={{ uri: item.avatar || 'https://via.placeholder.com/150' }} // Use placeholder if avatar is null
-                onError={(e) => console.error('Error loading image:', e.nativeEvent.error)}
-              />
-            </View>
-            <View style={{ marginLeft: 10 }}>
-              <Text style={styles.leadTitle}>{item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo}>{item.mobile}</Text>
-                <TouchableOpacity onPress={() => handlePhonePress(item.mobile)}>
-                  <View style={{ marginLeft: 10 }}>
-                    <AntDesign name="phone" size={20} color="black" />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-          <Pressable onPress={() => editlead(item)}>
-            <AntDesign name="edit" size={25} color="black" />
-          </Pressable>
-        </View>
-        <View style={{ marginTop: 10 }}>
-          <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
-          <Text style={styles.leadInfo1}>Role: {item.role}</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.leadInfo1}>Created Date: {item.created_date}</Text>
-          </View>
-        </View>
-      </View>
-    </Pressable>
-  );
-
   const onPressPlusButton = () => {
     navigation.navigate('Add User'); 
+  };
+
+  const Item = ({ item, navigation }) => {
+    const editlead = () => {
+      navigation.navigate('AppDrawer');
+    };
+
+    return (
+      <Pressable>
+        <View style={styles.leadContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+              <View style={styles.profileContainer}>
+                <Image 
+                  style={styles.profileImage} 
+                  source={{ uri: item.avatar || 'https://via.placeholder.com/150' }} // Use placeholder if avatar is null
+                  onError={(e) => console.error('Error loading image:', e.nativeEvent.error)}
+                />
+              </View>
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.leadTitle}>{item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.leadInfo}>{item.mobile}</Text>
+                  <TouchableOpacity onPress={() => handlePhonePress(item.mobile)}>
+                    <View style={{ marginLeft: 10 }}>
+                      <AntDesign name="phone" size={20} color="black" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+            <Pressable onPress={editlead}>
+              <AntDesign name="edit" size={25} color="black" />
+            </Pressable>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+            <Text style={styles.leadInfo1}>Role: {item.role}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.leadInfo1}>Created Date: {item.created_date}</Text>
+            </View>
+          </View>
+        </View>
+      </Pressable>
+    );
   };
 
   return (
     <View style={styles.container}>
       <FlatList
         data={userData}
-        renderItem={({ item }) => <Item item={item} />}
+        renderItem={({ item }) => <Item item={item} navigation={navigation} />}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 150 }}

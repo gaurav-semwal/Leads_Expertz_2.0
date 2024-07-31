@@ -1,18 +1,15 @@
-  import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {Colors} from '../../Comman/Styles';
 import {TextInput} from 'react-native-paper';
-import Button from '../../Components/Button';
+import Button from '../../Src/Components/Button';
+
+import Toast from 'react-native-toast-message';
+import validator from 'validator';
 import {Picker} from '@react-native-picker/picker';
 import {
-    Add_Lead,
+  Update_Lead,
   Get_Campaigns,
   Get_Category,
   Get_City,
@@ -20,11 +17,10 @@ import {
   Get_Source,
   Get_State,
   Get_Sub_Category,
-} from '../../../Api/authApi';
-import Toast from 'react-native-toast-message';
-import validator from 'validator';
+  Get_Lead,
+} from '../../Api/authApi';
 
-const Addlead = ({navigation}) => {
+const Updatelead = ({navigation}) => {
   const [mobilenumner, setmobilenumber] = useState('');
   const [fullname, setfullname] = useState('');
   const [email, setemail] = useState('');
@@ -58,6 +54,7 @@ const Addlead = ({navigation}) => {
     getsource();
     getcampaigns();
     getproject();
+    getlead();
   }, []);
 
   const handleaddleads = async () => {};
@@ -131,13 +128,13 @@ const Addlead = ({navigation}) => {
     } catch (error) {
       console.log(error);
     } finally {
-    } 
+    }
   };
 
   const getcity = async itemValue => {
     try {
       const response = await Get_City(itemValue);
-
+console.log("CITY DEKH AARI HAI", response);
       if (response.msg === '') {
         setcity(response.data);
       } else {
@@ -208,48 +205,77 @@ const Addlead = ({navigation}) => {
     }
   };
 
-  const Submit = async () => {
-    console.log(  
-        selectedtype,
-        selectedCategory,
-        selectedSubcategory,
-        selectedSource,
-        selectedcampigns,
-        classification,
-        selectedproject,
-        selectedState,
-        selectedCity,
-        address,
-        fullname,
-        email,
-        mobilenumner,
-        whatsapp,)
+  const getlead = async () => {
     try {
-      const response = await Add_Lead(
+      const response = await Get_Lead();
+      console.log('CHAISTHA HELP KARO',response);
+      if (response.msg === 'Load successfully') {
+        const leadData = response.data[0]; 
+        setfullname(leadData.name || '');
+        setmobilenumber(leadData.phone || ''); 
+        setemail(leadData.email || '');
+        setcomments(leadData.notes || ''); 
+        setaddress(leadData.field3); 
+        setwhatsapp(leadData.whatsapp_no || '');
+        setSelectedSource(leadData.source || '');
+        setselectedtype(leadData.type || '');
+        setSelectedCategory(leadData.catg_id || '');  
+        setSelectedSubcategory(leadData.sub_catg_id || ''); 
+        setselectedproject(leadData.project_id || ''); 
+        setselectedcampigns(leadData.campaign || ''); 
+        setSelectedState(leadData.field2 || ''); 
+        setSelectedCity(leadData.field1 || ''); 
+        setselectedclassification(leadData.classification || '');
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const Submit = async () => {
+    console.log(
+      fullname,
+      email,
+      mobilenumner,
+      selectedSource,
+      selectedtype,
+      selectedCategory,
+      selectedSubcategory,
+      selectedclassification,
+      selectedcampigns,
+      selectedproject,
+      selectedState,
+      selectedCity,
+      address,
+      comments,
+    );
+    try {
+      const response = await Update_Lead(
+        fullname,
+        email,
+        mobilenumner,
+        selectedSource,
         selectedtype,
         selectedCategory,
         selectedSubcategory,
-        selectedSource,
+        selectedclassification,
         selectedcampigns,
-        classification,
         selectedproject,
         selectedState,
         selectedCity,
         address,
-        fullname,
-        email,
-        mobilenumner,
-        whatsapp
+        comments,
       );
 
-      console.log(response)
-  
-      if (response.result.msg === "Save successfully") {
+      console.log(response);
+
+      if (response.result.msg === 'Save successfully') {
         Toast.show({
           text1: response.msg,
           type: 'success',
         });
-        navigation.navigate('Home');
+        navigation.navigate('allleads');
       } else {
         Toast.show({
           text1: response.msg,
@@ -259,11 +285,13 @@ const Addlead = ({navigation}) => {
     } catch (error) {
       console.log(error);
       Toast.show({
-        text1: response.msg,
+        text1: 'Error',
         type: 'error',
       });
     }
   };
+
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.form}>
@@ -367,7 +395,6 @@ const Addlead = ({navigation}) => {
               onValueChange={handletypeChange}>
               <Picker.Item label="Select Type" value="" />
               <Picker.Item label="Residential" value="residential" />
-              <Picker.Item label="Commercial" value="commercial" />
             </Picker>
           </View>
         </View>
@@ -505,7 +532,7 @@ const Addlead = ({navigation}) => {
             onChangeText={text => setwhatsapp(text)}
             style={[styles.textinput]}
             mode="outlined"
-            keyboardType='numeric'
+            keyboardType="numeric"
           />
         </View>
       </View>
@@ -519,7 +546,7 @@ const Addlead = ({navigation}) => {
   );
 };
 
-export default Addlead;
+export default Updatelead;
 
 const styles = StyleSheet.create({
   container: {

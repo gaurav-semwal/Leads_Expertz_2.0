@@ -1,8 +1,8 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Provider as PaperProvider } from 'react-native-paper';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {Provider as PaperProvider} from 'react-native-paper';
 import Loginscreen from '../Authentication/Loginscreen';
 import Homescreen from '../Screens/Homescreen';
 import Drawercontent from './Drawercontent';
@@ -37,9 +37,10 @@ import Lost from '../Screens/Lead Managment/Others/Lost';
 import Leadtransfer from '../Screens/Leadtransfer';
 import Allleads from '../Screens/Lead Managment/Allleads';
 import Searchleads from '../Screens/Lead Managment/Searchleads';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AddInventory from '../Screens/Inventory/AddInventory';
+import Updatelead from '../Screens/UpdateLead';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -48,8 +49,8 @@ const Tab = createBottomTabNavigator();
 const BottomTabNavigation = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
+      screenOptions={({route}) => ({
+        tabBarIcon: ({color, size}) => {
           let iconName;
 
           switch (route.name) {
@@ -71,18 +72,33 @@ const BottomTabNavigation = () => {
 
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
-      })}
-    >
-      <Tab.Screen name="Home" component={Homescreen} options={{ headerShown: false }} />
-      <Tab.Screen name="All Leads" component={Allleads} options={{
-        headerShown: false,
-      }} />
-      <Tab.Screen name="User List" component={Userlist} options={{
-        headerShown: false,
-      }} />
-      <Tab.Screen name="Settings" component={Settingsscreen} options={{
-        headerShown: false,
-      }} />
+      })}>
+      <Tab.Screen
+        name="Home"
+        component={Homescreen}
+        options={{headerShown: false}}
+      />
+      <Tab.Screen
+        name="All Leads"
+        component={Allleads}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="User List"
+        component={Userlist}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settingsscreen}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -113,65 +129,108 @@ const Stacknavigation = () => {
     <NavigationContainer>
       <PaperProvider>
         <Stack.Navigator>
-          <Stack.Screen name="Login" component={Loginscreen} options={{ headerShown: false }} />
-          <Stack.Screen name="AppDrawer" component={DrawerNavigation} options={{ headerShown: false }} />
-          <Stack.Screen name="CompanyHierarchy" component={CompanyHierarchy} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} />
-          <Stack.Screen name="FutureLead" component={SmartLeadSegmentation} options={{
-            headerShown: true,
-
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-
-            },
-          }} />
-          <Stack.Screen name="Setting" component={Settingsscreen} options={{ title: 'Profile Screen', headerShown: true }} />
-          <Stack.Screen name="Category" component={Category} options={{
-            headerShown: true,
-
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-
-            },
-          }}
+          <Stack.Screen
+            name="Login"
+            component={Loginscreen}
+            options={{headerShown: false}}
           />
-          <Stack.Screen name="SubCategory" component={SubCategory} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
+
+          <Stack.Screen
+            name="AppDrawer"
+            component={DrawerNavigation}
+            options={{headerShown: false}}
           />
-          <Stack.Screen name="Inventory" component={Inventory} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
+           <Stack.Screen
+            name="Update Lead"
+            component={Updatelead}
+            options={{
+              headerShown: true,
+
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="CompanyHierarchy"
+            component={CompanyHierarchy}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="FutureLead"
+            component={SmartLeadSegmentation}
+            options={{
+              headerShown: true,
+
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Setting"
+            component={Settingsscreen}
+            options={{title: 'Profile Screen', headerShown: true}}
+          />
+          <Stack.Screen
+            name="Category"
+            component={Category}
+            options={{
+              headerShown: true,
+
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="SubCategory"
+            component={SubCategory}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Inventory"
+            component={Inventory}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
           />
 
           <Stack.Screen name="AddInventory" component={AddInventory} options={{
@@ -536,6 +595,7 @@ const Stacknavigation = () => {
               },
             }}
           />
+         
         </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>
