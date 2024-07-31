@@ -502,3 +502,214 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
+
+  export const Add_Category = async (type,name) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("type", type);
+      formdata.append("name", name);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}add-category`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Add_Sub_Category = async (categoryid,name) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("category_id", categoryid);
+      formdata.append("name", name);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}add-sub-category`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Add_Inventory = async (categorytype, categoryid, subcategoryid, name, description, location, price, size, file1, file2, file3, file4, file5) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+  
+      // Create FormData
+      const formdata = new FormData();
+      formdata.append("category_type", categorytype);
+      formdata.append("category_id", categoryid);
+      formdata.append("sub_category_id", subcategoryid);
+      formdata.append("name", name);
+      formdata.append("description", description);
+      formdata.append("location", location);
+      formdata.append("price", price);
+      formdata.append("size", size);
+  
+      // Append files to FormData with correct URIs
+      const addFile = (uri, name) => {
+        if (!uri) return null;
+        return {
+          uri: uri,
+          type: 'image/jpeg', // Adjust if your file is of a different type
+          name: name,
+        };
+      };
+  
+      const files = [file1, file2, file3, file4, file5];
+      const fileNames = ['file1.jpg', 'file2.jpg', 'file3.jpg', 'file4.jpg', 'file5.jpg'];
+  
+      files.forEach((fileUri, index) => {
+        if (fileUri) {
+          const file = addFile(fileUri, fileNames[index]);
+          if (file) {
+            console.log(`Appending file ${index + 1}:`, file);
+            formdata.append(`file${index + 1}`, file);
+          }
+        }
+      });
+  
+      // Make the API request
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      console.log('Making request with options:', requestOptions);
+  
+      const response = await fetch('https://pro-leadexpertz.clikzopdevp.com/api/add-inventory', requestOptions);
+  
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.statusText}`);
+      }
+  
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Status = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-status`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Get_Lead_Data = async (leadid) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+
+      const formdata = new FormData();
+      formdata.append("lead_id", leadid);
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-lead-data`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };

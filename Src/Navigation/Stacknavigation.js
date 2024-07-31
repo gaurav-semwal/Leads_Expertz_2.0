@@ -39,6 +39,7 @@ import Allleads from '../Screens/Lead Managment/Allleads';
 import Searchleads from '../Screens/Lead Managment/Searchleads';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AddInventory from '../Screens/Inventory/AddInventory';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -61,9 +62,9 @@ const BottomTabNavigation = () => {
             case 'All Leads':
               iconName = 'list';
               break;
-              case 'User List':
-                iconName = 'users';
-                break;
+            case 'User List':
+              iconName = 'users';
+              break;
             default:
               iconName = 'question';
           }
@@ -73,13 +74,13 @@ const BottomTabNavigation = () => {
       })}
     >
       <Tab.Screen name="Home" component={Homescreen} options={{ headerShown: false }} />
-      <Tab.Screen  name="All Leads" component={Allleads} options={{
+      <Tab.Screen name="All Leads" component={Allleads} options={{
         headerShown: false,
       }} />
-       <Tab.Screen name="User List" component={Userlist} options={{
+      <Tab.Screen name="User List" component={Userlist} options={{
         headerShown: false,
       }} />
-       <Tab.Screen name="Settings" component={Settingsscreen} options={{
+      <Tab.Screen name="Settings" component={Settingsscreen} options={{
         headerShown: false,
       }} />
     </Tab.Navigator>
@@ -162,6 +163,18 @@ const Stacknavigation = () => {
           }}
           />
           <Stack.Screen name="Inventory" component={Inventory} options={{
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: '#625bc5',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          />
+
+          <Stack.Screen name="AddInventory" component={AddInventory} options={{
             headerShown: true,
             headerStyle: {
               backgroundColor: '#625bc5',

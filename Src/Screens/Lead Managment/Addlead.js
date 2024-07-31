@@ -368,6 +368,7 @@ const Addlead = ({navigation}) => {
               onValueChange={handletypeChange}>
               <Picker.Item label="Select Type" value="" />
               <Picker.Item label="Residential" value="residential" />
+              <Picker.Item label="Commercial" value="commercial" />
             </Picker>
           </View>
         </View>
@@ -380,7 +381,7 @@ const Addlead = ({navigation}) => {
               onValueChange={handleCategory}>
               <Picker.Item label="Select Category" value="" />
               {category.map((src, index) => (
-                <Picker.Item key={index} label={src.type} value={src.id} />
+                <Picker.Item key={index} label={src.name} value={src.id} />
               ))}
             </Picker>
           </View>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList ,Modal,ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TextInput } from 'react-native-paper';
-import { Get_Lead } from '../../../Api/authApi';
+import { Get_Lead, Get_Lead_Data, Get_Status } from '../../../Api/authApi';
 import moment from 'moment';
 
 const Allleads = () => {
@@ -15,10 +16,27 @@ const Allleads = () => {
   const [selectedDatedob, setSelectedDatedob] = useState('');
   const [leadData, setLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [statusData, setStatusData] = useState([]); 
+const [selectedItem, setSelectedItem] = useState(null);
+const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     getlead();
+    getstatus();
   }, []);
+
+  const getstatus = async () => {
+    try {
+      const response = await Get_Status();
+      console.log('sttus',response);
+      if (response.msg === '') {
+         setStatusData(response.data);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getlead = async () => {
     try {
@@ -51,20 +69,34 @@ const Allleads = () => {
     console.log('Edit lead:', item);
   };
 
-  const openModal = (item) => {
-    console.log('Open modal:', item);
+  const openModal = async (item) => {
+    setModalVisible(true);
+    try {
+      const response = await Get_Lead_Data(item.id);
+      console.log(response)
+      if (response.msg === "Load successfully") {
+        setSelectedItem(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    }
   };
 
   const handlePhonePress = (phone) => {
     console.log('Phone press:', phone);
   };
 
-  const editlead = (item) => {
-    console.log('Edit lead:', item);
+  const closeModal = () => {
+    setSelectedItem(null);
+    setModalVisible(false);
   };
 
-  const handleRecordNotes = (item) => {
-    console.log('Record notes:', item);
+  const editlead = (item) => {
+    console.log('Edit lead:', item);
   };
 
   const Item = ({ item }) => (
@@ -77,7 +109,7 @@ const Allleads = () => {
           <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
             <Text style={styles.editButtonText1}>{item.status}</Text>
           </Pressable>
-        </View>
+        </View> 
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={styles.profileContainer}>
@@ -111,6 +143,75 @@ const Allleads = () => {
     </Pressable>
   );
 
+  const LeadModal = ({ item }) => {
+    if (!item) return null; 
+  
+    const leadComments = item.lead_comment || [];
+  
+    return (
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={closeModal}
+        transparent={true}
+      >
+        <View style={styles.centeredView}>
+          <Pressable style={styles.modalBackground} onPress={closeModal}>
+            <View style={styles.modalView}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalText}>Lead Details</Text>
+                <Pressable onPress={closeModal}>
+                  <MaterialCommunityIcons name="close-circle" size={25} color="#625bc5" />
+                </Pressable>
+              </View>
+  
+              <View style={{ flexDirection: 'column', padding: 10 }}>
+                <Text style={styles.modalText}>Name: {item.name || 'N/A'}</Text>
+                <Text style={styles.modalText}>Email: {item.email || 'N/A'}</Text>
+                <Text style={styles.modalText}>Mobile: {item.phone || 'N/A'}</Text>
+                <Text style={styles.modalText}>Address: {item.field3 || 'N/A'}</Text>
+                <Text style={styles.modalText}>DOB: {item.app_dob || 'N/A'}</Text>
+                <Text style={styles.modalText}>DOA: {item.app_doa || 'N/A'}</Text>
+                <Text style={styles.modalText}>Source: {item.source || 'N/A'}</Text>
+                <Text style={styles.modalText}>Type: {item.type || 'N/A'}</Text>
+                <Text style={styles.modalText}>Category: {item.cat_name || 'N/A'}</Text>
+                <Text style={styles.modalText}>SubCategory: {item.subcatname || 'N/A'}</Text>
+                <Text style={styles.modalText}>State: {item.field1 || 'N/A'}</Text>
+                <Text style={styles.modalText}>City: {item.field2 || 'N/A'}</Text>
+                <Text style={styles.modalText}>Classification: {item.classification || 'N/A'}</Text>
+                <Text style={styles.modalText}>Project: {item.project_id || 'N/A'}</Text>
+                <Text style={styles.modalText}>Campaign: {item.campaign || 'N/A'}</Text>
+                <Text style={styles.modalText}>Status: {item.status || 'N/A'}</Text>
+              </View>
+  
+              <View style={{ height: '30%', padding: 10 }}>
+                <ScrollView>
+                  <View style={styles.modalheading}>
+                    <Text style={styles.modalText}>Lead Comments</Text>
+                  </View>
+                  {leadComments.length > 0 ? (
+                    leadComments.map((comment, index) => (
+                      <View key={index} style={styles.commentContainer}>
+                        <Text style={styles.commentText}>{comment.comment || 'No comment text'}</Text>
+                        <Text style={styles.modalText}>Status: {comment.status || 'N/A'}</Text>
+                        <Text style={styles.modalText}>Remind: {comment.remind || 'N/A'}</Text>
+                        <Text style={styles.modalText}>Created Date: {comment.created_date || 'N/A'}</Text>
+                        {index !== leadComments.length - 1 && <View style={styles.separator} />}
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.modalText}>No comments available</Text>
+                  )}
+                </ScrollView>
+              </View>
+            </View>
+          </Pressable>
+        </View>
+      </Modal>
+    );
+  };
+  
+  
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -133,14 +234,14 @@ const Allleads = () => {
           <View style={{ width: '49%' }}>
             <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
-              <Picker
+            <Picker
                 selectedValue={status}
-                onValueChange={(itemValue, itemIndex) => setstatus(itemValue)}
+                onValueChange={(itemValue) => setstatus(itemValue)}
               >
                 <Picker.Item label="Select Status" value="" />
-                <Picker.Item label="All" value="All" />
-                <Picker.Item label="Self" value="Self" />
-                <Picker.Item label="Team" value="Team" />
+                {statusData.map(statusItem => (
+                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+                ))}
               </Picker>
             </View>
           </View>
@@ -213,6 +314,8 @@ const Allleads = () => {
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
+
+{selectedItem && <LeadModal item={selectedItem} />}
     </View>
   );
 };
@@ -371,7 +474,7 @@ const styles = StyleSheet.create({
   },
   modalBackground: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -380,6 +483,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 5,
     width: '90%',
+    padding: 10,
   },
   modalheading: {
     width: '100%',

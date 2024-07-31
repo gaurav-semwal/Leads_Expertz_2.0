@@ -1,118 +1,135 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Pressable, ScrollView, TouchableOpacity } from 'react-native';
-import { Table, Row } from 'react-native-table-component';
+import { StyleSheet, View, Text, Pressable, Modal, TouchableOpacity } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Colors } from '../../Comman/Styles';
-import {Picker} from '@react-native-picker/picker'
-
+import { Picker } from '@react-native-picker/picker';
+import { TextInput } from 'react-native-paper';
+import { Add_Sub_Category, Get_Category } from '../../../Api/authApi';
+import Toast from 'react-native-toast-message';
 
 const SubCategory = ({ navigation }) => {
-    const navigateToAddUser = () => {
-        navigation.navigate('Add User');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedtype, setselectedtype] = useState('');
+    const [Subcategoryname, setsubCategoryname] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [category, setCategory] = useState([]);
+
+    const onPressPlusButton = () => {
+        setModalVisible(true);
     };
 
-    
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [widthArr] = useState([100, 150, 150, 100]);  
-
-    const upcomingBirthdays = [
-        { id: 1, name: 'Gaurav Semwal', email: 'gauravsemwal@example.com', phone: '123-456-7890', status: 'Active', role: 'Admin', action: 'View Details' },
-        { id: 2, name: 'Saurav Semwal', email: 'saurav.semwal@example.com', phone: '987-654-3210', status: 'Inactive', role: 'User', action: 'View Details' },
-        { id: 3, name: 'Raghav Mehta', email: 'raghavmehta26@example.com', phone: '555-555-5555', status: 'Active', role: 'Manager', action: 'View Details' },
-        { id: 4, name: 'Kavita Pant', email: 'pant@example.com', phone: '111-222-3333', status: 'Active', role: 'User', action: 'View Details' },
-        { id: 5, name: 'Manan Sakhuja', email: 'manansakhuja123@example.com', phone: '999-888-7777', status: 'Inactive', role: 'Admin', action: 'View Details' },
-    ];
-
-    const renderPagination = () => {
-        const totalPages = Math.ceil(upcomingBirthdays.length / itemsPerPage);
-
-        return (
-            <View style={styles.pagination}>
-                <TouchableOpacity
-                    style={styles.pageButton}
-                    disabled={currentPage === 1}
-                    onPress={() => setCurrentPage(currentPage - 1)}
-                >
-                    <AntDesign name="left" color="#625bc5" size={25} />
-                </TouchableOpacity>
-                <Text style={styles.pageText}>
-                    {currentPage} / {totalPages}
-                </Text>
-                <TouchableOpacity
-                    style={styles.pageButton}
-                    disabled={currentPage === totalPages}
-                    onPress={() => setCurrentPage(currentPage + 1)}
-                >
-                    <AntDesign name="right" color="#625bc5" size={25} />
-                </TouchableOpacity>
-            </View>
-        );
+    const closeModal = () => {
+        setModalVisible(false);
     };
 
-    const renderTableRows = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const dataToDisplay = upcomingBirthdays.slice(startIndex, endIndex);
+    const handletypeChange = itemValue => {
+        console.log(itemValue);
+        setselectedtype(itemValue);
+        gecategoryapi(itemValue);
+    };
 
-        return dataToDisplay.map((rowData, index) => (
-            <Row
-                key={rowData.id}
-                data={[
-                    (startIndex + index + 1).toString(),  
-                    rowData.name,  
-                    rowData.role,  
-                    rowData.action  
-                ]}
-                widthArr={widthArr}
-                style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-                textStyle={styles.text}
-            />
-        ));
+    const gecategoryapi = async typeId => {
+        console.log(typeId);
+        try {
+            const response = await Get_Category(typeId);
+            console.log('category', response);
+            if (response.msg === 'Load successfully.') {
+                setCategory(response.data);
+            } else {
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const Addsubcategoryapi = async () => {
+        console.log(selectedtype, selectedCategory,Subcategoryname);
+        try {
+            const response = await Add_Sub_Category(selectedtype, selectedCategory,Subcategoryname);
+            console.log('category', response);
+            if (response.msg === 'Save successfully.') {
+                setModalVisible(false);
+                Toast.show({
+                    text1: response.msg,
+                    type: 'success',
+                });
+            } else {
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleCategory = (itemValue, itemIndex) => {
+        setSelectedCategory(itemValue);
     };
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.text}>Manage User</Text>
-                <Pressable style={styles.newuser} onPress={navigateToAddUser}>
-                    <Text style={styles.text1}>New User</Text>
+            <View style={styles.plusButtonContainer}>
+                <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+                    <AntDesign name="plus" size={28} color="#dbdad3" />
                 </Pressable>
             </View>
 
-            <View style={styles.pickerContainer}>
-                <Text style={styles.text}>Show</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        selectedValue={itemsPerPage}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
-                    >
-                        <Picker.Item label="10" value={10} />
-                        <Picker.Item label="100" value={100} />
-                        <Picker.Item label="500" value={500} />
-                        <Picker.Item label="All" value={upcomingBirthdays.length} />
-                    </Picker>
-                </View>
-                <Text style={styles.text}>Entries</Text>
-            </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={closeModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View>
+                            <Text style={styles.heading}>Select Type</Text>
+                            <View style={styles.dropdowncontainer1}>
+                                <Picker
+                                    selectedValue={selectedtype}
+                                    style={styles.picker}
+                                    onValueChange={handletypeChange}>
+                                    <Picker.Item label="Select Type" value="" />
+                                    <Picker.Item label="Residential" value="residential" />
+                                    <Picker.Item label="Commercial" value="commercial" />
+                                </Picker>
+                            </View>
+                        </View>
 
-            <View>
-                <ScrollView horizontal>
-                    <View>
-                        <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                            <Row
-                                data={['S.No', 'Name', 'Type', 'Action']}
-                                widthArr={widthArr}
-                                style={styles.header}
-                                textStyle={[styles.text, { color: '#000' }]}
+                        <View>
+                        <Text style={styles.heading}>Select Category Name</Text>
+                            <View style={styles.dropdowncontainer1}>
+                                <Picker
+                                    selectedValue={selectedCategory}
+                                    style={styles.picker}
+                                    onValueChange={handleCategory}>
+                                    <Picker.Item label="Select Category" value="" />
+                                    {category.map((src, index) => (
+                                        <Picker.Item key={index} label={src.name} value={src.id} />
+                                    ))}
+                                </Picker>
+                            </View>
+                        </View>
+                        <View>
+                            <Text style={styles.heading}>Enter Sub Category Name</Text>
+
+                            <TextInput
+                                label="Enter Sub Category Name"
+                                value={Subcategoryname}
+                                onChangeText={text => setsubCategoryname(text)}
+                                style={[styles.textinput]}
+                                mode="outlined"
                             />
-                            {renderTableRows()}
-                        </Table>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
+                                <Text style={styles.modalButtonText}>Close</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.modalButton} onPress={Addsubcategoryapi}>
+                                <Text style={styles.modalButtonText}>Add</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </ScrollView>
-                {renderPagination()}
-            </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -124,66 +141,71 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff'
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 10
-    },
-    text: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#000'
-    },
-    text1: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#fff'
-    },
-    newuser: {
-        backgroundColor: Colors.Button,
-        padding: 5
-    },
-    pagination: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
+    plusButtonContainer: {
+        position: 'absolute',
+        backgroundColor: '#625bc5',
+        borderRadius: 50,
+        width: 50,
+        height: 50,
         alignItems: 'center',
-        marginTop: 10
-    },
-    pageButton: {
-        marginHorizontal: 10
-    },
-    pageText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#625bc5'
-    },
-    row: {
-        height: 40,
-        backgroundColor: '#E7E6E1',
         justifyContent: 'center',
-        alignItems: 'center'
+        elevation: 3,
+        alignSelf: 'flex-end',
+        bottom: 20,
+        right: 20,
     },
-    text: {
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: 14,
-        color: '#000'
-    },
-    pickerContainer: {
-        flexDirection: 'row',
+    plusButton: {
+        width: 50,
+        height: 50,
         alignItems: 'center',
-        margin: 10
+        justifyContent: 'center',
     },
-    pickerWrapper: {
-        borderWidth: 1,
-        borderColor: '#000',
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        height: 350,
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+    },
+    modalText: {
+        fontSize: 18,
+        marginBottom: 20,
+    },
+    modalButton: {
+        padding: 10,
+        backgroundColor: '#625bc5',
         borderRadius: 5,
-        marginHorizontal: 10,
-        width: 109, 
-        overflow: 'hidden' 
+        alignItems: 'center',
+        width: '47%'
+    },
+    modalButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
     picker: {
-        height: 25,
-        color: '#000'
+        borderBlockColor: 'black',
+        borderWidth: 1,
+        borderColor: 'black',
     },
+    dropdowncontainer1: {
+        borderWidth: 1,
+        height: 48,
+        justifyContent: 'center',
+        borderRadius: 5,
+        borderColor: '#625bc5',
+        width: '100%'
+    },
+    heading: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: 'black'
+    }
 });
