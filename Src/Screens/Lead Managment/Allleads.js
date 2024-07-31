@@ -48,7 +48,6 @@ const [modalVisible, setModalVisible] = useState(false);
       }
     } catch (error) {
       console.log(error);
-      // Handle error
     }
   };
 
