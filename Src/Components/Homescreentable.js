@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
+import moment from 'moment';  // Import moment for date calculations
 import HomeScheduletable from './HomeScheduletable';
 import { Get_Birthday } from '../../Api/authApi';
 
 const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
-  const [tableData, setTableData] = useState([]); 
-  const [allData, setAllData] = useState([]); // State to store all data
-  const [widthArr] = useState([100, 150, 150, 100, 150]); 
+  const [tableData, setTableData] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [widthArr] = useState([100, 150, 150, 100, 150]);
 
   useEffect(() => {
     getBirthday();
@@ -17,10 +18,9 @@ const Homescreentable = () => {
   const getBirthday = async () => {
     try {
       const response = await Get_Birthday();
-      console.log('BIRTHDAY SEMWAL', response);
       if (response.msg === '') {
-        setAllData(response.data); // Store all data in state
-        setTableData(response.data); // Also set the initial table data
+        setAllData(response.data);
+        filterData(response.data, activeButton);
       }
     } catch (error) {
       console.log(error);
@@ -31,22 +31,26 @@ const Homescreentable = () => {
     }
   };
 
-  // Function to handle button press and set active button and corresponding table data
-  const onPressButton = (type) => {
-    setActiveButton(type);
-    switch (type) {
-      case 'Upcoming Birthday':
-        setTableData(allData.filter(item => item.type === 'Birthday')); // Filter data for birthdays
-        break;
-      case 'Upcoming Anniversary':
-        setTableData(allData.filter(item => item.type === 'Anniversary')); // Filter data for anniversaries
-        break;
-      default:
-        setTableData(allData); // Default to showing all data
-    }
+  const filterData = (data, type) => {
+    const today = moment();
+    const startOfMonth = today.clone().startOf('month');
+    const endOfMonth = today.clone().endOf('month');
+    const upcomingRange = 14; // Number of days to consider as "upcoming"
+
+    const filteredData = data.filter(item => {
+      const itemDate = moment(item.lead_date);
+      const isUpcoming = itemDate.isBetween(today, today.clone().add(upcomingRange, 'days'), 'day', '[]');
+      return type === 'Upcoming Birthday' && isUpcoming && item.type === 'Birthday';
+    });
+
+    setTableData(filteredData);
   };
 
-  // Function to render table rows
+  const onPressButton = (type) => {
+    setActiveButton(type);
+    filterData(allData, type);
+  };
+
   const renderTableRows = () => {
     return tableData.map((rowData, index) => (
       <Row
@@ -67,8 +71,8 @@ const Homescreentable = () => {
 
   return (
     <View style={styles.container}>
+      <HomeScheduletable />
       <View style={styles.body}>
-        {/* Pressable buttons to switch between upcoming birthdays and anniversaries */}
         <Pressable
           style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
           onPress={() => onPressButton('Upcoming Birthday')}
@@ -83,7 +87,6 @@ const Homescreentable = () => {
         </Pressable>
       </View>
 
-      {/* Table to display data */}
       <ScrollView horizontal>
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
@@ -97,14 +100,9 @@ const Homescreentable = () => {
           </Table>
         </View>
       </ScrollView>
-
-      {/* Additional component */}
-      <HomeScheduletable />
     </View>
   );
 };
-
-export default Homescreentable;
 
 const styles = StyleSheet.create({
   container: {
@@ -137,4 +135,10 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: '#E7E6E1',
   },
+  header: {
+    height: 50,
+    backgroundColor: '#F7F6E7',
+  },
 });
+
+export default Homescreentable;

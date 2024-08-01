@@ -15,9 +15,9 @@ const Homescreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.button}>
-        <View style={styles.buttoncontainer}>
+        {/* <View style={styles.buttoncontainer}>
           <Text style={styles.text}>Quick Search</Text>
-        </View>
+        </View> */}
         <View style={styles.buttoncontainer1}>
           <Text style={styles.text}>Add Quick Lead</Text>
         </View>

@@ -215,7 +215,7 @@ const Addlead = ({navigation}) => {
         selectedSubcategory,
         selectedSource,
         selectedcampigns,
-        classification,
+        selectedclassification,
         selectedproject,
         selectedState,
         selectedCity,
@@ -231,7 +231,7 @@ const Addlead = ({navigation}) => {
         selectedSubcategory,
         selectedSource,
         selectedcampigns,
-        classification,
+        selectedclassification,
         selectedproject,
         selectedState,
         selectedCity,
@@ -353,7 +353,7 @@ const Addlead = ({navigation}) => {
               onValueChange={handleSourceChange}>
               <Picker.Item label="Select Source" value="" />
               {source.map((src, index) => (
-                <Picker.Item key={index} label={src.name} value={src.id} />
+                <Picker.Item key={index} label={src.name} value={src.name} />
               ))}
             </Picker>
           </View>
@@ -407,8 +407,8 @@ const Addlead = ({navigation}) => {
               style={styles.picker}
               onValueChange={handleclassificationChange}>
               <Picker.Item label="Select Classification" value="" />
-              <Picker.Item label="Hot" value="residential" />
-              <Picker.Item label="Cold" value="residential" />
+              <Picker.Item label="Hot" value="hot" />
+              <Picker.Item label="Cold" value="cold" />
             </Picker>
           </View>
         </View>
@@ -422,7 +422,7 @@ const Addlead = ({navigation}) => {
                 onValueChange={handlecampignsChange}>
                 <Picker.Item label="Select Campigns" value="" />
                 {campigns.map((src, index) => (
-                  <Picker.Item key={index} label={src.name} value={src.id} />
+                  <Picker.Item key={index} label={src.name} value={src.name} />
                 ))}
               </Picker>
             </View>
@@ -439,7 +439,7 @@ const Addlead = ({navigation}) => {
                   <Picker.Item
                     key={index}
                     label={src.project_name}
-                    value={src.id}
+                    value={src.project_name}
                   />
                 ))}
               </Picker>

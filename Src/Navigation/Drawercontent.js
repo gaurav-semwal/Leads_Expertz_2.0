@@ -533,13 +533,13 @@ const DrawerContent = props => {
         />
       </TouchableOpacity>
       {rendereventsSubMenu(6)}
-
+{/* 
       <TouchableOpacity
         style={styles.drawerItemsingle}
         onPress={() => props.navigation.navigate('CompanyHierarchy')}>
         <Fontisto name="calendar" size={20} color="#333" style={styles.icon} />
         <Text style={styles.label}>Company Hierarchy</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* <TouchableOpacity style={styles.drawerItem} onPress={() => toggleeventsSubMenu(6)}>
                 <View style={styles.drawerItem1} >

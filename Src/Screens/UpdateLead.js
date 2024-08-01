@@ -17,10 +17,15 @@ import {
   Get_Source,
   Get_State,
   Get_Sub_Category,
-  Get_Lead,
+  Get_Lead_Data,
+  Get_Status
 } from '../../Api/authApi';
+import { useRoute } from '@react-navigation/native';
 
 const Updatelead = ({navigation}) => {
+  const route = useRoute();
+  const { leadid } = route.params;
+
   const [mobilenumner, setmobilenumber] = useState('');
   const [fullname, setfullname] = useState('');
   const [email, setemail] = useState('');
@@ -47,6 +52,8 @@ const Updatelead = ({navigation}) => {
   const [whatsapp, setwhatsapp] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState('');
+  const [statusData, setStatusData] = useState([]);
+  const [status, setstatus] = useState('');
 
   useEffect(() => {
     getstate();
@@ -55,7 +62,21 @@ const Updatelead = ({navigation}) => {
     getcampaigns();
     getproject();
     getlead();
+    getstatus();
   }, []);
+
+  const getstatus = async () => {
+    try {
+      const response = await Get_Status();
+      console.log('sttus', response);
+      if (response.msg === '') {
+        setStatusData(response.data);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleaddleads = async () => {};
 
@@ -207,10 +228,10 @@ console.log("CITY DEKH AARI HAI", response);
 
   const getlead = async () => {
     try {
-      const response = await Get_Lead();
-      console.log('CHAISTHA HELP KARO',response);
+      const response = await Get_Lead_Data(leadid);
+      console.log('CHAISTHA HELP KARO',response.data);
       if (response.msg === 'Load successfully') {
-        const leadData = response.data[0]; 
+        const leadData = response.data; 
         setfullname(leadData.name || '');
         setmobilenumber(leadData.phone || ''); 
         setemail(leadData.email || '');
@@ -219,8 +240,26 @@ console.log("CITY DEKH AARI HAI", response);
         setwhatsapp(leadData.whatsapp_no || '');
         setSelectedSource(leadData.source || '');
         setselectedtype(leadData.type || '');
-        setSelectedCategory(leadData.catg_id || '');  
         setSelectedSubcategory(leadData.sub_catg_id || ''); 
+
+        const typ = await setselectedtype;
+        const selectedType = typ.data.find(typ => typ.id === leadData.type);
+        console.log('hhhhhhhhhhh',typ)
+
+        var ctp  = '';
+        if (selectedType) {
+            setselectedtype(selectedType.id);
+            ctp = await Get_Category(selectedType.id);
+            setCategory(ctp.data);
+        }
+
+        const selectedCategory = ctp.data.find(cat => cat.id === leadData.catg_id);
+        console.log('jjjjjjjjjjjjj',ctp)
+        if (selectedCategory) {
+            setSelectedCategory(selectedCategory.id);
+            getSubcategory(selectedCategory.id);
+        }
+
         setselectedproject(leadData.project_id || ''); 
         setselectedcampigns(leadData.campaign || ''); 
         setSelectedState(leadData.field2 || ''); 
@@ -381,7 +420,7 @@ console.log("CITY DEKH AARI HAI", response);
               onValueChange={handleSourceChange}>
               <Picker.Item label="Select Source" value="" />
               {source.map((src, index) => (
-                <Picker.Item key={index} label={src.name} value={src.id} />
+                <Picker.Item key={index} label={src.name} value={src.name} />
               ))}
             </Picker>
           </View>
@@ -395,6 +434,7 @@ console.log("CITY DEKH AARI HAI", response);
               onValueChange={handletypeChange}>
               <Picker.Item label="Select Type" value="" />
               <Picker.Item label="Residential" value="residential" />
+              <Picker.Item label="Commercial" value="commercial" />
             </Picker>
           </View>
         </View>
@@ -434,8 +474,8 @@ console.log("CITY DEKH AARI HAI", response);
               style={styles.picker}
               onValueChange={handleclassificationChange}>
               <Picker.Item label="Select Classification" value="" />
-              <Picker.Item label="Hot" value="residential" />
-              <Picker.Item label="Cold" value="residential" />
+              <Picker.Item label="Hot" value="hot" />
+              <Picker.Item label="Cold" value="cold" />
             </Picker>
           </View>
         </View>
@@ -449,7 +489,7 @@ console.log("CITY DEKH AARI HAI", response);
                 onValueChange={handlecampignsChange}>
                 <Picker.Item label="Select Campigns" value="" />
                 {campigns.map((src, index) => (
-                  <Picker.Item key={index} label={src.name} value={src.id} />
+                  <Picker.Item key={index} label={src.name} value={src.name} />
                 ))}
               </Picker>
             </View>
@@ -505,7 +545,21 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-        <View>
+<View style={{top:10}}>
+        <View style={styles.dropdowncontainer1}>
+              <Picker
+                selectedValue={status}
+                onValueChange={(itemValue) => setstatus(itemValue)}
+              >
+                <Picker.Item label="Select Status" value="" />
+                {statusData.map(statusItem => (
+                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+                ))}
+              </Picker>
+            </View>
+            </View>
+
+        <View style={{top:10}}>
           <TextInput
             label="Enter Address"
             value={address}
@@ -515,7 +569,7 @@ console.log("CITY DEKH AARI HAI", response);
           />
         </View>
 
-        <View>
+        <View style={{top:10}}>
           <TextInput
             label="Enter Comments"
             value={comments}
@@ -525,7 +579,7 @@ console.log("CITY DEKH AARI HAI", response);
           />
         </View>
 
-        <View>
+        <View style={{top:10}}>
           <TextInput
             label="Enter Whatsapp number"
             value={whatsapp}
@@ -537,7 +591,7 @@ console.log("CITY DEKH AARI HAI", response);
         </View>
       </View>
 
-      <Pressable style={{top: 20}} onPress={Submit}>
+      <Pressable style={{top: 30}} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 

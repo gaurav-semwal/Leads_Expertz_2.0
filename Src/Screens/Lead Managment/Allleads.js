@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList ,Modal,ScrollView} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList, Modal, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TextInput } from 'react-native-paper';
 import { Get_Lead, Get_Lead_Data, Get_Status } from '../../../Api/authApi';
 import moment from 'moment';
+import { Calendar } from 'react-native-calendars';
 
-const Allleads = ({navigation }) => {
+const Allleads = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
   const [dob, setdob] = useState();
@@ -16,9 +17,11 @@ const Allleads = ({navigation }) => {
   const [selectedDatedob, setSelectedDatedob] = useState('');
   const [leadData, setLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [statusData, setStatusData] = useState([]); 
-const [selectedItem, setSelectedItem] = useState(null);
-const [modalVisible, setModalVisible] = useState(false);
+  const [statusData, setStatusData] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   useEffect(() => {
     getlead();
@@ -28,9 +31,9 @@ const [modalVisible, setModalVisible] = useState(false);
   const getstatus = async () => {
     try {
       const response = await Get_Status();
-      console.log('sttus',response);
+      console.log('sttus', response);
       if (response.msg === '') {
-         setStatusData(response.data);
+        setStatusData(response.data);
       } else {
       }
     } catch (error) {
@@ -64,6 +67,27 @@ const [modalVisible, setModalVisible] = useState(false);
     setTimeout(() => setRefreshing(false), 1000);
   };
 
+  
+  const handleDateSelect = async (date) => {
+    setSelectedDate(date);
+    setShowCalendarModal(false);
+
+    if (date) {
+        setSelectedDate(date);
+        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+    }
+};
+
+  const handleDateSelectdob = async (date) => {
+    setSelectedDatedob(date);
+    setShowCalendar(false);
+
+    if (date) {
+        setSelectedDatedob(date);
+        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+    }
+};
+
   const leadedit = (item) => {
     console.log('Edit lead:', item);
   };
@@ -96,7 +120,7 @@ const [modalVisible, setModalVisible] = useState(false);
 
   const editlead = (item) => {
     console.log('Edit lead:', item);
-    navigation.navigate('Update Lead');
+    navigation.navigate('Update Lead', { leadid: item.id ,status:item.status});
   };
 
   const Item = ({ item }) => (
@@ -109,7 +133,7 @@ const [modalVisible, setModalVisible] = useState(false);
           <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
             <Text style={styles.editButtonText1}>{item.status}</Text>
           </Pressable>
-        </View> 
+        </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={styles.profileContainer}>
@@ -144,10 +168,10 @@ const [modalVisible, setModalVisible] = useState(false);
   );
 
   const LeadModal = ({ item }) => {
-    if (!item) return null; 
-  
+    if (!item) return null;
+
     const leadComments = item.lead_comment || [];
-  
+
     return (
       <Modal
         visible={modalVisible}
@@ -164,7 +188,7 @@ const [modalVisible, setModalVisible] = useState(false);
                   <MaterialCommunityIcons name="close-circle" size={25} color="#625bc5" />
                 </Pressable>
               </View>
-  
+
               <View style={{ flexDirection: 'column', padding: 10 }}>
                 <Text style={styles.modalText}>Name: {item.name || 'N/A'}</Text>
                 <Text style={styles.modalText}>Email: {item.email || 'N/A'}</Text>
@@ -183,7 +207,7 @@ const [modalVisible, setModalVisible] = useState(false);
                 <Text style={styles.modalText}>Campaign: {item.campaign || 'N/A'}</Text>
                 <Text style={styles.modalText}>Status: {item.status || 'N/A'}</Text>
               </View>
-  
+
               <View style={{ height: '30%', padding: 10 }}>
                 <ScrollView>
                   <View style={styles.modalheading}>
@@ -210,8 +234,8 @@ const [modalVisible, setModalVisible] = useState(false);
       </Modal>
     );
   };
-  
-  
+
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -234,7 +258,7 @@ const [modalVisible, setModalVisible] = useState(false);
           <View style={{ width: '49%' }}>
             <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
-            <Picker
+              <Picker
                 selectedValue={status}
                 onValueChange={(itemValue) => setstatus(itemValue)}
               >
@@ -251,7 +275,7 @@ const [modalVisible, setModalVisible] = useState(false);
           <View style={{ width: '49%' }}>
             <View>
               <TextInput
-                label="DOB"
+                label="Date"
                 value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
                 onChangeText={(text) => setdob(text)}
                 style={[styles.textinputdob, {}]}
@@ -315,7 +339,41 @@ const [modalVisible, setModalVisible] = useState(false);
         onRefresh={handleRefresh}
       />
 
-{selectedItem && <LeadModal item={selectedItem} />}
+      {selectedItem && <LeadModal item={selectedItem} />}
+
+      <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showCalendar}
+                onRequestClose={() => setShowCalendar(false)}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+
+
+                    <Calendar
+                        onDayPress={(day) => handleDateSelectdob(day.dateString)}
+                        markedDates={{
+                            [selectedDate]: { selected: true, selectedColor: 'blue' }
+                        }}
+                    />
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showCalendarModal}
+                onRequestClose={() => setShowCalendarModal(false)}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+
+
+                    <Calendar
+                        onDayPress={(day) => handleDateSelect(day.dateString)}
+                        markedDates={{
+                            [selectedDate]: { selected: true, selectedColor: 'blue' }
+                        }}
+                    />
+                </View>
+            </Modal>
     </View>
   );
 };

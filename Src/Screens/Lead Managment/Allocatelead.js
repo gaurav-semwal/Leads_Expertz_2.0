@@ -99,7 +99,7 @@ const Allocatelead = () => {
           </Picker>
         </View>
         <TouchableOpacity style={styles.buttoncontainer1}>
-          <Text style={styles.text1}>Search</Text>
+          <Text style={styles.text1}>Allocate</Text>
         </TouchableOpacity>
       </View>
 
