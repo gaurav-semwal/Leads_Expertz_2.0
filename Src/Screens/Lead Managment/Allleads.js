@@ -7,7 +7,7 @@ import { TextInput } from 'react-native-paper';
 import { Get_Lead, Get_Lead_Data, Get_Status } from '../../../Api/authApi';
 import moment from 'moment';
 
-const Allleads = () => {
+const Allleads = ({navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
   const [dob, setdob] = useState();
@@ -96,6 +96,7 @@ const [modalVisible, setModalVisible] = useState(false);
 
   const editlead = (item) => {
     console.log('Edit lead:', item);
+    navigation.navigate('Update Lead');
   };
 
   const Item = ({ item }) => (

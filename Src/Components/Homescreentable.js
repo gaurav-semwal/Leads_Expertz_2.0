@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import HomeScheduletable from './HomeScheduletable';
 import { Get_Birthday } from '../../Api/authApi';
 
 const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
   const [tableData, setTableData] = useState([]); 
+  const [allData, setAllData] = useState([]); // State to store all data
   const [widthArr] = useState([100, 150, 150, 100, 150]); 
 
   useEffect(() => {
@@ -19,7 +19,8 @@ const Homescreentable = () => {
       const response = await Get_Birthday();
       console.log('BIRTHDAY SEMWAL', response);
       if (response.msg === '') {
-        setTableData(response.data);
+        setAllData(response.data); // Store all data in state
+        setTableData(response.data); // Also set the initial table data
       }
     } catch (error) {
       console.log(error);
@@ -35,13 +36,13 @@ const Homescreentable = () => {
     setActiveButton(type);
     switch (type) {
       case 'Upcoming Birthday':
-        setTableData(response.data.filter(item => item.type === 'Birthday')); // Filter data for birthdays
+        setTableData(allData.filter(item => item.type === 'Birthday')); // Filter data for birthdays
         break;
       case 'Upcoming Anniversary':
-        setTableData(response.data.filter(item => item.type === 'Anniversary')); // Filter data for anniversaries
+        setTableData(allData.filter(item => item.type === 'Anniversary')); // Filter data for anniversaries
         break;
       default:
-        setTableData(response.data); // Default to showing all data
+        setTableData(allData); // Default to showing all data
     }
   };
 

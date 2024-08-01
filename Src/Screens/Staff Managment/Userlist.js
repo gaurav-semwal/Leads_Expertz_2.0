@@ -77,12 +77,12 @@ const Userlist = ({ navigation }) => {
   const onPressPlusButton = () => {
     navigation.navigate('Add User'); 
   };
-
-  const Item = ({ item, navigation }) => {
-    const editlead = () => {
-      navigation.navigate('AppDrawer');
-    };
-
+  const editleadnavigate = (navigation) => {
+    console.log('hi');
+    // navigation.navigate('Update Lead');
+  };
+  
+  const Item = ({ item, navigation }) => {  
     return (
       <Pressable>
         <View style={styles.leadContainer}>
@@ -107,7 +107,7 @@ const Userlist = ({ navigation }) => {
                 </View>
               </View>
             </View>
-            <Pressable onPress={editlead}>
+            <Pressable onPress={() => editleadnavigate(navigation)}>
               <AntDesign name="edit" size={25} color="black" />
             </Pressable>
           </View>

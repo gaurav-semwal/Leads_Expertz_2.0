@@ -1,24 +1,39 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ToastAndroid } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { Pending_Allocate } from '../../../Api/authApi';
 
 const Allocatelead = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10); 
   const [currentPage, setCurrentPage] = useState(1);
-  const widthArr = [50, 70, 70, 70, 100, 100, 100, 100, 120, 100]; // Adjusted widths for table columns 
+  const [data, setData] = useState([]); // State to hold API data
+  const widthArr = [50, 70, 90, 100, 100, 100, 100, 150, 200]; // Adjusted widths for table columns 
 
-  const upcomingBirthdays = [
-    { id: 1, sno: 1, leadid: 12, source: 'Online', campaign: 'hdnd', classification: 'Admin', status: 'online', name: 'Isack', phone: '9876545', email: 'alicesmith@example.com', leaddate: '12-9-200' },
-    { id: 2, sno: 2, leadid: 13, source: 'Offline', campaign: 'abc', classification: 'User', status: 'offline', name: 'John Doe', phone: '9876545', email: 'johndoe@example.com', leaddate: '11-8-200' },
-    { id: 3, sno: 3, leadid: 14, source: 'Online', campaign: 'xyz', classification: 'Admin', status: 'online', name: 'Jane Smith', phone: '9876545', email: 'janesmith@example.com', leaddate: '10-7-200' },
-    { id: 4, sno: 4, leadid: 15, source: 'Offline', campaign: 'pqr', classification: 'User', status: 'offline', name: 'Michael Johnson', phone: '9876545', email: 'michael@example.com', leaddate: '9-6-200' },
-  ];
+  const fetchPendingAllocate = async () => {
+    try {
+      const response = await Pending_Allocate();
+      console.log("PENDINGGGG", response);
+      if (response.msg === 'Load successfully.') {
+        setData(response.data); // Update state with API data
+      } else {
+        // Handle error case
+        ToastAndroid.show(response.msg, ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.show('An error occurred', ToastAndroid.SHORT);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingAllocate();
+  }, []);
 
   const renderPagination = () => {
-    const totalPages = Math.ceil(upcomingBirthdays.length / itemsPerPage);
+    const totalPages = Math.ceil(data.length / itemsPerPage);
 
     return (
       <View style={styles.pagination}>
@@ -46,22 +61,21 @@ const Allocatelead = () => {
   const renderTableRows = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const dataToDisplay = upcomingBirthdays.slice(startIndex, endIndex);
+    const dataToDisplay = data.slice(startIndex, endIndex);
 
     return dataToDisplay.map((rowData) => (
       <Row
         key={rowData.id}
         data={[
-          rowData.sno.toString(),
-          rowData.leadid.toString(),
-          rowData.source,
+          rowData.id.toString(),
           rowData.campaign,
           rowData.classification,
+          rowData.source,
           rowData.status,
           rowData.name,
-          rowData.phone.toString(),
+          rowData.phone,
           rowData.email,
-          rowData.leaddate,
+          rowData.lead_date,
         ]}
         widthArr={widthArr}
         style={[styles.row, { backgroundColor: rowData.id % 2 === 0 ? '#F7F6E7' : '#E7E6E1' }]}
@@ -89,80 +103,12 @@ const Allocatelead = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.pickerContainer}>
-                <Text style={styles.text}>Show</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        selectedValue={itemsPerPage}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
-                    >
-                        <Picker.Item label="10" value={10} />
-                        <Picker.Item label="100" value={100} />
-                        <Picker.Item label="500" value={500} />
-                        <Picker.Item label="All" value={upcomingBirthdays.length} />
-                    </Picker>
-                </View>
-                <Text style={styles.text}>Entries</Text>
-            </View>
-
-      <View style={styles.pickerContainer}>
-                <Text style={styles.text}>Show</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        selectedValue={itemsPerPage}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
-                    >
-                        <Picker.Item label="10" value={10} />
-                        <Picker.Item label="100" value={100} />
-                        <Picker.Item label="500" value={500} />
-                        <Picker.Item label="All" value={upcomingBirthdays.length} />
-                    </Picker>
-                </View>
-                <Text style={styles.text}>Entries</Text>
-            </View>
-
-      <View style={styles.pickerContainer}>
-                <Text style={styles.text}>Show</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        selectedValue={itemsPerPage}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
-                    >
-                        <Picker.Item label="10" value={10} />
-                        <Picker.Item label="100" value={100} />
-                        <Picker.Item label="500" value={500} />
-                        <Picker.Item label="All" value={upcomingBirthdays.length} />
-                    </Picker>
-                </View>
-                <Text style={styles.text}>Entries</Text>
-            </View>
-
-      <View style={styles.pickerContainer}>
-                <Text style={styles.text}>Show</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        selectedValue={itemsPerPage}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
-                    >
-                        <Picker.Item label="10" value={10} />
-                        <Picker.Item label="100" value={100} />
-                        <Picker.Item label="500" value={500} />
-                        <Picker.Item label="All" value={upcomingBirthdays.length} />
-                    </Picker>
-                </View>
-                <Text style={styles.text}>Entries</Text>
-            </View>
-
       <View>
         <ScrollView horizontal>
           <View>
             <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
               <Row
-                data={['S.No', 'Lead Id', 'Source', 'Campaign', 'Classification', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
+                data={['ID', 'Campaign', 'Classification', 'Source', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
                 widthArr={widthArr}
                 style={styles.header}
                 textStyle={[styles.text, { color: '#000' }]}
@@ -172,7 +118,6 @@ const Allocatelead = () => {
           </View>
         </ScrollView>
 
-        {renderPagination()}
 
       </View>
     </View>
@@ -240,22 +185,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
-  pickerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 10,
-    marginBottom:20
-},
-pickerWrapper: {
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 5,
-    marginHorizontal: 10,
-    width: 110, 
-    overflow: 'hidden'
-},
-picker: {
-    height: 25, 
-    color: '#000' 
-},
 });

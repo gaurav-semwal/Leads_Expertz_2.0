@@ -825,3 +825,66 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
+
+  export const Pending_Allocate = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}pending-allocate`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+  export const Get_Inventory = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}get-inventory`, requestOptions);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const result = await response.json();
+  
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };

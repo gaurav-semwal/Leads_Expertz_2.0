@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Pressable, Modal, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Pressable, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Picker } from '@react-native-picker/picker';
 import { TextInput } from 'react-native-paper';
-import { Add_Sub_Category, Get_Category } from '../../../Api/authApi';
+import { Add_Category, Get_Category, Get_Sub_Category } from '../../../Api/authApi';
 import Toast from 'react-native-toast-message';
+import { Table, Row, Rows } from 'react-native-table-component';
 
 const SubCategory = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedtype, setselectedtype] = useState('');
-    const [Subcategoryname, setsubCategoryname] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedType, setSelectedType] = useState('');
+    const [categoryName, setCategoryName] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [tableHead] = useState(['ID', 'Category Name']);
+    const [widthArr] = useState([150, 200]);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
     const [category, setCategory] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [subcategory, setSubcategory] = useState([]);
 
     const onPressPlusButton = () => {
         setModalVisible(true);
@@ -21,55 +29,158 @@ const SubCategory = ({ navigation }) => {
         setModalVisible(false);
     };
 
-    const handletypeChange = itemValue => {
-        console.log(itemValue);
-        setselectedtype(itemValue);
-        gecategoryapi(itemValue);
+    const handleCategory = (itemValue, itemIndex) => {
+        setSelectedCategory(itemValue);
+        getSubcategory(itemValue);
     };
 
-    const gecategoryapi = async typeId => {
-        console.log(typeId);
+    const getSubcategory = async (category_id) => {
         try {
-            const response = await Get_Category(typeId);
-            console.log('category', response);
+            const response = await Get_Sub_Category(category_id);
             if (response.msg === 'Load successfully.') {
-                setCategory(response.data);
+                setSubcategory(response.data);
+                // Update filteredCategories as well if needed
+                setFilteredCategories(response.data);
             } else {
+                Toast.show({
+                    text1: 'Failed to load subcategories',
+                    type: 'error',
+                });
             }
         } catch (error) {
-            console.log(error);
+            Toast.show({
+                text1: 'An error occurred',
+                type: 'error',
+            });
         }
     };
 
-    const Addsubcategoryapi = async () => {
-        console.log(selectedtype, selectedCategory,Subcategoryname);
+    const handleTypeChange = (itemValue) => {
+        setSelectedType(itemValue);
+        gecategoryapi(itemValue);
+    };
+
+    const gecategoryapi = async (typeId) => {
         try {
-            const response = await Add_Sub_Category(selectedtype, selectedCategory,Subcategoryname);
-            console.log('category', response);
+            const response = await Get_Category(typeId);
+            if (response.msg === 'Load successfully.') {
+                setCategory(response.data);
+            } else {
+                Toast.show({
+                    text1: 'Failed to load categories',
+                    type: 'error',
+                });
+            }
+        } catch (error) {
+            Toast.show({
+                text1: 'An error occurred',
+                type: 'error',
+            });
+        }
+    };
+
+    const addCategoryApi = async () => {
+        try {
+            const response = await Add_Category(selectedType, categoryName);
             if (response.msg === 'Save successfully.') {
+                const newCategory = { type: selectedType, name: categoryName };
+                setCategories([...categories, newCategory]);
+                setFilteredCategories([...filteredCategories, newCategory]);
                 setModalVisible(false);
                 Toast.show({
                     text1: response.msg,
                     type: 'success',
                 });
+                setSelectedType('');
+                setCategoryName('');
             } else {
+                Toast.show({
+                    text1: 'Failed to save category',
+                    type: 'error',
+                });
             }
         } catch (error) {
-            console.log(error);
+            Toast.show({
+                text1: 'An error occurred',
+                type: 'error',
+            });
         }
     };
 
-    const handleCategory = (itemValue, itemIndex) => {
-        setSelectedCategory(itemValue);
+    const renderTableRows = () => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const dataToDisplay = subcategory.slice(startIndex, endIndex);
+
+        return dataToDisplay.map((rowData, index) => (
+            <Row
+                key={startIndex + index}
+                data={[
+                    rowData.id.toString(),
+                    rowData.name
+                ]}
+                widthArr={widthArr}
+                style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+                textStyle={styles.text}
+            />
+        ));
+    };
+
+    const renderPagination = () => {
+        const totalPages = Math.ceil(subcategory.length / itemsPerPage);
+
+        return (
+            <View style={styles.pagination}>
+                <TouchableOpacity
+                    style={styles.pageButton}
+                    disabled={currentPage === 1}
+                    onPress={() => setCurrentPage(currentPage - 1)}
+                >
+                    <AntDesign name="left" color="#625bc5" size={25} />
+                </TouchableOpacity>
+                <Text style={styles.pageText}>{currentPage} / {totalPages}</Text>
+                <TouchableOpacity
+                    style={styles.pageButton}
+                    disabled={currentPage === totalPages}
+                    onPress={() => setCurrentPage(currentPage + 1)}
+                >
+                    <AntDesign name="right" color="#625bc5" size={25} />
+                </TouchableOpacity>
+            </View>
+        );
     };
 
     return (
         <View style={styles.container}>
-            <View style={styles.plusButtonContainer}>
-                <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
-                    <AntDesign name="plus" size={28} color="#dbdad3" />
-                </Pressable>
+            <View style={styles.top}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={styles.dropdownContainer}>
+                        <Picker
+                            selectedValue={selectedType}
+                            onValueChange={handleTypeChange}
+                        >
+                            <Picker.Item label="Select Type" value="" />
+                            <Picker.Item label="Residential" value="residential" />
+                            <Picker.Item label="Commercial" value="commercial" />
+                        </Picker>
+                    </View>
+                </View>
             </View>
+
+            <View style={styles.top}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={styles.dropdownContainer}>
+                    <Picker
+                        selectedValue={selectedCategory}
+                        onValueChange={handleCategory}>
+                        <Picker.Item label="Select Category" value="" />
+                        {category.map((src, index) => (
+                            <Picker.Item key={index} label={src.name} value={src.id} />
+                        ))}
+                    </Picker>
+                </View>
+                </View>
+                </View>
 
             <Modal
                 animationType="slide"
@@ -81,11 +192,12 @@ const SubCategory = ({ navigation }) => {
                     <View style={styles.modalContent}>
                         <View>
                             <Text style={styles.heading}>Select Type</Text>
-                            <View style={styles.dropdowncontainer1}>
+                            <View style={styles.dropdownContainer}>
                                 <Picker
-                                    selectedValue={selectedtype}
+                                    selectedValue={selectedType}
                                     style={styles.picker}
-                                    onValueChange={handletypeChange}>
+                                    onValueChange={handleTypeChange}
+                                >
                                     <Picker.Item label="Select Type" value="" />
                                     <Picker.Item label="Residential" value="residential" />
                                     <Picker.Item label="Commercial" value="commercial" />
@@ -94,42 +206,69 @@ const SubCategory = ({ navigation }) => {
                         </View>
 
                         <View>
-                        <Text style={styles.heading}>Select Category Name</Text>
-                            <View style={styles.dropdowncontainer1}>
-                                <Picker
-                                    selectedValue={selectedCategory}
-                                    style={styles.picker}
-                                    onValueChange={handleCategory}>
-                                    <Picker.Item label="Select Category" value="" />
-                                    {category.map((src, index) => (
-                                        <Picker.Item key={index} label={src.name} value={src.id} />
-                                    ))}
-                                </Picker>
-                            </View>
-                        </View>
-                        <View>
-                            <Text style={styles.heading}>Enter Sub Category Name</Text>
-
+                            <Text style={styles.heading}>Select Category Name</Text>
                             <TextInput
-                                label="Enter Sub Category Name"
-                                value={Subcategoryname}
-                                onChangeText={text => setsubCategoryname(text)}
-                                style={[styles.textinput]}
+                                label="Category Name"
+                                value={categoryName}
+                                onChangeText={text => setCategoryName(text)}
+                                style={styles.textInput}
                                 mode="outlined"
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+                        <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
                                 <Text style={styles.modalButtonText}>Close</Text>
                             </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.modalButton} onPress={Addsubcategoryapi}>
+                            <TouchableOpacity style={styles.modalButton} onPress={addCategoryApi}>
                                 <Text style={styles.modalButtonText}>Add</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
             </Modal>
+
+            {/* <View style={styles.pickerContainer}>
+                <Text style={styles.text}>Show</Text>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={itemsPerPage}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setItemsPerPage(itemValue)}
+                    >
+                        <Picker.Item label="10" value={10} />
+                        <Picker.Item label="50" value={50} />
+                        <Picker.Item label="100" value={100} />
+                        <Picker.Item label="All" value={subcategory.length} />
+                    </Picker>
+                </View>
+                <Text style={styles.text}>Entries</Text>
+            </View> */}
+
+            <Text style={styles.tableTitle}>
+                {selectedCategory ? `Subcategories for Category ID ${selectedCategory}` : 'Subcategories'}
+            </Text>
+
+            <ScrollView horizontal={true}>
+                <View>
+                    <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                        <Row
+                            data={tableHead}
+                            widthArr={widthArr}
+                            style={styles.header}
+                            textStyle={[styles.text, { color: 'black' }]}
+                        />
+                        {renderTableRows()}
+                    </Table>
+                </View>
+            </ScrollView>
+            {renderPagination()}
+
+            <View style={styles.plusButtonContainer}>
+                <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+                    <AntDesign name="plus" size={28} color="#dbdad3" />
+                </Pressable>
+            </View>
         </View>
     );
 };
@@ -139,7 +278,14 @@ export default SubCategory;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        padding: 10,
+    },
+    top: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     plusButtonContainer: {
         position: 'absolute',
@@ -150,7 +296,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 3,
-        alignSelf: 'flex-end',
         bottom: 20,
         right: 20,
     },
@@ -190,22 +335,80 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
-    picker: {
-        borderBlockColor: 'black',
-        borderWidth: 1,
-        borderColor: 'black',
+    heading: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: 'black',
     },
-    dropdowncontainer1: {
+    dropdownContainer: {
         borderWidth: 1,
         height: 48,
         justifyContent: 'center',
         borderRadius: 5,
         borderColor: '#625bc5',
-        width: '100%'
+        width: '100%',
+        marginBottom: 10,
     },
-    heading: {
+    picker: {
+        height: 48,
+        color: 'black',
+    },
+    textInput: {
+        marginTop: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    modalButton: {
+        padding: 12,
+        backgroundColor: '#625bc5',
+        borderRadius: 5,
+        alignItems: 'center',
+        width: '47%',
+    },
+    modalButtonText: {
+        color: '#fff',
         fontSize: 16,
-        fontWeight: '700',
-        color: 'black'
-    }
+    },
+    text: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    row: {
+        height: 40,
+        backgroundColor: '#E7E6E1',
+    },
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginTop: 10,
+    },
+    pageButton: {
+        marginHorizontal: 5,
+    },
+    pageText: {
+        color: '#625bc5',
+        fontWeight: 'bold',
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10,
+        marginBottom: 20,
+    },
+    pickerWrapper: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        width: 110,
+        overflow: 'hidden',
+    },
+    tableTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginVertical: 10,
+        textAlign: 'center',
+    },
 });
