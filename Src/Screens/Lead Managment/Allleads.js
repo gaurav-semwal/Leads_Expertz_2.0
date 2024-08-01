@@ -4,13 +4,14 @@ import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TextInput } from 'react-native-paper';
-import { Get_Lead, Get_Lead_Data, Get_Status } from '../../../Api/authApi';
+import { Get_Lead, Get_Lead_Data, Get_Status, Get_User } from '../../../Api/authApi';
 import moment from 'moment';
 import { Calendar } from 'react-native-calendars';
 
 const Allleads = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
+  const [user, setuser] = useState('');
   const [dob, setdob] = useState();
   const [doa, setdoa] = useState();
   const [selectedDate, setSelectedDate] = useState('');
@@ -18,6 +19,7 @@ const Allleads = ({ navigation }) => {
   const [leadData, setLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [statusData, setStatusData] = useState([]);
+  const [userData, setuserData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -26,6 +28,7 @@ const Allleads = ({ navigation }) => {
   useEffect(() => {
     getlead();
     getstatus();
+    getuser();
   }, []);
 
   const getstatus = async () => {
@@ -34,6 +37,19 @@ const Allleads = ({ navigation }) => {
       console.log('sttus', response);
       if (response.msg === '') {
         setStatusData(response.data);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getuser = async () => {
+    try {
+      const response = await Get_User();
+      console.log('user', response);
+      if (response.msg === 'Load successfully.') {
+        setuserData(response.data);
       } else {
       }
     } catch (error) {
@@ -244,13 +260,13 @@ const Allleads = ({ navigation }) => {
             <Text>From</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
-                selectedValue={selectedValue}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+                selectedValue={userData}
+                onValueChange={(itemValue, itemIndex) => setuser(itemValue)}
               >
                 <Picker.Item label="Select User" value="" />
-                <Picker.Item label="All" value="All" />
-                <Picker.Item label="Self" value="Self" />
-                <Picker.Item label="Team" value="Team" />
+                {userData.map(statusItem => (
+                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+                ))}
               </Picker>
             </View>
           </View>
