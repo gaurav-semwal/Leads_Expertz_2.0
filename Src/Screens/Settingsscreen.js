@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Button from '../Components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const Profilescreen = ({ navigation }) => {
   const [fullname, setFullname] = useState('');
@@ -9,6 +10,28 @@ const Profilescreen = ({ navigation }) => {
   const [mobilenumber, setMobilenumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('name');
+        const storedEmail = await AsyncStorage.getItem('email');
+        const storedMobile = await AsyncStorage.getItem('mobile');
+        const storedPassword = await AsyncStorage.getItem('password');
+
+        if (storedUsername && storedEmail && storedMobile &&storedPassword) {
+          setFullname(storedUsername);
+          setMail(storedEmail);
+          setMobilenumber(storedMobile);
+          setPassword(storedPassword)
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []); 
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

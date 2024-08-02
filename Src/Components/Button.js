@@ -5,9 +5,9 @@ import { Colors } from '../Comman/Styles'
 const Button = ({ text }) => {
   return (
     <View style={styles.container}>
-    <View style={styles.Button}>
-    <Text style={styles.text}>{text}</Text>
-    </View>
+      <View style={styles.Button}>
+        <Text style={styles.text}>{text}</Text>
+      </View>
     </View>
   )
 }
@@ -15,22 +15,22 @@ const Button = ({ text }) => {
 export default Button
 
 const styles = StyleSheet.create({
-    container: {
-        flex:1,
-    },
-    Button:{
-        height:48,
-        width:'85%',
-        alignItems: 'center',
-        backgroundColor:Colors.Button,
-        borderRadius:10,
-        justifyContent: 'center',
-        alignSelf: 'center',
-        bottom: '40%',
-    },
-    text:{
-        color:'white',
-        fontSize:14,
-        fontWeight:'500'
-    }
+  container: {
+    flex: 1,
+  },
+  Button: {
+    height: 48,
+    width: '85%',
+    alignItems: 'center',
+    backgroundColor: Colors.Button,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    bottom: '40%',
+  },
+  text: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500'
+  }
 })

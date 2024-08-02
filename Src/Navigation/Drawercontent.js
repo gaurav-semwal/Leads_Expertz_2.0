@@ -84,7 +84,7 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Users List</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}  onPress={() => props.navigation.navigate('PromoteList')}>
+          {/* <TouchableOpacity style={styles.subMenuItem}  onPress={() => props.navigation.navigate('PromoteList')}>
             <Ionicons
               name="person"
               size={20}
@@ -92,7 +92,7 @@ const DrawerContent = props => {
               style={styles.icon}
             />
             <Text style={styles.subMenuText}>Promote List</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       );
     }
