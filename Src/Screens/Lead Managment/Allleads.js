@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Pressable, FlatList, Modal, ScrollView } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, {useState, useEffect, useCallback} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+  FlatList,
+  Modal,
+  ScrollView,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TextInput } from 'react-native-paper';
-import { Get_Lead, Get_Lead_Data, Get_Status, Get_User } from '../../../Api/authApi';
+import {TextInput} from 'react-native-paper';
+import {
+  Get_Lead,
+  Get_Lead_Data,
+  Get_Status,
+  Get_User,
+} from '../../../Api/authApi';
 import moment from 'moment';
-import { Calendar } from 'react-native-calendars';
+import {Calendar} from 'react-native-calendars';
+import {useFocusEffect} from '@react-navigation/native';
 
-const Allleads = ({ navigation }) => {
+const Allleads = ({navigation}) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
   const [user, setuser] = useState('');
@@ -24,6 +39,33 @@ const Allleads = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedValue('');
+      setstatus('');
+      setuser('');
+      setdob('');
+      setdoa('');
+      setSelectedDate('');
+      setSelectedDatedob('');
+      setLeadData([]);
+      setRefreshing(false);
+      setStatusData([]);
+      setuserData([]);
+      setSelectedItem(null);
+      setModalVisible(false);
+      setShowCalendar(false);
+      setShowCalendarModal(false);
+      setStartDate('');
+      setEndDate('');
+      getlead();
+      getstatus();
+      getuser();
+    }, []),
+  );
 
   useEffect(() => {
     getlead();
@@ -34,10 +76,8 @@ const Allleads = ({ navigation }) => {
   const getstatus = async () => {
     try {
       const response = await Get_Status();
-      console.log('sttus', response);
       if (response.msg === '') {
         setStatusData(response.data);
-      } else {
       }
     } catch (error) {
       console.log(error);
@@ -47,26 +87,49 @@ const Allleads = ({ navigation }) => {
   const getuser = async () => {
     try {
       const response = await Get_User();
-      console.log('user', response);
       if (response.msg === 'Load successfully.') {
         setuserData(response.data);
-      } else {
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getlead = async () => {
+  const getlead = async (
+    statusFilter = '',
+    startDateFilter = '',
+    endDateFilter = '',
+  ) => {
     try {
       const response = await Get_Lead();
-      console.log(response);
       if (response.msg === 'Load successfully') {
-        setLeadData(response.data);
+        let filteredData = response.data;
+
+        if (statusFilter) {
+          filteredData = filteredData.filter(
+            lead => lead.status === statusFilter,
+          );
+        }
+
+        if (startDateFilter && endDateFilter) {
+          filteredData = filteredData.filter(lead => {
+            const leadDate = moment(lead.lead_date);
+            return leadDate.isBetween(
+              startDateFilter,
+              endDateFilter,
+              'days',
+              '[]',
+            );
+          });
+        }
+
+        setLeadData(filteredData);
       } else {
+        setLeadData([]);
       }
     } catch (error) {
       console.log(error);
+      setLeadData([]);
     }
   };
 
@@ -83,37 +146,29 @@ const Allleads = ({ navigation }) => {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
-  
-  const handleDateSelect = async (date) => {
+  const handleDateSelect = async date => {
     setSelectedDate(date);
     setShowCalendarModal(false);
+    setStartDate(date);
+    getlead(status, date, endDate);
+  };
 
-    if (date) {
-        setSelectedDate(date);
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-    }
-};
-
-  const handleDateSelectdob = async (date) => {
+  const handleDateSelectdob = async date => {
     setSelectedDatedob(date);
     setShowCalendar(false);
+    setEndDate(date);
+    getlead(status, startDate, date);
+  };
 
-    if (date) {
-        setSelectedDatedob(date);
-        const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
-    }
-};
-
-  const leadedit = (item) => {
+  const leadedit = item => {
     console.log('Edit lead:', item);
   };
 
-  const openModal = async (item) => {
+  const openModal = async item => {
     setModalVisible(true);
     try {
       const response = await Get_Lead_Data(item.id);
-      console.log(response)
-      if (response.msg === "Load successfully") {
+      if (response.msg === 'Load successfully') {
         setSelectedItem(response.data);
       }
     } catch (error) {
@@ -125,7 +180,7 @@ const Allleads = ({ navigation }) => {
     }
   };
 
-  const handlePhonePress = (phone) => {
+  const handlePhonePress = phone => {
     console.log('Phone press:', phone);
   };
 
@@ -134,15 +189,19 @@ const Allleads = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  const editlead = (item) => {
-    console.log('Edit lead:', item);
-    navigation.navigate('Update Lead', { leadid: item.id ,status:item.status});
+  const editlead = item => {
+    navigation.navigate('Update Lead', {leadid: item.id, status: item.status});
   };
 
-  const Item = ({ item }) => (
+  const Item = ({item}) => (
     <Pressable>
       <View style={styles.leadContainer}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
           <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
             <Text style={styles.editButtonText}>Lead Edit</Text>
           </Pressable>
@@ -150,17 +209,21 @@ const Allleads = ({ navigation }) => {
             <Text style={styles.editButtonText1}>{item.status}</Text>
           </Pressable>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-            <View style={styles.profileContainer}>
-              {/* <Image style={styles.profileImage} source={require('../Assets/Images/profile.jpg')} /> */}
-            </View>
-            <View style={{ marginLeft: 10 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            <View style={styles.profileContainer}></View>
+            <View style={{marginLeft: 10}}>
               <Text style={styles.leadTitle}>{item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={styles.leadInfo}>{item.phone}</Text>
                 <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{ marginLeft: 10 }}>
+                  <View style={{marginLeft: 10}}>
                     <AntDesign name="phone" size={20} color="black" />
                   </View>
                 </TouchableOpacity>
@@ -171,19 +234,26 @@ const Allleads = ({ navigation }) => {
             <AntDesign name="edit" size={25} color="black" />
           </Pressable>
         </View>
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
           <Text style={styles.leadInfo1}>Source: {item.source}</Text>
           <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.leadInfo1}>Date: {moment(item.lead_date).format('YYYY-MM-DD')}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={styles.leadInfo1}>
+              Date: {moment(item.lead_date).format('YYYY-MM-DD')}
+            </Text>
           </View>
         </View>
       </View>
     </Pressable>
   );
 
-  const LeadModal = ({ item }) => {
+  const LeadModal = ({item}) => {
     if (!item) return null;
 
     const leadComments = item.lead_comment || [];
@@ -192,95 +262,155 @@ const Allleads = ({ navigation }) => {
       <Modal
         visible={modalVisible}
         animationType="slide"
-        onRequestClose={closeModal}
         transparent={true}
+        onRequestClose={closeModal} // This is still needed to handle hardware back button
       >
         <View style={styles.centeredView}>
-          <Pressable style={styles.modalBackground} onPress={closeModal}>
+          <View style={styles.modalBackground}>
             <View style={styles.modalView}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalText}>Lead Details</Text>
                 <Pressable onPress={closeModal}>
-                  <MaterialCommunityIcons name="close-circle" size={25} color="#625bc5" />
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={25}
+                    color="#625bc5"
+                  />
                 </Pressable>
               </View>
 
-              <View style={{ flexDirection: 'column', padding: 10 }}>
-                <Text style={styles.modalText}>Name: {item.name || 'N/A'}</Text>
-                <Text style={styles.modalText}>Email: {item.email || 'N/A'}</Text>
-                <Text style={styles.modalText}>Mobile: {item.phone || 'N/A'}</Text>
-                <Text style={styles.modalText}>Address: {item.field3 || 'N/A'}</Text>
-                <Text style={styles.modalText}>DOB: {item.app_dob || 'N/A'}</Text>
-                <Text style={styles.modalText}>DOA: {item.app_doa || 'N/A'}</Text>
-                <Text style={styles.modalText}>Source: {item.source || 'N/A'}</Text>
-                <Text style={styles.modalText}>Type: {item.type || 'N/A'}</Text>
-                <Text style={styles.modalText}>Category: {item.cat_name || 'N/A'}</Text>
-                <Text style={styles.modalText}>SubCategory: {item.subcatname || 'N/A'}</Text>
-                <Text style={styles.modalText}>State: {item.field1 || 'N/A'}</Text>
-                <Text style={styles.modalText}>City: {item.field2 || 'N/A'}</Text>
-                <Text style={styles.modalText}>Classification: {item.classification || 'N/A'}</Text>
-                <Text style={styles.modalText}>Project: {item.project_id || 'N/A'}</Text>
-                <Text style={styles.modalText}>Campaign: {item.campaign || 'N/A'}</Text>
-                <Text style={styles.modalText}>Status: {item.status || 'N/A'}</Text>
-              </View>
+              <ScrollView contentContainerStyle={{}}>
+                <View style={{flexDirection: 'column', padding: 10}}>
+                  <Text style={styles.modalText}>
+                    Name: {item.name || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Email: {item.email || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Mobile: {item.phone || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Address: {item.field3 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    DOB: {item.app_dob || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    DOA: {item.app_doa || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Source: {item.source || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Type: {item.type || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Category: {item.cat_name || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    SubCategory: {item.subcatname || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    State: {item.field1 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    City: {item.field2 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Classification: {item.classification || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Project: {item.project_id || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Campaign: {item.campaign || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Status: {item.status || 'N/A'}
+                  </Text>
+                </View>
 
-              <View style={{ height: '30%', padding: 10 }}>
-                <ScrollView>
+                <View style={{padding: 10}}>
                   <View style={styles.modalheading}>
                     <Text style={styles.modalText}>Lead Comments</Text>
                   </View>
                   {leadComments.length > 0 ? (
                     leadComments.map((comment, index) => (
                       <View key={index} style={styles.commentContainer}>
-                        <Text style={styles.commentText}>{comment.comment || 'No comment text'}</Text>
-                        <Text style={styles.modalText}>Status: {comment.status || 'N/A'}</Text>
-                        <Text style={styles.modalText}>Remind: {comment.remind || 'N/A'}</Text>
-                        <Text style={styles.modalText}>Created Date: {comment.created_date || 'N/A'}</Text>
-                        {index !== leadComments.length - 1 && <View style={styles.separator} />}
+                        <Text style={styles.commentText}>
+                          {comment.comment || 'No comment text'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Status: {comment.status || 'N/A'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Remind: {comment.remind || 'N/A'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Created Date: {comment.created_date || 'N/A'}
+                        </Text>
+
+                        {index !== leadComments.length - 1 && (
+                          <View style={styles.separator} />
+                        )}
                       </View>
                     ))
                   ) : (
                     <Text style={styles.modalText}>No comments available</Text>
                   )}
-                </ScrollView>
-              </View>
+                </View>
+              </ScrollView>
             </View>
-          </Pressable>
+          </View>
         </View>
       </Modal>
     );
   };
 
-
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-          <View style={{ width: '49%' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}>
+          <View style={{width: '49%'}}>
             <Text>From</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
-                selectedValue={userData}
-                onValueChange={(itemValue, itemIndex) => setuser(itemValue)}
-              >
+                selectedValue={user}
+                onValueChange={itemValue => setuser(itemValue)}>
                 <Picker.Item label="Select User" value="" />
                 {userData.map(statusItem => (
-                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+                  <Picker.Item
+                    key={statusItem.id}
+                    label={statusItem.name}
+                    value={statusItem.name}
+                  />
                 ))}
               </Picker>
             </View>
           </View>
 
-          <View style={{ width: '49%' }}>
+          <View style={{width: '49%'}}>
             <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={status}
-                onValueChange={(itemValue) => setstatus(itemValue)}
-              >
+                onValueChange={itemValue => {
+                  setstatus(itemValue);
+                  getlead(itemValue, startDate, endDate);
+                }}>
                 <Picker.Item label="Select Status" value="" />
                 {statusData.map(statusItem => (
-                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+                  <Picker.Item
+                    key={statusItem.id}
+                    label={statusItem.name}
+                    value={statusItem.name}
+                  />
                 ))}
               </Picker>
             </View>
@@ -288,12 +418,16 @@ const Allleads = ({ navigation }) => {
         </View>
 
         <View style={styles.dob}>
-          <View style={{ width: '49%' }}>
+          <View style={{width: '49%'}}>
             <View>
               <TextInput
-                label="Date"
-                value={selectedDatedob ? moment(selectedDatedob).format('YYYY-MM-DD') : ''}
-                onChangeText={(text) => setdob(text)}
+                label="From Date"
+                value={
+                  selectedDatedob
+                    ? moment(selectedDatedob).format('YYYY-MM-DD')
+                    : ''
+                }
+                onChangeText={text => setdob(text)}
                 style={[styles.textinputdob, {}]}
                 mode="outlined"
                 maxLength={10}
@@ -314,11 +448,13 @@ const Allleads = ({ navigation }) => {
             </View>
           </View>
 
-          <View style={{ width: '49%' }}>
+          <View style={{width: '49%'}}>
             <TextInput
-              label="To"
-              value={selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''}
-              onChangeText={(text) => setdoa(text)}
+              label="To Date"
+              value={
+                selectedDate ? moment(selectedDate).format('YYYY-MM-DD') : ''
+              }
+              onChangeText={text => setdoa(text)}
               style={[styles.textinputdob, {}]}
               mode="outlined"
               maxLength={10}
@@ -340,17 +476,19 @@ const Allleads = ({ navigation }) => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.buttoncontainer1}>
+        <TouchableOpacity
+          style={styles.buttoncontainer1}
+          onPress={() => getlead(status, startDate, endDate)}>
           <Text style={styles.text1}>Search</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={leadData}
-        renderItem={({ item }) => <Item item={item} />}
-        keyExtractor={(item) => item.id.toString()}
+        renderItem={({item}) => <Item item={item} />}
+        keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 10 }}
+        contentContainerStyle={{paddingTop: 10}}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
@@ -358,38 +496,34 @@ const Allleads = ({ navigation }) => {
       {selectedItem && <LeadModal item={selectedItem} />}
 
       <Modal
-                animationType="slide"
-                transparent={true}
-                visible={showCalendar}
-                onRequestClose={() => setShowCalendar(false)}>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
+        animationType="slide"
+        transparent={true}
+        visible={showCalendar}
+        onRequestClose={() => setShowCalendar(false)}>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <Calendar
+            onDayPress={day => handleDateSelectdob(day.dateString)}
+            markedDates={{
+              [selectedDate]: {selected: true, selectedColor: 'blue'},
+            }}
+          />
+        </View>
+      </Modal>
 
-
-                    <Calendar
-                        onDayPress={(day) => handleDateSelectdob(day.dateString)}
-                        markedDates={{
-                            [selectedDate]: { selected: true, selectedColor: 'blue' }
-                        }}
-                    />
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={showCalendarModal}
-                onRequestClose={() => setShowCalendarModal(false)}>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-
-
-                    <Calendar
-                        onDayPress={(day) => handleDateSelect(day.dateString)}
-                        markedDates={{
-                            [selectedDate]: { selected: true, selectedColor: 'blue' }
-                        }}
-                    />
-                </View>
-            </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showCalendarModal}
+        onRequestClose={() => setShowCalendarModal(false)}>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <Calendar
+            onDayPress={day => handleDateSelect(day.dateString)}
+            markedDates={{
+              [selectedDate]: {selected: true, selectedColor: 'blue'},
+            }}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -414,7 +548,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-    width: '100%'
+    width: '100%',
   },
   buttoncontainer1: {
     height: 38,
@@ -423,13 +557,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#625bc5',
     alignItems: 'center',
     justifyContent: 'center',
-    top: 10
+    top: 10,
   },
   text1: {
     color: 'white',
   },
-  textinputdob: {
-  },
+  textinputdob: {},
   top: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -468,7 +601,7 @@ const styles = StyleSheet.create({
     borderColor: '#ede8e8',
     borderWidth: 1,
     backgroundColor: '#ede8e8',
-    marginBottom: 10
+    marginBottom: 10,
   },
   editButton: {
     alignSelf: 'flex-start',
@@ -514,12 +647,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
+  // modalContainer: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  // },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -544,20 +677,23 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalBackground: {
+    backgroundColor: 'transparent', // Make sure this is transparent
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   modalView: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    elevation: 5,
+    padding: 20,
     width: '90%',
-    padding: 10,
+    maxHeight: '80%', // Restrict the height to avoid overflow
+    elevation: 5,
   },
   modalheading: {
     width: '100%',
@@ -600,6 +736,6 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     height: '30%',
-    padding: 10
+    padding: 10,
   },
 });

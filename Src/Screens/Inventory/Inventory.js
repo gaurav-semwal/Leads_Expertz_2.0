@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,15 +8,17 @@ import {
   ToastAndroid,
   Image,
 } from 'react-native';
-import {Table, Row} from 'react-native-table-component';
+import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Get_Inventory} from '../../../Api/authApi';
+import { Get_Inventory } from '../../../Api/authApi';
 
-const Inventory = ({navigation}) => {
-  const [data, setData] = useState([]); // State to hold API data
+const baseUrl = 'https://pro-leadexpertz.clikzopdevp.com/';
+
+const Inventory = ({ navigation }) => {
+  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 150]; // Adjusted widths for table columns
+  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 200]; // Adjusted widths for table columns
 
   useEffect(() => {
     fetchInventory();
@@ -29,7 +31,7 @@ const Inventory = ({navigation}) => {
       if (response.error) {
         ToastAndroid.show(response.msg, ToastAndroid.SHORT);
       } else {
-        setData(response.data); // Update state with API data
+        setData(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -42,11 +44,11 @@ const Inventory = ({navigation}) => {
     const endIndex = startIndex + itemsPerPage;
     const dataToDisplay = data.slice(startIndex, endIndex);
 
-    return dataToDisplay.map((rowData, index) => (
+    return dataToDisplay.map((rowData) => (
       <Row
         key={rowData.id}
         data={[
-          index + 1,
+          rowData.id,
           rowData.type,
           rowData.category,
           rowData.sub_category,
@@ -57,12 +59,11 @@ const Inventory = ({navigation}) => {
           rowData.price,
           rowData.img1 ? (
             <Image
-              source={require('../../Assets/logo.png')}
+              source={{ uri:`${baseUrl}${rowData.img1}` }}
               style={styles.image}
-              //   source={{ uri: rowData.img1 }}
-              //   style={styles.image}
-              //   onError={() => console.log('Failed to load image:', rowData.img1)}
-              //   onLoad={() => console.log('Image loaded successfully:', rowData.img1)}
+              resizeMethod=''
+              onError={() => console.log('Failed to load image:', rowData.img1)}
+              onLoad={() => console.log('Image loaded successfully:', rowData.img1)}
             />
           ) : (
             <Text>No Image</Text>
@@ -71,7 +72,7 @@ const Inventory = ({navigation}) => {
         widthArr={widthArr}
         style={[
           styles.row,
-          {backgroundColor: rowData.id % 2 === 0 ? '#F7F6E7' : '#E7E6E1'},
+          { backgroundColor: rowData.id % 2 === 0 ? '#F7F6E7' : '#E7E6E1' },
         ]}
         textStyle={styles.text}
       />
@@ -135,7 +136,7 @@ const Inventory = ({navigation}) => {
               ]}
               widthArr={widthArr}
               style={styles.header}
-              textStyle={[styles.text, {color: '#000'}]}
+              textStyle={[styles.text, { color: '#000' }]}
             />
             {renderTableRows()}
           </Table>
@@ -189,9 +190,9 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   image: {
-    width: 100,
-    alignSelf: 'center',
-    height: 40,
+    width: "100%",
+    height: 60,
+    resizeMode: 'cover',
   },
   pagination: {
     flexDirection: 'row',
