@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     width: '90%',
-    maxHeight: '80%', // Restrict the height to avoid overflow
+    maxHeight: '80%', 
     elevation: 5,
   },
   modalheading: {

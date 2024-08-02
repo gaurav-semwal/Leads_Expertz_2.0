@@ -153,7 +153,7 @@ const SubCategory = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.top}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center',justifyContent:'space-between' }}>
                     <View style={styles.dropdownContainer}>
                         <Picker
                             selectedValue={selectedType}
@@ -164,12 +164,8 @@ const SubCategory = ({ navigation }) => {
                             <Picker.Item label="Commercial" value="commercial" />
                         </Picker>
                     </View>
-                </View>
-            </View>
 
-            <View style={styles.top}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={styles.dropdownContainer}>
+                    <View style={styles.dropdownContainer}>
                     <Picker
                         selectedValue={selectedCategory}
                         onValueChange={handleCategory}>
@@ -180,7 +176,7 @@ const SubCategory = ({ navigation }) => {
                     </Picker>
                 </View>
                 </View>
-                </View>
+            </View>
 
             <Modal
                 animationType="slide"
@@ -285,7 +281,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
     },
     plusButtonContainer: {
         position: 'absolute',
@@ -346,7 +341,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 5,
         borderColor: '#625bc5',
-        width: '100%',
+        width: '49%',
         marginBottom: 10,
     },
     picker: {
