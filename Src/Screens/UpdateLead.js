@@ -1,13 +1,13 @@
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Colors} from '../../Comman/Styles';
-import {TextInput} from 'react-native-paper';
+import { Colors } from '../../Comman/Styles';
+import { TextInput } from 'react-native-paper';
 import Button from '../../Src/Components/Button';
 
 import Toast from 'react-native-toast-message';
 import validator from 'validator';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import {
   Update_Lead,
   Get_Campaigns,
@@ -22,7 +22,7 @@ import {
 } from '../../Api/authApi';
 import { useRoute } from '@react-navigation/native';
 
-const Updatelead = ({navigation}) => {
+const Updatelead = ({ navigation }) => {
   const route = useRoute();
   const { leadid } = route.params;
 
@@ -37,7 +37,6 @@ const Updatelead = ({navigation}) => {
   const [subcategory, setSubcategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const [project, setproject] = useState([]);
   const [selectedproject, setselectedproject] = useState('');
   const [campigns, setcampigns] = useState([]);
   const [selectedcampigns, setselectedcampigns] = useState('');
@@ -53,7 +52,29 @@ const Updatelead = ({navigation}) => {
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState('');
   const [statusData, setStatusData] = useState([]);
-  const [status, setstatus] = useState('');
+
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [budget, setBudget] = useState('');
+
+
+
+  const [status, setStatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedProject, setSelectedProject] = useState('');
+  const [size, setSize] = useState('');
+  const [price, setPrice] = useState('');
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantContact, setApplicantContact] = useState('');
+  const [applicantCity, setApplicantCity] = useState('');
+  const [applicantDob, setApplicantDob] = useState('');
+  const [applicantDoa, setApplicantDoa] = useState('');
+  const project = [
+    { id: '1', project_name: 'Project 1' },
+    { id: '2', project_name: 'Project 2' },
+  ];
+
+
 
   useEffect(() => {
     getstate();
@@ -63,6 +84,7 @@ const Updatelead = ({navigation}) => {
     getproject();
     getlead();
     getstatus();
+
   }, []);
 
   const getstatus = async () => {
@@ -78,7 +100,7 @@ const Updatelead = ({navigation}) => {
     }
   };
 
-  const handleaddleads = async () => {};
+  const handleaddleads = async () => { };
 
   const handleSourceChange = itemValue => {
     setSelectedSource(itemValue);
@@ -155,7 +177,7 @@ const Updatelead = ({navigation}) => {
   const getcity = async itemValue => {
     try {
       const response = await Get_City(itemValue);
-console.log("CITY DEKH AARI HAI", response);
+      console.log("CITY DEKH AARI HAI", response);
       if (response.msg === '') {
         setcity(response.data);
       } else {
@@ -229,41 +251,41 @@ console.log("CITY DEKH AARI HAI", response);
   const getlead = async () => {
     try {
       const response = await Get_Lead_Data(leadid);
-      console.log('CHAISTHA HELP KARO',response.data);
+      console.log('CHAISTHA HELP KARO', response.data);
       if (response.msg === 'Load successfully') {
-        const leadData = response.data; 
+        const leadData = response.data;
         setfullname(leadData.name || '');
-        setmobilenumber(leadData.phone || ''); 
+        setmobilenumber(leadData.phone || '');
         setemail(leadData.email || '');
-        setcomments(leadData.notes || ''); 
-        setaddress(leadData.field3); 
+        setcomments(leadData.notes || '');
+        setaddress(leadData.field3);
         setwhatsapp(leadData.whatsapp_no || '');
         setSelectedSource(leadData.source || '');
         setselectedtype(leadData.type || '');
-        setSelectedSubcategory(leadData.sub_catg_id || ''); 
+        setSelectedSubcategory(leadData.sub_catg_id || '');
 
         const typ = await setselectedtype;
         const selectedType = typ.data.find(typ => typ.id === leadData.type);
-        console.log('hhhhhhhhhhh',typ)
+        console.log('hhhhhhhhhhh', typ)
 
-        var ctp  = '';
+        var ctp = '';
         if (selectedType) {
-            setselectedtype(selectedType.id);
-            ctp = await Get_Category(selectedType.id);
-            setCategory(ctp.data);
+          setselectedtype(selectedType.id);
+          ctp = await Get_Category(selectedType.id);
+          setCategory(ctp.data);
         }
 
         const selectedCategory = ctp.data.find(cat => cat.id === leadData.catg_id);
-        console.log('jjjjjjjjjjjjj',ctp)
+        console.log('jjjjjjjjjjjjj', ctp)
         if (selectedCategory) {
-            setSelectedCategory(selectedCategory.id);
-            getSubcategory(selectedCategory.id);
+          setSelectedCategory(selectedCategory.id);
+          getSubcategory(selectedCategory.id);
         }
 
-        setselectedproject(leadData.project_id || ''); 
-        setselectedcampigns(leadData.campaign || ''); 
-        setSelectedState(leadData.field2 || ''); 
-        setSelectedCity(leadData.field1 || ''); 
+        setselectedproject(leadData.project_id || '');
+        setselectedcampigns(leadData.campaign || '');
+        setSelectedState(leadData.field2 || '');
+        setSelectedCity(leadData.field1 || '');
         setselectedclassification(leadData.classification || '');
       } else {
       }
@@ -288,6 +310,16 @@ console.log("CITY DEKH AARI HAI", response);
       selectedCity,
       address,
       comments,
+      date,
+      time,
+      budget,
+      applicantName,
+      applicantContact,
+      applicantCity,
+      applicantDob,
+      applicantDoa,
+      price,
+      size
     );
     try {
       const response = await Update_Lead(
@@ -305,6 +337,16 @@ console.log("CITY DEKH AARI HAI", response);
         selectedCity,
         address,
         comments,
+        date,
+        time,
+        budget,
+        applicantName,
+        applicantContact,
+        applicantCity,
+        applicantDob,
+        applicantDoa,
+        price,
+        size
       );
 
       console.log(response);
@@ -328,6 +370,21 @@ console.log("CITY DEKH AARI HAI", response);
         type: 'error',
       });
     }
+  };
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+    // Reset dynamic fields when status changes
+    setDate('');
+    setTime('');
+    setBudget('');
+    setApplicantName('');
+    setApplicantContact('');
+    setApplicantCity('');
+    setApplicantDob('');
+    setApplicantDoa('');
+    setPrice('');
+    setSize('');
   };
 
 
@@ -354,7 +411,7 @@ console.log("CITY DEKH AARI HAI", response);
               const formattedText = text.replace(/[^0-9]/g, '');
               setmobilenumber(formattedText.slice(0, 10));
             }}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
             keyboardType="numeric"
             maxLength={10}
@@ -378,7 +435,7 @@ console.log("CITY DEKH AARI HAI", response);
             label="Full Name"
             value={fullname}
             onChangeText={text => setfullname(text)}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
           />
         </View>
@@ -401,7 +458,7 @@ console.log("CITY DEKH AARI HAI", response);
               label="Email"
               value={email}
               onChangeText={handleEmailChange}
-              style={[styles.textinput, {paddingLeft: 30}]}
+              style={[styles.textinput, { paddingLeft: 30 }]}
               mode="outlined"
               maxLength={100}
               keyboardType="email-address"
@@ -412,7 +469,7 @@ console.log("CITY DEKH AARI HAI", response);
           </>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSource}
@@ -426,7 +483,7 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedtype}
@@ -439,7 +496,7 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedCategory}
@@ -453,7 +510,7 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSubcategory}
@@ -467,7 +524,7 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedclassification}
@@ -481,7 +538,7 @@ console.log("CITY DEKH AARI HAI", response);
         </View>
 
         <View style={styles.dob}>
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedcampigns}
@@ -495,7 +552,7 @@ console.log("CITY DEKH AARI HAI", response);
             </View>
           </View>
 
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedproject}
@@ -545,21 +602,186 @@ console.log("CITY DEKH AARI HAI", response);
           </View>
         </View>
 
-<View style={{top:10}}>
-        <View style={styles.dropdowncontainer1}>
+        <View style={{ top: 10 }}>
+          <View style={styles.dropdowncontainer1}>
+            <Picker
+              selectedValue={status}
+              onValueChange={handleStatusChange}
+            >
+              <Picker.Item label="Select Status" value="" />
+              {statusData.map(statusItem => (
+                <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {status === 'INTERESTED' || status === 'CALL SCHEDULED' || status === 'VISIT SCHEDULED' ? (
+          <>
+            <View style={{ top: 10 }}>
+              <TextInput
+                label="Select Date"
+                value={date}
+                onChangeText={text => setDate(text)}
+                style={[styles.textinput]}
+                mode="outlined"
+              />
+            </View>
+            <View style={{ top: 10 }}>
+              <TextInput
+                label="Select Time"
+                value={time}
+                onChangeText={text => setTime(text)}
+                style={[styles.textinput]}
+                mode="outlined"
+              />
+            </View>
+          </>
+        ) : null}
+
+        {status === 'FUTURE LEAD' ? (
+          <>
+            <View style={{ top: 10 }}>
+              <TextInput
+                label="Select Budget"
+                value={budget}
+                onChangeText={text => setBudget(text)}
+                style={[styles.textinput]}
+                mode="outlined"
+              />
+            </View>
+            <View style={{ top: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.dropdowncontainer}>
+                <Picker
+                  selectedValue={selectedState}
+                  dropdownIconRippleColor={1}
+                  style={styles.picker}
+                  onValueChange={handleStateChange}>
+                  <Picker.Item label="Select State" value="" />
+                  {states.map((state, index) => (
+                    <Picker.Item key={index} label={state} value={state} />
+                  ))}
+                </Picker>
+              </View>
+
+              <View style={styles.dropdowncontainer}>
+                <Picker
+                  selectedValue={selectedCity}
+                  style={styles.picker}
+                  onValueChange={city => setSelectedCity(city)}>
+                  <Picker.Item label="Select City" value="" />
+                  {city.map((state, index) => (
+                    <Picker.Item
+                      key={index}
+                      label={state.city}
+                      value={state.city}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+          </>
+        ) : null}
+
+        {status === 'CONVERTED' ? (
+          <>
+            <View style={[styles.dropdowncontainer1, {top: 20}]}>
               <Picker
-                selectedValue={status}
-                onValueChange={(itemValue) => setstatus(itemValue)}
-              >
+                selectedValue={selectedStatus}
+                onValueChange={(value) => {
+                  setSelectedStatus(value);
+                }}>
                 <Picker.Item label="Select Status" value="" />
-                {statusData.map(statusItem => (
-                  <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
-                ))}
+                <Picker.Item label="Booked" value="BOOKED" />
+                <Picker.Item label="Completed" value="COMPLETED" />
               </Picker>
             </View>
-            </View>
+            {selectedStatus === 'COMPLETED' && (
+              <>
+                <View style={{ top: 25 }}>
+                  <View style={styles.dropdowncontainer1}>
+                    <Picker
+                      selectedValue={selectedProject}
+                      style={styles.picker}
+                      onValueChange={(value) => setSelectedProject(value)}>
+                      <Picker.Item label="Select Project" value="" />
+                      {project.map((src, index) => (
+                        <Picker.Item key={index} label={src.project_name} value={src.id} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Enter Size"
+                    value={size}
+                    onChangeText={(text) => setSize(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Enter Price"
+                    value={price}
+                    onChangeText={(text) => setPrice(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Applicant Name"
+                    value={applicantName}
+                    onChangeText={(text) => setApplicantName(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Applicant Contact"
+                    value={applicantContact}
+                    onChangeText={(text) => setApplicantContact(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Applicant City"
+                    value={applicantCity}
+                    onChangeText={(text) => setApplicantCity(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Applicant DOB"
+                    value={applicantDob}
+                    onChangeText={(text) => setApplicantDob(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+                <View style={{ top: 25 }}>
+                  <TextInput
+                    label="Applicant DOA"
+                    value={applicantDoa}
+                    onChangeText={(text) => setApplicantDoa(text)}
+                    style={styles.textinput}
+                    mode="outlined"
+                  />
+                </View>
+              </>
+            )}
+          </>
+        ) : null}
 
-        <View style={{top:10}}>
+
+        <View style={{ top: 25 }}>
           <TextInput
             label="Enter Address"
             value={address}
@@ -569,7 +791,7 @@ console.log("CITY DEKH AARI HAI", response);
           />
         </View>
 
-        <View style={{top:10}}>
+        <View style={{ top: 25 }}>
           <TextInput
             label="Enter Comments"
             value={comments}
@@ -579,7 +801,7 @@ console.log("CITY DEKH AARI HAI", response);
           />
         </View>
 
-        <View style={{top:10}}>
+        <View style={{ top: 25 }}>
           <TextInput
             label="Enter Whatsapp number"
             value={whatsapp}
@@ -591,11 +813,11 @@ console.log("CITY DEKH AARI HAI", response);
         </View>
       </View>
 
-      <Pressable style={{top: 30}} onPress={Submit}>
+      <Pressable style={{ top: 40 }} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 
-      <View style={{height: 30}}></View>
+      <View style={{ height: 30 }}></View>
     </ScrollView>
   );
 };
@@ -612,6 +834,16 @@ const styles = StyleSheet.create({
   },
   form: {
     margin: 10,
+  },
+  // textinput: {
+  //   // marginBottom: 10,
+  //   backgroundColor: '#fff',
+  // },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
   },
   dob: {
     flexDirection: 'row',
