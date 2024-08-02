@@ -643,8 +643,6 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
- 
-
 
   export const Add_Category = async (type,name) => {
     try {
@@ -899,7 +897,7 @@ export const Add_User = async (name, mobile, email, password, role) => {
   
       const myHeaders = new Headers();
       myHeaders.append("token", token);
-      
+  
       const requestOptions = {
         method: "GET",
         headers: myHeaders,
@@ -914,12 +912,16 @@ export const Add_User = async (name, mobile, email, password, role) => {
   
       const result = await response.json();
   
+      // Ensure this is logged to compare
+      console.log('API Response:', result);
+  
       return result;
     } catch (error) {
       console.error('API Request Error:', error);
       throw error;
     }
   };
+  
 
   export const Allocate_Lead = async (leadIds, userId) => {
     console.log('222222222222222222222', leadIds, userId);
@@ -956,6 +958,55 @@ export const Add_User = async (name, mobile, email, password, role) => {
       return result;
     } catch (error) {
       console.error('API Request Error:', error);
+      throw error;
+    }
+  };
+
+  export const Add_Quick_Lead = async (name, number
+  ) => {
+    try {
+      const isValid = await isValidToken();
+      if (!isValid) {
+        console.log('invaid')
+        throw new Error('Invalid or expired token');
+      }
+  
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('Token:', token);
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+  
+      const formdata = new FormData();
+      formdata.append("name", name);
+      formdata.append("phone", number);
+  
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+  
+      const response = await fetch(`${base_url}add-lead`, requestOptions);
+      console.log('Response:', response);
+      
+      const statusCode = response.status;
+      console.log('Status Code:', statusCode);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${statusCode}`);
+      }
+  
+      const result = await response.json();
+      console.log('Result:', result);
+  
+      return { statusCode, result };
+    } catch (error) {
+      console.error('Error:', error);
       throw error;
     }
   };

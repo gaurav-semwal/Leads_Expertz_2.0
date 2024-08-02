@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,21 +9,21 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {TextInput} from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import {
   Get_Lead,
   Get_Lead_Data,
   Get_Status,
-  Get_User,
+  Get_user,
 } from '../../../Api/authApi';
 import moment from 'moment';
-import {Calendar} from 'react-native-calendars';
-import {useFocusEffect} from '@react-navigation/native';
+import { Calendar } from 'react-native-calendars';
+import { useFocusEffect } from '@react-navigation/native';
 
-const Allleads = ({navigation}) => {
+const Allleads = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [status, setstatus] = useState('');
   const [user, setuser] = useState('');
@@ -86,7 +86,8 @@ const Allleads = ({navigation}) => {
 
   const getuser = async () => {
     try {
-      const response = await Get_User();
+      const response = await Get_user();
+      console.log('user', response)
       if (response.msg === 'Load successfully.') {
         setuserData(response.data);
       }
@@ -190,10 +191,10 @@ const Allleads = ({navigation}) => {
   };
 
   const editlead = item => {
-    navigation.navigate('Update Lead', {leadid: item.id, status: item.status});
+    navigation.navigate('Update Lead', { leadid: item.id, status: item.status });
   };
 
-  const Item = ({item}) => (
+  const Item = ({ item }) => (
     <Pressable>
       <View style={styles.leadContainer}>
         <View
@@ -216,14 +217,14 @@ const Allleads = ({navigation}) => {
             justifyContent: 'space-between',
           }}>
           <View
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={styles.profileContainer}></View>
-            <View style={{marginLeft: 10}}>
+            <View style={{ marginLeft: 10 }}>
               <Text style={styles.leadTitle}>{item.name}</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.leadInfo}>{item.phone}</Text>
                 <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{marginLeft: 10}}>
+                  <View style={{ marginLeft: 10 }}>
                     <AntDesign name="phone" size={20} color="black" />
                   </View>
                 </TouchableOpacity>
@@ -234,7 +235,7 @@ const Allleads = ({navigation}) => {
             <AntDesign name="edit" size={25} color="black" />
           </Pressable>
         </View>
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
           <Text style={styles.leadInfo1}>Source: {item.source}</Text>
           <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
@@ -253,7 +254,7 @@ const Allleads = ({navigation}) => {
     </Pressable>
   );
 
-  const LeadModal = ({item}) => {
+  const LeadModal = ({ item }) => {
     if (!item) return null;
 
     const leadComments = item.lead_comment || [];
@@ -280,7 +281,7 @@ const Allleads = ({navigation}) => {
               </View>
 
               <ScrollView contentContainerStyle={{}}>
-                <View style={{flexDirection: 'column', padding: 10}}>
+                <View style={{ flexDirection: 'column', padding: 10 }}>
                   <Text style={styles.modalText}>
                     Name: {item.name || 'N/A'}
                   </Text>
@@ -331,7 +332,7 @@ const Allleads = ({navigation}) => {
                   </Text>
                 </View>
 
-                <View style={{padding: 10}}>
+                <View style={{ padding: 10 }}>
                   <View style={styles.modalheading}>
                     <Text style={styles.modalText}>Lead Comments</Text>
                   </View>
@@ -377,25 +378,26 @@ const Allleads = ({navigation}) => {
             justifyContent: 'space-between',
             width: '100%',
           }}>
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <Text>From</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={user}
                 onValueChange={itemValue => setuser(itemValue)}>
                 <Picker.Item label="Select User" value="" />
-                {userData.map(statusItem => (
+                {userData.map(userItem => (
                   <Picker.Item
-                    key={statusItem.id}
-                    label={statusItem.name}
-                    value={statusItem.name}
+                    key={userItem.id}
+                    label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                    value={userItem.name}
                   />
                 ))}
               </Picker>
             </View>
           </View>
 
-          <View style={{width: '49%'}}>
+
+          <View style={{ width: '49%' }}>
             <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
@@ -418,7 +420,7 @@ const Allleads = ({navigation}) => {
         </View>
 
         <View style={styles.dob}>
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View>
               <TextInput
                 label="From Date"
@@ -448,7 +450,7 @@ const Allleads = ({navigation}) => {
             </View>
           </View>
 
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <TextInput
               label="To Date"
               value={
@@ -485,10 +487,10 @@ const Allleads = ({navigation}) => {
 
       <FlatList
         data={leadData}
-        renderItem={({item}) => <Item item={item} />}
+        renderItem={({ item }) => <Item item={item} />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingTop: 10}}
+        contentContainerStyle={{ paddingTop: 10 }}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
@@ -500,11 +502,11 @@ const Allleads = ({navigation}) => {
         transparent={true}
         visible={showCalendar}
         onRequestClose={() => setShowCalendar(false)}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <Calendar
             onDayPress={day => handleDateSelectdob(day.dateString)}
             markedDates={{
-              [selectedDate]: {selected: true, selectedColor: 'blue'},
+              [selectedDate]: { selected: true, selectedColor: 'blue' },
             }}
           />
         </View>
@@ -515,11 +517,11 @@ const Allleads = ({navigation}) => {
         transparent={true}
         visible={showCalendarModal}
         onRequestClose={() => setShowCalendarModal(false)}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <Calendar
             onDayPress={day => handleDateSelect(day.dateString)}
             markedDates={{
-              [selectedDate]: {selected: true, selectedColor: 'blue'},
+              [selectedDate]: { selected: true, selectedColor: 'blue' },
             }}
           />
         </View>
@@ -692,7 +694,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     width: '90%',
-    maxHeight: '80%', 
+    maxHeight: '80%',
     elevation: 5,
   },
   modalheading: {

@@ -41,6 +41,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AddInventory from '../Screens/Inventory/AddInventory';
 import Updatelead from '../Screens/UpdateLead';
+import Updateuser from '../Screens/Staff Managment/UpdateUser';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -248,6 +249,20 @@ const Stacknavigation = () => {
           <Stack.Screen
             name="Add User"
             component={Adduser}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Update User"
+            component={Updateuser}
             options={{
               headerShown: true,
               headerStyle: {

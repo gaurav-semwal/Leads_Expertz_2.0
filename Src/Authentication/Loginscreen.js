@@ -7,46 +7,8 @@ import Toast from 'react-native-toast-message';
 import { Login_Api } from '../../Api/authApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
 const Loginscreen = ({ navigation }) => {
 
-  const [loading, setLoading] = useState(false);
-
-  // const handleLoginPress = async () => {
-  //   navigation.navigate('AppDrawer');
-  //   // try {
-  //   //   setLoading(true);
-  //   //   const response = await Login(mobilenumner, password);
-  //   //   if (response.msg === "User logged in successfully.") {
-  //   //     await AsyncStorage.removeItem('authToken');
-
-  //   //     await AsyncStorage.setItem('authToken', response.data.token);
-  //   //     await AsyncStorage.setItem('userPassword', response.data.password);
-  //   //     await AsyncStorage.setItem('mobile', response.data.mobile);
-
-  //   //     Toast.show({
-  //   //       text1: 'User login successful',
-  //   //       type: 'success',
-  //   //     });
-
-  //   //     navigation.navigate('bottom');
-  //   //   } else {
-  //   //     Toast.show({
-  //   //       text1: 'Failed to login!',
-  //   //       type: 'error',
-  //   //     });
-  //   //   }
-  //   // } catch (error) {
-  //   //   console.log(error);
-  //   //   Toast.show({
-  //   //     text1: 'Error',
-  //   //     type: 'error',
-  //   //   });
-  //   // } finally {
-  //   //   setLoading(false);
-  //   // }
-  // };
   const [email, setemail] = useState();
   const [password, setpassword] = useState();
 
@@ -82,6 +44,8 @@ const Loginscreen = ({ navigation }) => {
         await AsyncStorage.setItem('authToken', response.data.token);
         await AsyncStorage.setItem('email', response.data.email);
         await AsyncStorage.setItem('password', response.data.password);
+        await AsyncStorage.setItem('name', response.data.name);
+        await AsyncStorage.setItem('mobile', response.data.mobile);
 
         Toast.show({
           text1: 'Login Successfull',
