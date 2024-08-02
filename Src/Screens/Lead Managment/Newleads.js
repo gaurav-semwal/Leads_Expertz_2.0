@@ -6,18 +6,24 @@ import {
   Pressable,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Modal,
+  ScrollView
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Get_Lead } from '../../../Api/authApi';
+import { Get_Lead,Get_Lead_Data } from '../../../Api/authApi';
 import { Colors } from '../../Comman/Styles';
 import moment from 'moment';
+import Toast from 'react-native-toast-message';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Newlead = () => {
+const Newlead = ({navigation}) => {
   const [activeButton, setActiveButton] = useState('All');
   const [leadData, setLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     getUser();
@@ -48,10 +54,151 @@ const Newlead = () => {
     await getUser();
     setRefreshing(false);
   };
-  const getBackgroundColor = (index) => {
-    const colors = ['#f9f9f9', '#e0f7fa', '#e1bee7', '#fff9c4'];
-    return colors[index % colors.length];
+
+  const openModal = async item => {
+    setModalVisible(true);
+    try {
+      const response = await Get_Lead_Data(item.id);
+      if (response.msg === 'Load successfully') {
+        setSelectedItem(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    }
   };
+
+  const handlePhonePress = phone => {
+    console.log('Phone press:', phone);
+  };
+
+  const closeModal = () => {
+    setSelectedItem(null);
+    setModalVisible(false);
+  };
+
+  const LeadModal = ({ item }) => {
+    if (!item) return null;
+
+    const leadComments = item.lead_comment || [];
+
+    return (
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModal} // This is still needed to handle hardware back button
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalView}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalText}>Lead Details</Text>
+                <Pressable onPress={closeModal}>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={25}
+                    color="#625bc5"
+                  />
+                </Pressable>
+              </View>
+
+              <ScrollView contentContainerStyle={{}}>
+                <View style={{ flexDirection: 'column', padding: 10 }}>
+                  <Text style={styles.modalText}>
+                    Name: {item.name || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Email: {item.email || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Mobile: {item.phone || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Address: {item.field3 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    DOB: {item.app_dob || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    DOA: {item.app_doa || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Source: {item.source || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Type: {item.type || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Category: {item.cat_name || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    SubCategory: {item.subcatname || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    State: {item.field1 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    City: {item.field2 || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Classification: {item.classification || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Project: {item.project_id || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Campaign: {item.campaign || 'N/A'}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Status: {item.status || 'N/A'}
+                  </Text>
+                </View>
+
+                <View style={{ padding: 10 }}>
+                  <View style={styles.modalheading}>
+                    <Text style={styles.modalText}>Lead Comments</Text>
+                  </View>
+                  {leadComments.length > 0 ? (
+                    leadComments.map((comment, index) => (
+                      <View key={index} style={styles.commentContainer}>
+                        <Text style={styles.commentText}>
+                          {comment.comment || 'No comment text'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Status: {comment.status || 'N/A'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Remind: {comment.remind || 'N/A'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Created Date: {comment.created_date || 'N/A'}
+                        </Text>
+
+                        {index !== leadComments.length - 1 && (
+                          <View style={styles.separator} />
+                        )}
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.modalText}>No comments available</Text>
+                  )}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const editlead = item => {
+    navigation.navigate('Update Lead', { leadid: item.id, status: item.status });
+  };
+  
   const LeadItem = ({ item, index }) => {
     return (
 <Pressable>
@@ -90,9 +237,9 @@ const Newlead = () => {
         </View>
       </View>
     </View>
-    {/* <Pressable onPress={() => editlead(item)}>
+    <Pressable onPress={() => editlead(item)}>
       <AntDesign name="edit" size={25} color="black" />
-    </Pressable> */}
+    </Pressable>
   </View>
   <View style={{marginTop: 10}}>
     <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
@@ -179,6 +326,9 @@ const Newlead = () => {
           onRefresh={handleRefresh}
         />
       )}
+
+{selectedItem && <LeadModal item={selectedItem} />}
+
     </View>
   );
 };
@@ -268,6 +418,69 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalBackground: {
+    backgroundColor: 'transparent', // Make sure this is transparent
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+  },
+  modalView: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+    elevation: 5,
+  },
+  modalheading: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 5,
+  },
+  commentsContainer: {
+    height: '30%',
+    padding: 10,
   },
 });
 

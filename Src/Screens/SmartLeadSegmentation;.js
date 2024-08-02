@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-
 import { Get_Lead } from '../../Api/authApi';
 import moment from 'moment';
 import { Colors } from '../Comman/Styles';

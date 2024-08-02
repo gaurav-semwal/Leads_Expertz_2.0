@@ -34,6 +34,7 @@ const Updatelead = ({ navigation }) => {
   const [type, settype] = useState([]);
   const [selectedtype, setselectedtype] = useState('');
   const [category, setCategory] = useState([]);
+  const [project, setproject] = useState([]);
   const [subcategory, setSubcategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
@@ -52,13 +53,9 @@ const Updatelead = ({ navigation }) => {
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState('');
   const [statusData, setStatusData] = useState([]);
-
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [budget, setBudget] = useState('');
-
-
-
   const [status, setStatus] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedProject, setSelectedProject] = useState('');
@@ -69,11 +66,6 @@ const Updatelead = ({ navigation }) => {
   const [applicantCity, setApplicantCity] = useState('');
   const [applicantDob, setApplicantDob] = useState('');
   const [applicantDoa, setApplicantDoa] = useState('');
-  const project = [
-    { id: '1', project_name: 'Project 1' },
-    { id: '2', project_name: 'Project 2' },
-  ];
-
 
 
   useEffect(() => {
@@ -251,7 +243,7 @@ const Updatelead = ({ navigation }) => {
   const getlead = async () => {
     try {
       const response = await Get_Lead_Data(leadid);
-      console.log('CHAISTHA HELP KARO', response.data);
+      console.log('CHAISTHA HELP KARO', response);
       if (response.msg === 'Load successfully') {
         const leadData = response.data;
         setfullname(leadData.name || '');
