@@ -920,3 +920,42 @@ export const Add_User = async (name, mobile, email, password, role) => {
       throw error;
     }
   };
+
+  export const Allocate_Lead = async (leadIds, userId) => {
+    console.log('222222222222222222222', leadIds, userId);
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+    
+      if (!token) {
+        throw new Error('Token not found');
+      }
+    
+      const myHeaders = new Headers();
+      myHeaders.append("token", token);
+      // Add the "Cookie" header if required by your server.
+    
+      const formdata = new FormData();
+      formdata.append("lead_ids", JSON.stringify(leadIds)); // Convert leadIds to JSON string if the server expects a JSON string
+      formdata.append("user_id", String(userId)); // Convert userId to string
+      
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+      };
+    
+      const response = await fetch(`${base_url}allocate-lead`, requestOptions);
+    
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+    
+      const result = await response.json(); // Ensure the response is JSON
+      
+      return result;
+    } catch (error) {
+      console.error('API Request Error:', error);
+      throw error;
+    }
+  };

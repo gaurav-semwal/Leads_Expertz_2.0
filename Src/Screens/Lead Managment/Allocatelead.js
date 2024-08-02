@@ -1,61 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ToastAndroid } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, Text, View, ScrollView, Pressable, ToastAndroid, RefreshControl } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Pending_Allocate } from '../../../Api/authApi';
+import CheckBox from '@react-native-community/checkbox';
+import { Pending_Allocate, Get_User, Allocate_Lead } from '../../../Api/authApi';
+import Toast from 'react-native-toast-message';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Allocatelead = () => {
   const [selectedValue, setSelectedValue] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState(10); 
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState([]); // State to hold API data
-  const widthArr = [50, 70, 90, 100, 100, 100, 100, 150, 200]; // Adjusted widths for table columns 
+  const [data, setData] = useState([]);
+  const [userData, setuserData] = useState([]);
+  const [user, setuser] = useState('');
+  const [selectedRows, setSelectedRows] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+  const widthArr = [50, 70, 90, 100, 100, 100, 100, 150, 200];
 
   const fetchPendingAllocate = async () => {
+    setRefreshing(true); // Start refreshing
     try {
       const response = await Pending_Allocate();
       console.log("PENDINGGGG", response);
       if (response.msg === 'Load successfully.') {
-        setData(response.data); // Update state with API data
+        setData(response.data);
       } else {
-        // Handle error case
         ToastAndroid.show(response.msg, ToastAndroid.SHORT);
       }
     } catch (error) {
       console.log(error);
       ToastAndroid.show('An error occurred', ToastAndroid.SHORT);
+    } finally {
+      setRefreshing(false); // Stop refreshing
     }
   };
 
-  useEffect(() => {
-    fetchPendingAllocate();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchPendingAllocate();
+      getuser();
+    }, [])
+  );
 
-  const renderPagination = () => {
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+  const getuser = async () => {
+    try {
+      const response = await Get_User();
+      console.log('user', response);
+      if (response.msg === 'Load successfully.') {
+        setuserData(response.data);
+      } else {
+        // Handle error case
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    return (
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === 1}
-          onPress={() => setCurrentPage(currentPage - 1)}
-        >
-          <AntDesign name="left" color="#625bc5" size={25} />
-        </TouchableOpacity>
-        <Text style={styles.pageText}>
-          {currentPage} / {totalPages}
-        </Text>
-        <TouchableOpacity
-          style={styles.pageButton}
-          disabled={currentPage === totalPages}
-          onPress={() => setCurrentPage(currentPage + 1)}
-        >
-          <AntDesign name="right" color="#625bc5" size={25} />
-        </TouchableOpacity>
-      </View>
-    );
+  const allocateapi = async (userId, leadIds) => {
+    console.log('kkkkkkkkkkkkkkkkkkkk', userId, leadIds);
+    try {
+      const response = await Allocate_Lead(leadIds, userId); // Ensure correct argument order
+      console.log('Allocation Response:', response);
+      if (response.msg === 'Save successfully.') { // Ensure this matches the response from your server
+        Toast.show({
+          text1: response.msg,
+          type: 'success',
+        });
+        // Optionally, you could refresh the data here
+        fetchPendingAllocate();
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAllocate = () => {
+    const leadIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    if (!user) {
+      ToastAndroid.show('Please select a user.', ToastAndroid.SHORT);
+      return;
+    }
+    if (leadIds.length === 0) {
+      ToastAndroid.show('Please select at least one lead.', ToastAndroid.SHORT);
+      return;
+    }
+    allocateapi(user, leadIds);
+  };
+
+  const handleCheckboxChange = (id) => {
+    setSelectedRows(prev => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   const renderTableRows = () => {
@@ -67,6 +109,10 @@ const Allocatelead = () => {
       <Row
         key={rowData.id}
         data={[
+          <CheckBox
+            value={!!selectedRows[rowData.id]}
+            onValueChange={() => handleCheckboxChange(rowData.id)}
+          />,
           rowData.id.toString(),
           rowData.campaign,
           rowData.classification,
@@ -84,31 +130,44 @@ const Allocatelead = () => {
     ));
   };
 
+  const onRefresh = useCallback(() => {
+    fetchPendingAllocate();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <View style={styles.dropdowncontainer1}>
           <Picker
-            selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+            selectedValue={user}
+            onValueChange={(itemValue) => setuser(itemValue)}
           >
             <Picker.Item label="Select User" value="" />
-            <Picker.Item label="All" value="All" />
-            <Picker.Item label="Self" value="Self" />
-            <Picker.Item label="Team" value="Team" />
+            {userData.map(statusItem => (
+              <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.id} />
+            ))}
           </Picker>
         </View>
-        <TouchableOpacity style={styles.buttoncontainer1}>
+        <Pressable style={styles.buttoncontainer1} onPress={handleAllocate}>
           <Text style={styles.text1}>Allocate</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <View>
-        <ScrollView horizontal>
+        <ScrollView
+          horizontal
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#625bc5']} // Customize loader color if needed
+            />
+          }
+        >
           <View>
             <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
               <Row
-                data={['ID', 'Campaign', 'Classification', 'Source', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
+                data={['Select', 'ID', 'Campaign', 'Classification', 'Source', 'Status', 'Name', 'Phone', 'Email', 'Lead Date']}
                 widthArr={widthArr}
                 style={styles.header}
                 textStyle={[styles.text, { color: '#000' }]}
@@ -117,8 +176,6 @@ const Allocatelead = () => {
             </Table>
           </View>
         </ScrollView>
-
-
       </View>
     </View>
   );
@@ -176,8 +233,14 @@ const styles = StyleSheet.create({
   },
   row: {
     height: 40,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  header: {
+    height: 30, // Adjust this height to your preference
+    backgroundColor: '#f1f1f1', // Optional: background color for header
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     textAlign: 'center',
