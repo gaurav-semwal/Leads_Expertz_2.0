@@ -246,7 +246,7 @@ const Addlead = ({navigation}) => {
   
       if (response.result.msg === "Save successfully") {
         Toast.show({
-          text1: response.msg,
+          text1: 'Save Successfully',
           type: 'success',
         });
         navigation.navigate('Home');
@@ -505,6 +505,7 @@ const Addlead = ({navigation}) => {
             onChangeText={text => setwhatsapp(text)}
             style={[styles.textinput]}
             mode="outlined"
+            maxLength={10}
             keyboardType='numeric'
           />
         </View>

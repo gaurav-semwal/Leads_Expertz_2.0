@@ -220,20 +220,20 @@ const Allleads = ({ navigation }) => {
           <View
             style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={styles.profileContainer}></View>
-            <View style={{ marginLeft: 10 }}>
-              <Text style={styles.leadTitle}>{item.name}</Text>
+            <View>
+              <Text style={styles.leadInfo1}>Name: {item.name}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo}>{item.phone}</Text>
+                <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
                 <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{ marginLeft: 10 }}>
-                    <AntDesign name="phone" size={20} color="black" />
+                  <View style={{marginLeft:10}}>
+                    <AntDesign name="phone" size={20} color="green" />
                   </View>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
           <Pressable onPress={() => editlead(item)}>
-            <AntDesign name="edit" size={25} color="black" />
+            <AntDesign name="edit" size={25} color="orange" />
           </Pressable>
         </View>
         <View style={{ marginTop: 10 }}>
@@ -342,6 +342,12 @@ const Allleads = ({ navigation }) => {
                       <View key={index} style={styles.commentContainer}>
                         <Text style={styles.commentText}>
                           {comment.comment || 'No comment text'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Name: {comment.name || 'N/A'}
+                        </Text>
+                        <Text style={styles.modalText}>
+                          Created Date: {comment.created_date || 'N/A'}
                         </Text>
                         <Text style={styles.modalText}>
                           Status: {comment.status || 'N/A'}
