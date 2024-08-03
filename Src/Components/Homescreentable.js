@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
-import moment from 'moment';  // Import moment for date calculations
+import moment from 'moment';  
 import HomeScheduletable from './HomeScheduletable';
 import { Get_Birthday } from '../../Api/authApi';
 
@@ -35,7 +35,7 @@ const Homescreentable = () => {
     const today = moment();
     const startOfMonth = today.clone().startOf('month');
     const endOfMonth = today.clone().endOf('month');
-    const upcomingRange = 14; // Number of days to consider as "upcoming"
+    const upcomingRange = 14; 
 
     const filteredData = data.filter(item => {
       const itemDate = moment(item.lead_date);

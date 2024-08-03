@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,25 +6,22 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  Image,
   Modal,
   Button
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Get_Role, Get_User} from '../../../Api/authApi';
+import { Get_Role, Get_User } from '../../../Api/authApi';
 import Toast from 'react-native-toast-message';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 
-const Userlist = ({navigation}) => {
+const Userlist = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState('');
   const [roles, setRoles] = useState([]);
-
   const [selectedTM, setSelectedTM] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -61,35 +58,12 @@ const Userlist = ({navigation}) => {
     }, []),
   );
 
-  const fetchAvatars = async users => {
-    const avatarPromises = users.map(async user => {
-      try {
-        const response = await fetch(
-          'https://random-data-api.com/api/v2/users',
-        );
-        const text = await response.text();
-        try {
-          const data = JSON.parse(text);
-          return {...user, avatar: data.avatar};
-        } catch {
-          console.error('Error: Response not in JSON format');
-          return {...user, avatar: null};
-        }
-      } catch (error) {
-        console.error('Error fetching avatar:', error);
-        return {...user, avatar: null};
-      }
-    });
-    return Promise.all(avatarPromises);
-  };
-
   const fetchData = async () => {
     try {
       const response = await Get_User();
       console.log(response);
       if (response.msg === 'Load successfully.') {
-        const usersWithAvatars = await fetchAvatars(response.data);
-        setUserData(usersWithAvatars);
+        setUserData(response.data);
       } else {
         Toast.show({
           text1: response.msg,
@@ -121,7 +95,11 @@ const Userlist = ({navigation}) => {
     navigation.navigate('Update User');
   };
 
-  const Item = ({item}) => {
+  const getFirstLetter = (name) => {
+    return name ? name.charAt(0).toUpperCase() : '';
+  };
+
+  const Item = ({ item }) => {
     return (
       <Pressable>
         <View style={styles.leadContainer}>
@@ -138,33 +116,27 @@ const Userlist = ({navigation}) => {
                 marginTop: 10,
               }}>
               <View style={styles.profileContainer}>
-                <Image
-                  style={styles.profileImage}
-                  source={{
-                    uri: item.avatar || 'https://via.placeholder.com/150',
-                  }} // Use placeholder if avatar is null
-                  onError={e =>
-                    console.error('Error loading image:', e.nativeEvent.error)
-                  }
-                />
+                <View style={styles.profileLetterContainer}>
+                  <Text style={styles.profileLetter}>{getFirstLetter(item.name)}</Text>
+                </View>
               </View>
-              <View style={{marginLeft: 10}}>
+              <View style={{ marginLeft: 10 }}>
                 <Text style={styles.leadTitle}>{item.name}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Text style={styles.leadInfo}>{item.mobile}</Text>
                   <TouchableOpacity
                     onPress={() => handlePhonePress(item.mobile)}>
-                    <View style={{marginLeft: 10}}>
+                    <View style={{ marginLeft: 10 }}>
                       <AntDesign name="phone" size={20} color="darkgreen" />
                     </View>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <TouchableOpacity
                 onPress={() => editleadnavigate()}
-                style={{right: '50%'}}>
+                style={{ right: '50%' }}>
                 <AntDesign name="edit" size={25} color="orange" />
               </TouchableOpacity>
               {/* <TouchableOpacity onPress={() => openModal(item)}>
@@ -172,7 +144,7 @@ const Userlist = ({navigation}) => {
               </TouchableOpacity> */}
             </View>
           </View>
-          <View style={{marginTop: 10}}>
+          <View style={{ marginTop: 10 }}>
             <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
             <Text style={styles.leadInfo1}>Role: {item.role}</Text>
             <View
@@ -195,10 +167,10 @@ const Userlist = ({navigation}) => {
     <View style={styles.container}>
       <FlatList
         data={userData}
-        renderItem={({item}) => <Item item={item} />}
+        renderItem={({ item }) => <Item item={item} />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 150}}
+        contentContainerStyle={{ paddingBottom: 150 }}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
@@ -246,7 +218,6 @@ const Userlist = ({navigation}) => {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-            
               }}>
               <Button title="Close" onPress={closeModal} />
               <Button
@@ -275,7 +246,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 3,
@@ -285,10 +256,20 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     overflow: 'hidden',
+    backgroundColor: '#625bc5',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  profileImage: {
+  profileLetterContainer: {
     width: '100%',
     height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileLetter: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   leadTitle: {
     fontSize: 16,
@@ -326,7 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // semi-transparent background
+    backgroundColor: 'rgba(0,0,0,0.5)', 
   },
   modalContainer: {
     width: 300,

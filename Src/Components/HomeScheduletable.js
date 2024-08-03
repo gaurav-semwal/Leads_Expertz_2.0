@@ -12,17 +12,14 @@ const HomeScheduletable = () => {
   const [callScheduleData, setCallScheduleData] = useState([
     { id: 1, name: 'John Doe', campaign: 'Campaign A', classification: 'High', last_updated: '2023-01-01', comments: 'Lorem ipsum', mobile: '1234567890' },
     { id: 2, name: 'Alice Smith', campaign: 'Campaign B', classification: 'Medium', last_updated: '2023-01-02', comments: 'Dolor sit amet', mobile: '9876543210' },
-    // Add more dummy data as needed
   ]);
   const [visitScheduleData, setVisitScheduleData] = useState([
     { id: 1, name: 'Bob Brown', campaign: 'Campaign C', classification: 'Low', last_updated: '2023-01-03', comments: 'Consectetur adipiscing elit', mobile: '4567890123' },
     { id: 2, name: 'Emily Johnson', campaign: 'Campaign D', classification: 'High', last_updated: '2023-01-04', comments: 'Sed do eiusmod tempor', mobile: '2345678901' },
-    // Add more dummy data as needed
   ]);
   const [missedFollowUpData, setMissedFollowUpData] = useState([
     { id: 1, name: 'David Lee', campaign: 'Campaign E', classification: 'Medium', last_updated: '2023-01-05', comments: 'Ut labore et dolore magna', mobile: '3456789012' },
     { id: 2, name: 'Sarah Clark', campaign: 'Campaign F', classification: 'High', last_updated: '2023-01-06', comments: 'Ut enim ad minim veniam', mobile: '5678901234' },
-    // Add more dummy data as needed
   ]);
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
   const [widthArr] = useState([100, 150, 100, 100, 150, 150]);
@@ -32,8 +29,6 @@ const HomeScheduletable = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // You can call handleLoginPress here if needed for real data fetch
-      // handleLoginPress();
     }, []),
   );
 
@@ -77,11 +72,11 @@ const HomeScheduletable = () => {
           <Pressable onPress={() => handlePhoneCall(rowData.mobile)} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}>
             <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.comments}</Text>
             <View style={{ flexDirection: 'row' }}>
-              {/* Edit Icon */}
+             
               <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
                 <AntDesign name="edit" color="#625bc5" size={20} />
               </Pressable>
-              {/* Phone Icon */}
+              
               <View style={styles.callIcon}>
                 <AntDesign name="phone" color="#625bc5" size={20} />
               </View>

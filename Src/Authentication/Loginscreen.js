@@ -55,7 +55,7 @@ const Loginscreen = ({ navigation }) => {
         navigation.navigate('AppDrawer');
       } else {
         Toast.show({
-          text1: 'Failed to login',
+          text1: response.msg,
           type: 'error',
         });
       }
@@ -70,12 +70,6 @@ const Loginscreen = ({ navigation }) => {
 
   return (
     <Paperprovider style={styles.container}>
-
-      {/* {loading && (
-        <View style={styles.loader}>
-          <ActivityIndicator size="large" />
-        </View>
-      )} */}
 
       <View>
         <Image
@@ -122,11 +116,6 @@ const Loginscreen = ({ navigation }) => {
 export default Loginscreen;
 
 const styles = StyleSheet.create({
-  eye: {
-    alignItems: 'flex-end',
-    bottom: '45%',
-    marginRight: "6%"
-  },
   container: {
     flex: 1,
     backgroundColor: 'white',
