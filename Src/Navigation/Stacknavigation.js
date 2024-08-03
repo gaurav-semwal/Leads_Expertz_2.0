@@ -106,7 +106,7 @@ const BottomTabNavigation = () => {
 
 const DrawerNavigation = () => {
   return (
-    <Drawer.Navigator drawerContent={props => <Drawercontent {...props} />}>
+    <Drawer.Navigator drawerContent={() => <Drawercontent />}>
       <Drawer.Screen
         name="Dashboard"
         component={BottomTabNavigation}

@@ -103,6 +103,7 @@ const Allleads = ({ navigation }) => {
   ) => {
     try {
       const response = await Get_Lead();
+      console.log(response)
       if (response.msg === 'Load successfully') {
         let filteredData = response.data;
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Text, View, ScrollView, Pressable, ToastAndroid, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Pressable, ToastAndroid, RefreshControl, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
 import CheckBox from '@react-native-community/checkbox';
-import { Pending_Allocate, Get_User, Allocate_Lead } from '../../../Api/authApi';
+import { Pending_Allocate, Get_user, Allocate_Lead } from '../../../Api/authApi';
 import Toast from 'react-native-toast-message';
 import { useFocusEffect } from '@react-navigation/native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Allocatelead = () => {
   const [selectedValue, setSelectedValue] = useState('');
@@ -45,7 +46,7 @@ const Allocatelead = () => {
 
   const getuser = async () => {
     try {
-      const response = await Get_User();
+      const response = await Get_user();
       console.log('user', response);
       if (response.msg === 'Load successfully.') {
         setuserData(response.data);
@@ -134,17 +135,44 @@ const Allocatelead = () => {
     fetchPendingAllocate();
   }, []);
 
+  const renderPagination = () => {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+
+    return (
+      <View style={styles.pagination}>
+        <TouchableOpacity
+          style={styles.pageButton}
+          disabled={currentPage === 1}
+          onPress={() => setCurrentPage(currentPage - 1)}
+        >
+          <AntDesign name="left" color="#625bc5" size={25} />
+        </TouchableOpacity>
+        <Text style={styles.pageText}>{currentPage} / {totalPages}</Text>
+        <TouchableOpacity
+          style={styles.pageButton}
+          disabled={currentPage === totalPages}
+          onPress={() => setCurrentPage(currentPage + 1)}
+        >
+          <AntDesign name="right" color="#625bc5" size={25} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <View style={styles.dropdowncontainer1}>
           <Picker
             selectedValue={user}
-            onValueChange={(itemValue) => setuser(itemValue)}
-          >
+            onValueChange={itemValue => setuser(itemValue)}>
             <Picker.Item label="Select User" value="" />
-            {userData.map(statusItem => (
-              <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.id} />
+            {userData.map(userItem => (
+              <Picker.Item
+                key={userItem.id}
+                label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                value={userItem.name}
+              />
             ))}
           </Picker>
         </View>
@@ -176,6 +204,7 @@ const Allocatelead = () => {
             </Table>
           </View>
         </ScrollView>
+        {renderPagination()}
       </View>
     </View>
   );
