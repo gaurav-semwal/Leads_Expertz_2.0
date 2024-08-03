@@ -31,7 +31,6 @@ const Updatelead = ({ navigation }) => {
   const [email, setemail] = useState('');
   const [source, setsource] = useState([]);
   const [selectedSource, setSelectedSource] = useState('');
-  const [type, settype] = useState([]);
   const [selectedtype, setselectedtype] = useState('');
   const [category, setCategory] = useState([]);
   const [project, setproject] = useState([]);
@@ -44,11 +43,9 @@ const Updatelead = ({ navigation }) => {
   const [city, setcity] = useState([]);
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState('');
-  const [classification, setclassification] = useState([]);
   const [selectedclassification, setselectedclassification] = useState('');
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [whatsapp, setwhatsapp] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [error, setError] = useState('');
@@ -92,7 +89,6 @@ const Updatelead = ({ navigation }) => {
     }
   };
 
-  const handleaddleads = async () => { };
 
   const handleSourceChange = itemValue => {
     setSelectedSource(itemValue);
@@ -133,7 +129,6 @@ const Updatelead = ({ navigation }) => {
   };
 
   const handletypeChange = itemValue => {
-    console.log(itemValue);
     setselectedtype(itemValue);
     gecategoryapi(itemValue);
   };
@@ -243,51 +238,67 @@ const Updatelead = ({ navigation }) => {
   const getlead = async () => {
     try {
       const response = await Get_Lead_Data(leadid);
-      console.log('CHAISTHA HELP KARO', response);
+      console.log('GETTING LEAD DATA --->', response);
       if (response.msg === 'Load successfully') {
         const leadData = response.data;
         setfullname(leadData.name || '');
         setmobilenumber(leadData.phone || '');
         setemail(leadData.email || '');
         setcomments(leadData.notes || '');
-        setaddress(leadData.field3);
+        setaddress(leadData.field3 || '');
         setwhatsapp(leadData.whatsapp_no || '');
         setSelectedSource(leadData.source || '');
         setselectedtype(leadData.type || '');
+        setSelectedCategory(leadData.catg_id || '');
         setSelectedSubcategory(leadData.sub_catg_id || '');
-
-        const typ = await setselectedtype;
-        const selectedType = typ.data.find(typ => typ.id === leadData.type);
-        console.log('hhhhhhhhhhh', typ)
-
-        var ctp = '';
-        if (selectedType) {
-          setselectedtype(selectedType.id);
-          ctp = await Get_Category(selectedType.id);
-          setCategory(ctp.data);
-        }
-
-        const selectedCategory = ctp.data.find(cat => cat.id === leadData.catg_id);
-        console.log('jjjjjjjjjjjjj', ctp)
-        if (selectedCategory) {
-          setSelectedCategory(selectedCategory.id);
-          getSubcategory(selectedCategory.id);
-        }
-
-        setselectedproject(leadData.project_id || '');
-        setselectedcampigns(leadData.campaign || '');
         setSelectedState(leadData.field2 || '');
         setSelectedCity(leadData.field1 || '');
         setselectedclassification(leadData.classification || '');
+        setselectedcampigns(leadData.campaign || '');
+        setselectedproject(leadData.project_id || '');
+  
+        if (leadData.type) {
+          const typeResponse = await Get_Category(leadData.type);
+          setCategory(typeResponse.data);
+          setSelectedCategory(leadData.catg_id || '');
+  
+          const subcategoryResponse = await Get_Sub_Category(leadData.catg_id);
+          setSubcategory(subcategoryResponse.data);
+          setSelectedSubcategory(leadData.sub_catg_id || '');
+        }
+        if (leadData.project_id) {
+          const projectResponse = await Get_Project();
+          setproject(projectResponse.data);
+        }
+  
+        if (leadData.campaign) {
+          const campaignsResponse = await Get_Campaigns();
+          setcampigns(campaignsResponse.data);
+        }
+  
+        if (leadData.field2) {
+          const stateResponse = await Get_State();
+          setStates(stateResponse.data.map(item => item.state));
+          setSelectedState(leadData.field2 || '');
+        }
+  
+        if (leadData.field1) {
+          const cityResponse = await Get_City(leadData.field2);
+          setcity(cityResponse.data);
+          setSelectedCity(leadData.field1 || '');
+        }
       } else {
       }
     } catch (error) {
       console.log(error);
     }
   };
+  
 
   const Submit = async () => {
     console.log(
+      'leadid',
+      leadid,
       fullname,
       email,
       mobilenumner,
@@ -296,6 +307,7 @@ const Updatelead = ({ navigation }) => {
       selectedCategory,
       selectedSubcategory,
       selectedclassification,
+      status,
       selectedcampigns,
       selectedproject,
       selectedState,
@@ -315,40 +327,43 @@ const Updatelead = ({ navigation }) => {
     );
     try {
       const response = await Update_Lead(
+        selectedSource,
+        selectedcampigns,
+        selectedCity,
+        selectedState,
         fullname,
         email,
-        mobilenumner,
-        selectedSource,
+        date,
+        time,
+        selectedclassification,
+        status,
+        comments,
+        selectedproject,
         selectedtype,
         selectedCategory,
         selectedSubcategory,
-        selectedclassification,
-        selectedcampigns,
+        selectedStatus,
         selectedproject,
-        selectedState,
-        selectedCity,
-        address,
-        comments,
-        date,
-        time,
-        budget,
+        size,
+        price,
         applicantName,
         applicantContact,
         applicantCity,
         applicantDob,
         applicantDoa,
-        price,
-        size
+        whatsapp,
+        address,
+        leadid 
       );
-
+  
       console.log(response);
-
-      if (response.result.msg === 'Save successfully') {
+  
+      if (response.msg === 'Save successfully') {
         Toast.show({
-          text1: response.msg,
+          text1: 'Save Successfully',
           type: 'success',
         });
-        navigation.navigate('allleads');
+        navigation.navigate('All Leads');
       } else {
         Toast.show({
           text1: response.msg,
@@ -363,6 +378,7 @@ const Updatelead = ({ navigation }) => {
       });
     }
   };
+  
 
   const handleStatusChange = (value) => {
     setStatus(value);
@@ -800,6 +816,7 @@ const Updatelead = ({ navigation }) => {
             onChangeText={text => setwhatsapp(text)}
             style={[styles.textinput]}
             mode="outlined"
+            maxLength={10}
             keyboardType="numeric"
           />
         </View>

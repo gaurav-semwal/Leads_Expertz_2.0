@@ -20,7 +20,7 @@ const Allocatelead = () => {
   const widthArr = [50, 70, 90, 100, 100, 100, 100, 150, 200];
 
   const fetchPendingAllocate = async () => {
-    setRefreshing(true); // Start refreshing
+    setRefreshing(true);
     try {
       const response = await Pending_Allocate();
       console.log("PENDINGGGG", response);
@@ -33,7 +33,7 @@ const Allocatelead = () => {
       console.log(error);
       ToastAndroid.show('An error occurred', ToastAndroid.SHORT);
     } finally {
-      setRefreshing(false); // Stop refreshing
+      setRefreshing(false);
     }
   };
 
@@ -51,30 +51,6 @@ const Allocatelead = () => {
       if (response.msg === 'Load successfully.') {
         setuserData(response.data);
       } else {
-        // Handle error case
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const allocateapi = async (userId, leadIds) => {
-    console.log('kkkkkkkkkkkkkkkkkkkk', userId, leadIds);
-    try {
-      const response = await Allocate_Lead(leadIds, userId); // Ensure correct argument order
-      console.log('Allocation Response:', response);
-      if (response.msg === 'Save successfully.') { // Ensure this matches the response from your server
-        Toast.show({
-          text1: response.msg,
-          type: 'success',
-        });
-        // Optionally, you could refresh the data here
-        fetchPendingAllocate();
-      } else {
-        Toast.show({
-          text1: response.msg,
-          type: 'error',
-        });
       }
     } catch (error) {
       console.log(error);
@@ -82,7 +58,7 @@ const Allocatelead = () => {
   };
 
   const handleAllocate = () => {
-    const leadIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    const leadIds = Object.keys(selectedRows).filter(id => selectedRows[id]).map(Number); // Ensure IDs are numbers
     if (!user) {
       ToastAndroid.show('Please select a user.', ToastAndroid.SHORT);
       return;
@@ -91,8 +67,36 @@ const Allocatelead = () => {
       ToastAndroid.show('Please select at least one lead.', ToastAndroid.SHORT);
       return;
     }
-    allocateapi(user, leadIds);
+    allocateapi(Number(user), leadIds);
   };
+
+  const allocateapi = async (userId, leadIds) => {
+    console.log('Allocating leads to user ID:', userId, 'with lead IDs:', leadIds);
+    try {
+      const response = await Allocate_Lead(leadIds, userId);
+      console.log('Allocation Response:', response);
+
+      if (response.msg === 'Save successfully.') {
+        Toast.show({
+          text1: response.msg,
+          type: 'success',
+        });
+        fetchPendingAllocate();
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log('Error allocating leads:', error);
+      Toast.show({
+        text1: 'An error occurred',
+        type: 'error',
+      });
+    }
+  };
+
 
   const handleCheckboxChange = (id) => {
     setSelectedRows(prev => ({
@@ -165,16 +169,18 @@ const Allocatelead = () => {
         <View style={styles.dropdowncontainer1}>
           <Picker
             selectedValue={user}
-            onValueChange={itemValue => setuser(itemValue)}>
+            onValueChange={(itemValue) => setuser(itemValue)}
+          >
             <Picker.Item label="Select User" value="" />
             {userData.map(userItem => (
               <Picker.Item
                 key={userItem.id}
                 label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                value={userItem.name}
+                value={userItem.id} // Set user ID as value
               />
             ))}
           </Picker>
+
         </View>
         <Pressable style={styles.buttoncontainer1} onPress={handleAllocate}>
           <Text style={styles.text1}>Allocate</Text>

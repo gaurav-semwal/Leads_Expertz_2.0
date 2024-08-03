@@ -569,21 +569,73 @@ export const Add_User = async (name, mobile, email, password, role) => {
 
 
   export const Update_Lead = async (
-    source,campaign,city,state,name,email,remind_date,remind_time,status,comment,project,category_type,category_id,sub_category_id,conv_type,project_id,prop_size,final_price,app_name,app_contact,app_city,app_dob,app_doa,whatsapp,address,lead_id
+    source,
+    campaign,
+    city,
+     state,
+  name,
+    email,
+     remind_date,
+  remind_time,
+     classification,
+    status,
+     comment,
+   project,
+     category_type,
+    category_id,
+      sub_category_id,
+  conv_type,
+   project_id,
+    prop_size,
+     final_price,
+  app_name,
+    app_contact,
+    app_city,
+app_dob,
+  app_doa,
+   whatsapp,
+  address,
+    lead_id
   ) => {
-    console.log('---->',  source,campaign,city,state,name,email,remind_date,remind_time,status,comment,project,category_type,category_id,sub_category_id,conv_type,project_id,prop_size,final_price,app_name,app_contact,app_city,app_dob,app_doa,whatsapp,address,lead_id);
+    console.log(  source,
+      campaign,
+      city,
+       state,
+    name,
+      email,
+       remind_date,
+    remind_time,
+       classification,
+      status,
+       comment,
+     project,
+       category_type,
+      category_id,
+        sub_category_id,
+    conv_type,
+     project_id,
+      prop_size,
+       final_price,
+    app_name,
+      app_contact,
+      app_city,
+  app_dob,
+    app_doa,
+     whatsapp,
+    address,
+      'leadid',lead_id)
     try {
       const isValid = await isValidToken();
       if (!isValid) {
-        console.log('invaid')
+        console.log('Invalid token');
         throw new Error('Invalid or expired token');
       }
-  
       const token = await AsyncStorage.getItem('authToken');
-      console.log('Token:', token);
       if (!token) {
+        console.log('Token not found');
         throw new Error('Token not found');
       }
+      console.log('Token:', token);
   
       const myHeaders = new Headers();
       myHeaders.append("token", token);
@@ -617,32 +669,26 @@ export const Add_User = async (name, mobile, email, password, role) => {
       formdata.append("address", address);
       formdata.append("lead_id", lead_id);
   
+      // Fetch request
       const requestOptions = {
-        method: "POST",
+        method: 'POST',
         headers: myHeaders,
         body: formdata,
-        redirect: "follow"
       };
   
       const response = await fetch(`${base_url}update-lead`, requestOptions);
-      console.log('Response:', response);
-      
-      const statusCode = response.status;
-      console.log('Status Code:', statusCode);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${statusCode}`);
-      }
+      const data = await response.json();
   
-      const result = await response.json();
-      console.log('Result:', result);
-  
-      return { statusCode, result };
+      // Return the response data
+      return data;
     } catch (error) {
+      // Handle and log errors
       console.error('Error:', error);
       throw error;
     }
   };
+  
+  
 
   export const Add_Category = async (type,name) => {
     try {

@@ -230,22 +230,22 @@ const Searchleads = ({ navigation }) => {
             <View
               style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
               <View style={styles.profileContainer}></View>
-              <View style={{marginLeft: 10}}>
-                <Text style={styles.leadTitle}>{item.name}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={styles.leadInfo}>{item.phone}</Text>
-                  <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                    <View style={{marginLeft: 10}}>
-                      <AntDesign name="phone" size={20} color="black" />
-                    </View>
-                  </TouchableOpacity>
-                </View>
+              <View>
+              <Text style={styles.leadInfo1}>Name: {item.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
+                <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
+                  <View style={{marginLeft:10}}>
+                    <AntDesign name="phone" size={20} color="green" />
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
-            <Pressable onPress={() => editlead(item)}>
-              <AntDesign name="edit" size={25} color="black" />
-            </Pressable>
           </View>
+          <Pressable onPress={() => editlead(item)}>
+            <AntDesign name="edit" size={25} color="orange" />
+          </Pressable>
+        </View>
           <View style={{marginTop: 10}}>
             <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
             <Text style={styles.leadInfo1}>Source: {item.source}</Text>
