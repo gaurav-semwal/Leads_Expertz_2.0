@@ -7,19 +7,13 @@ import {
     Platform
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Colors } from '../../Comman/Styles';
 import { TextInput } from 'react-native-paper';
 import Button from '../../Components/Button';
 import { Picker } from '@react-native-picker/picker';
 import {
     Add_Inventory,
-    Add_Lead,
-    Get_Campaigns,
     Get_Category,
     Get_City,
-    Get_Project,
-    Get_Source,
     Get_State,
     Get_Sub_Category,
 } from '../../../Api/authApi';
