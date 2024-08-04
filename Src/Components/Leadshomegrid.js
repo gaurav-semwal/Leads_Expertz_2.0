@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, FlatList ,ScrollView} from 'react-native';
+import { Pressable, StyleSheet, Text, View, FlatList, ScrollView } from 'react-native';
 import React from 'react';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Homescreentable from './Homescreentable';
@@ -19,7 +19,7 @@ const data = [
 ];
 
 const Leadshomegrid = () => {
-    const renderItem = ({ item, index }) => {
+    const renderItem = ({ item }) => {
         const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
         return (
@@ -28,7 +28,7 @@ const Leadshomegrid = () => {
                     <View style={[styles.icon, { backgroundColor: randomColor }]}>
                         <FontAwesome5 name="funnel-dollar" size={20} color="white" />
                     </View>
-                    <View>
+                    <View style={styles.textContainer}>
                         <Text style={styles.title}>{item.title}</Text>
                         <Text style={styles.title1}>(%)</Text>
                     </View>
@@ -39,19 +39,19 @@ const Leadshomegrid = () => {
 
     return (
         <View style={styles.container}>
-            <View>
-                <FlatList
-                    data={data}
-                    horizontal
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    showsVerticalScrollIndicator={false}
-                />
+            <View style={{height:'58%'}}>
+            <FlatList
+                data={data}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                numColumns={2}
+                key={2} 
+                showsVerticalScrollIndicator={false}
+            />
             </View>
             <ScrollView>
-            <Homescreentable/>
+                <Homescreentable />
             </ScrollView>
-         
         </View>
     );
 };
@@ -64,32 +64,36 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     item: {
-        borderRadius: 10,
-        shadowColor: '#888',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.6,
-        shadowRadius: 1,
-        elevation: 6,
         flex: 1,
         margin: 8,
-        padding: 5
+        padding: 5,
+        borderRadius: 10,
+        shadowColor: '#e0dad3',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+        elevation: 6,
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
     },
+    textContainer: {
+        flex: 1,
+        marginLeft: 10,
+    },
     title: {
         fontSize: 15,
         fontWeight: '400',
         color: 'black',
-        marginLeft: 10,
+        flexWrap: 'wrap',
     },
     title1: {
         fontSize: 15,
         fontWeight: '400',
         color: '#666',
-        marginLeft: 10,
+        flexWrap: 'wrap',
     },
     icon: {
         backgroundColor: '#fff',

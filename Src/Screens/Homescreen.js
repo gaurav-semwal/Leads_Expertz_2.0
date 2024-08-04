@@ -64,14 +64,12 @@ const Homescreen = ({ navigation }) => {
         </Picker>
       </View>
       <Leadshomegrid />
-
       <View style={styles.plusButtonContainer}>
         <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
           <AntDesign name="plus" size={28} color="#dbdad3" />
         </Pressable>
       </View>
 
-      {/* Modal for Add Quick Lead */}
       <Modal
         visible={modalVisible}
         transparent={true}
