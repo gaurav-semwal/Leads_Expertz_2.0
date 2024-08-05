@@ -559,7 +559,7 @@ const DrawerContent = props => {
         />
         <Text style={styles.label}>Leads Transfer</Text>
       </TouchableOpacity>
-
+{/* 
       <TouchableOpacity
         style={styles.drawerItem}
         onPress={() => toggleeventsSubMenu(6)}>
@@ -578,7 +578,7 @@ const DrawerContent = props => {
           color="#333"
         />
       </TouchableOpacity>
-      {rendereventsSubMenu(6)}
+      {rendereventsSubMenu(6)} */}
       {/* 
       <TouchableOpacity
         style={styles.drawerItemsingle}

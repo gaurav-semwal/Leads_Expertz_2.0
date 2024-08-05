@@ -107,15 +107,15 @@ const Leadtransfer = () => {
       const response = await Lead_Transfer(transferStatus, transferUserId, selectedLeads);
       console.log(response);
       if (response.msg === 'Save Successfully') {
-        setSelectedLeads([]);
-        setTransferUserId('');
-        setTransferStatus('');
-
-        await getLead(selectedUserId, status);
         Toast.show({
           text1: 'Save Successfully',
           type: 'success',
         });
+        // setSelectedLeads([]);
+        // setTransferUserId('');
+        // setTransferStatus('');
+
+        getLead();
       } else {
       }
     } catch (error) {
@@ -175,7 +175,7 @@ const Leadtransfer = () => {
           rowData.email ?? '',
           rowData.phone ?? '',
         ]}
-        widthArr={[40, ...widthArr]} // Adjust widthArr to accommodate checkbox
+        widthArr={[40, ...widthArr]} 
         style={[styles.row, { backgroundColor: index % 2 === 0 ? '#F7F6E7' : '#E7E6E1' }]}
         textStyle={styles.text}
       />
@@ -183,7 +183,7 @@ const Leadtransfer = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.top}>
         <View
           style={{
@@ -290,7 +290,7 @@ const Leadtransfer = () => {
 
         {renderPagination()}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
