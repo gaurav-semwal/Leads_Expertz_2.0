@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Linking
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Get_Lead,Get_Lead_Data } from '../../Api/authApi';
@@ -38,7 +39,7 @@ const SmartLeadSegmentation = ({navigation}) => {
       const response = await Get_Lead();
       if (response.msg === 'Load successfully') {
         console.log("HI THERE CHECKING NEW LEAD", response);
-        const filteredLeads = response.data?.filter(lead => lead.status === 'Future Lead') || [];
+        const filteredLeads = response.data?.filter(lead => lead.status === 'FUTURE LEAD') || [];
         setLeadData(filteredLeads);
       }
     } catch (error) {
@@ -74,8 +75,25 @@ const SmartLeadSegmentation = ({navigation}) => {
     }
   };
 
-  const handlePhonePress = phone => {
-    console.log('Phone press:', phone);
+  const handlePhonePress = (phoneNumber) => {
+    let phoneUrl = `tel:${phoneNumber}`;
+
+    Linking.openURL(phoneUrl)
+      .then((supported) => {
+        if (!supported) {
+          console.log(`Phone dialing not supported for number: ${phoneNumber}`);
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch((err) => {
+        console.error('An error occurred', err);
+        if (Platform.OS === 'android' && err.message.includes('not supported')) {
+          console.log('Android phone dialing may not be supported');
+        } else if (Platform.OS === 'ios' && err.message.includes('not allowed')) {
+          console.log('iOS phone dialing permission not allowed');
+        }
+      });
   };
 
   const closeModal = () => {

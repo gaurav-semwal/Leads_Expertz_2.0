@@ -73,6 +73,7 @@ const Updatelead = ({ navigation }) => {
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [showdobmodal, setshowdobmodal] = useState(false)
   const [showdoamodal, setshowdoamodal] = useState(false)
+  const [selectedBudget, setSelectedBudget] = useState("");
 
   const showTimePicker = () => {
     setTimePickerVisibility(true);
@@ -92,6 +93,10 @@ const Updatelead = ({ navigation }) => {
     getstatus();
 
   }, []);
+
+  const handleBudgetChange = (value) => {
+    setSelectedBudget(value);
+  };
 
   const addleads = () => {
     setShowCalendarModal(true);
@@ -771,16 +776,33 @@ const Updatelead = ({ navigation }) => {
 
         {status === 'FUTURE LEAD' ? (
           <>
-            <View style={{ top: 10 }}>
-              <TextInput
-                label="Select Budget"
-                value={budget}
-                onChangeText={text => setBudget(text)}
-                style={[styles.textinput]}
-                mode="outlined"
-              />
-            </View>
-            <View style={{ top: 25, flexDirection: 'row', justifyContent: 'space-between' }}>
+       <View style={[styles.dropdowncontainer1, { top: 20 }]}>
+        <Picker
+          selectedValue={selectedBudget}
+          style={styles.picker}
+          onValueChange={handleBudgetChange}
+        >
+          <Picker.Item label="Select Budget" value="" />
+          <Picker.Item label="5-10L" value="5-10L" />
+          <Picker.Item label="10-20L" value="10-20L" />
+          <Picker.Item label="20-30L" value="20-30L" />
+          <Picker.Item label="30-45L" value="30-45L" />
+          <Picker.Item label="45-60L" value="45-60L" />
+          <Picker.Item label="60-80L" value="60-80L" />
+          <Picker.Item label="80-1cr" value="80-1cr" />
+          <Picker.Item label="1-1.25cr" value="1-1.25cr" />
+          <Picker.Item label="1.25-1.5cr" value="1.25-1.5cr" />
+          <Picker.Item label="1.5-1.75cr" value="1.5-1.75cr" />
+          <Picker.Item label="1.75-2cr" value="1.75-2cr" />
+          <Picker.Item label="2-2.50cr" value="2-2.50cr" />
+          <Picker.Item label="2.50-3cr" value="2.50-3cr" />
+          <Picker.Item label="3-3.50cr" value="3-3.50cr" />
+          <Picker.Item label="3.50-4cr" value="3.50-4cr" />
+          <Picker.Item label="4-4.50cr" value="4-4.50cr" />
+        </Picker>
+      </View>
+
+            <View style={{ top: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={styles.dropdowncontainer}>
                 <Picker
                   selectedValue={selectedState}
