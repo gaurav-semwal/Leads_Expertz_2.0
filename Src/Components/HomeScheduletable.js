@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, Text, Pressable, Linking } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Colors } from '../Comman/Styles';
+import { Dashboard } from '../../Api/authApi';
 
 const HomeScheduletable = () => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    getDashboard();
+}, []);
+
+const getDashboard = async () => {
+    try {
+        const response = await Dashboard();
+        console.log('D A S H B O A R D -->', response.data);
+
+        if (response.data && response.data.leads && response.data.leads.length > 0) {
+
+        } else {
+            console.warn('Unexpected response format:', response);
+        }
+    } catch (error) {
+        console.log(error);
+        Toast.show({
+            text1: 'Error',
+            type: 'error',
+        });
+    } finally {
+        setLoading(false);
+    }
+};
 
   const [activeButton, setActiveButton] = useState('Call Schedule');
   const [callScheduleData, setCallScheduleData] = useState([
