@@ -8,6 +8,7 @@ import {
   FlatList,
   Modal,
   ScrollView,
+  Linking
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -170,6 +171,7 @@ const Allleads = ({ navigation }) => {
     setModalVisible(true);
     try {
       const response = await Get_Lead_Data(item.id);
+      console.log('hiiiiiiiii',response.data.lead_comment)
       if (response.msg === 'Load successfully') {
         setSelectedItem(response.data);
       }
@@ -182,8 +184,25 @@ const Allleads = ({ navigation }) => {
     }
   };
 
-  const handlePhonePress = phone => {
-    console.log('Phone press:', phone);
+  const handlePhonePress = (phoneNumber) => {
+    let phoneUrl = `tel:${phoneNumber}`;
+
+    Linking.openURL(phoneUrl)
+      .then((supported) => {
+        if (!supported) {
+          console.log(`Phone dialing not supported for number: ${phoneNumber}`);
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch((err) => {
+        console.error('An error occurred', err);
+        if (Platform.OS === 'android' && err.message.includes('not supported')) {
+          console.log('Android phone dialing may not be supported');
+        } else if (Platform.OS === 'ios' && err.message.includes('not allowed')) {
+          console.log('iOS phone dialing permission not allowed');
+        }
+      });
   };
 
   const closeModal = () => {
@@ -204,9 +223,9 @@ const Allleads = ({ navigation }) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
+          {/* <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
             <Text style={styles.editButtonText}>Lead Edit</Text>
-          </Pressable>
+          </Pressable> */}
           <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
             <Text style={styles.editButtonText1}>{item.status}</Text>
           </Pressable>
@@ -344,19 +363,16 @@ const Allleads = ({ navigation }) => {
                           {comment.comment || 'No comment text'}
                         </Text>
                         <Text style={styles.modalText}>
-                          Name: {comment.name || 'N/A'}
-                        </Text>
-                        <Text style={styles.modalText}>
                           Created Date: {comment.created_date || 'N/A'}
                         </Text>
                         <Text style={styles.modalText}>
                           Status: {comment.status || 'N/A'}
                         </Text>
                         <Text style={styles.modalText}>
-                          Remind: {comment.remind || 'N/A'}
+                          Remind Date: {comment.remind_date || 'N/A'}
                         </Text>
                         <Text style={styles.modalText}>
-                          Created Date: {comment.created_date || 'N/A'}
+                        Remind Time: {comment.remind_time || 'N/A'}
                         </Text>
 
                         {index !== leadComments.length - 1 && (

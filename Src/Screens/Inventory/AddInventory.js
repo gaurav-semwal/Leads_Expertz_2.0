@@ -4,6 +4,9 @@ import {
     StyleSheet,
     Text,
     View,
+    Image,
+    TouchableOpacity,
+    Modal,
     Platform
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
@@ -34,7 +37,7 @@ const AddInventory = ({ navigation }) => {
     const [whatsapp, setwhatsapp] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [property, setproperty] = useState('');
-    const [description, setdescription] = useState('')
+    const [description, setdescription] = useState('');
     const [price, setprice] = useState('');
     const [size, setsize] = useState('');
     const [fileUri, setFileUri] = useState(null);
@@ -42,6 +45,8 @@ const AddInventory = ({ navigation }) => {
     const [fileUri2, setFileUri2] = useState(null);
     const [fileUri3, setFileUri3] = useState(null);
     const [fileUri4, setFileUri4] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedImageUri, setSelectedImageUri] = useState(null);
 
     useEffect(() => {
         getstate();
@@ -96,6 +101,7 @@ const AddInventory = ({ navigation }) => {
         setSelectedCategory(itemValue);
         getSubcategory(itemValue);
     };
+
     const handleSubcategoryChange = itemValue => {
         setSelectedSubcategory(itemValue);
     };
@@ -190,7 +196,7 @@ const AddInventory = ({ navigation }) => {
                 selectedtype,
                 selectedCategory,
                 selectedSubcategory,
-                property, 
+                property,
                 description,
                 address,
                 price,
@@ -204,7 +210,7 @@ const AddInventory = ({ navigation }) => {
 
             console.log(response);
 
-            if (response.msg === "Save successfully.") {
+            if (response.msg === 'Save successfully.') {
                 Toast.show({
                     text1: response.msg,
                     type: 'success',
@@ -217,7 +223,7 @@ const AddInventory = ({ navigation }) => {
                 });
             }
         } catch (error) {
-            console.log("Error:", error);
+            console.log('Error:', error);
             Toast.show({
                 text1: 'An error occurred. Please try again.',
                 type: 'error',
@@ -225,6 +231,10 @@ const AddInventory = ({ navigation }) => {
         }
     };
 
+    const handleImageClick = (uri) => {
+        setSelectedImageUri(uri);
+        setModalVisible(true);
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -355,41 +365,66 @@ const AddInventory = ({ navigation }) => {
                 <View style={styles.filePickerContainer}>
                     <Pressable style={styles.filePickerButton} onPress={handleFilePick}>
                         <Text style={styles.filePickerText}>
-                            {fileUri ? 'File Selected' : 'Choose File'}
+                            {fileUri ? fileUri : 'Choose File'}
                         </Text>
                     </Pressable>
+                    {fileUri && (
+                        <TouchableOpacity onPress={() => handleImageClick(fileUri)}>
+                            <Text style={styles.urlText}>{fileUri}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.filePickerContainer}>
                     <Pressable style={styles.filePickerButton} onPress={handleFilePick1}>
                         <Text style={styles.filePickerText}>
-                            {fileUri1 ? 'File Selected' : 'Choose File'}
+                            {fileUri1 ? fileUri1 : 'Choose File'}
                         </Text>
                     </Pressable>
+                    {fileUri1 && (
+                        <TouchableOpacity onPress={() => handleImageClick(fileUri1)}>
+                            <Text style={styles.urlText}>{fileUri1}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.filePickerContainer}>
                     <Pressable style={styles.filePickerButton} onPress={handleFilePick2}>
                         <Text style={styles.filePickerText}>
-                            {fileUri2 ? 'File Selected' : 'Choose File'}
+                            {fileUri2 ? fileUri2 : 'Choose File'}
                         </Text>
                     </Pressable>
+                    {fileUri2 && (
+                        <TouchableOpacity onPress={() => handleImageClick(fileUri2)}>
+                            <Text style={styles.urlText}>{fileUri2}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.filePickerContainer}>
                     <Pressable style={styles.filePickerButton} onPress={handleFilePick3}>
                         <Text style={styles.filePickerText}>
-                            {fileUri3 ? 'File Selected' : 'Choose File'}
+                            {fileUri3 ? fileUri3 : 'Choose File'}
                         </Text>
                     </Pressable>
+                    {fileUri3 && (
+                        <TouchableOpacity onPress={() => handleImageClick(fileUri3)}>
+                            <Text style={styles.urlText}>{fileUri3}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.filePickerContainer}>
                     <Pressable style={styles.filePickerButton} onPress={handleFilePick4}>
                         <Text style={styles.filePickerText}>
-                            {fileUri4 ? 'File Selected' : 'Choose File'}
+                            {fileUri4 ? fileUri4 : 'Choose File'}
                         </Text>
                     </Pressable>
+                    {fileUri4 && (
+                        <TouchableOpacity onPress={() => handleImageClick(fileUri4)}>
+                            <Text style={styles.urlText}>{fileUri4}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
             </View>
@@ -399,6 +434,20 @@ const AddInventory = ({ navigation }) => {
             </Pressable>
 
             <View style={{ height: 30 }}></View>
+
+            <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <Image source={{ uri: selectedImageUri }} style={styles.fullImage} />
+                    <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </Pressable>
+                </View>
+            </Modal>
         </ScrollView>
     );
 };
@@ -454,5 +503,30 @@ const styles = StyleSheet.create({
     },
     filePickerText: {
         color: 'black'
+    },
+    urlText: {
+        color: 'blue',
+        textDecorationLine: 'underline',
+        marginTop: 5,
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fullImage: {
+        width: '90%',
+        height: '70%',
+        resizeMode: 'contain',
+    },
+    closeButton: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: 'black',
     },
 });

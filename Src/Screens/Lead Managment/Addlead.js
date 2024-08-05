@@ -439,7 +439,7 @@ const Addlead = ({navigation}) => {
                   <Picker.Item
                     key={index}
                     label={src.project_name}
-                    value={src.project_name}
+                    value={src.id}
                   />
                 ))}
               </Picker>
@@ -488,7 +488,7 @@ const Addlead = ({navigation}) => {
           />
         </View>
 
-        <View>
+        {/* <View>
           <TextInput
             label="Enter Comments"
             value={comments}
@@ -496,7 +496,7 @@ const Addlead = ({navigation}) => {
             style={[styles.textinput]}
             mode="outlined"
           />
-        </View>
+        </View> */}
 
         <View>
           <TextInput

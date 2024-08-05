@@ -7,9 +7,13 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Image,
+  Modal,
 } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Share from 'react-native-share';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import { Get_Inventory } from '../../../Api/authApi';
 
 const baseUrl = 'https://pro-leadexpertz.clikzopdevp.com/';
@@ -18,7 +22,9 @@ const Inventory = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 200]; // Adjusted widths for table columns
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 100, 100, 100, 100, 100, 100];
 
   useEffect(() => {
     fetchInventory();
@@ -37,6 +43,24 @@ const Inventory = ({ navigation }) => {
       console.log(error);
       ToastAndroid.show('An error occurred', ToastAndroid.SHORT);
     }
+  };
+
+  const handleShare = async (imageUri) => {
+    try {
+      const shareOptions = {
+        title: 'Share via',
+        url: imageUri,
+      };
+      await Share.open(shareOptions);
+    } catch (error) {
+      console.log('Error =>', error);
+      ToastAndroid.show('Failed to share the image', ToastAndroid.SHORT);
+    }
+  };
+
+  const handleImagePress = (imageUri) => {
+    setSelectedImage([{ url: imageUri }]);
+    setModalVisible(true);
   };
 
   const renderTableRows = () => {
@@ -58,16 +82,70 @@ const Inventory = ({ navigation }) => {
           rowData.size,
           rowData.price,
           rowData.img1 ? (
-            <Image
-              source={{ uri:`${baseUrl}${rowData.img1}` }}
-              style={styles.image}
-              resizeMethod=''
-              onError={() => console.log('Failed to load image:', rowData.img1)}
-              onLoad={() => console.log('Image loaded successfully:', rowData.img1)}
-            />
+            <TouchableOpacity onPress={() => handleImagePress(`${baseUrl}${rowData.img1}`)}>
+              <Image
+                source={{ uri: `${baseUrl}${rowData.img1}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.img1)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.img1)}
+              />
+            </TouchableOpacity>
           ) : (
             <Text>No Image</Text>
           ),
+          rowData.img2 ? (
+            <TouchableOpacity onPress={() => handleImagePress( `${baseUrl}${rowData.img2}`)}>
+              <Image
+              source={{ uri: `${baseUrl}${rowData.img2}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.img2)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.img2)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>No Image</Text>
+          ),
+          rowData.img3 ? (
+            <TouchableOpacity onPress={() => handleImagePress(`${baseUrl}${rowData.img3}` )}>
+              <Image
+                 source={{ uri: `${baseUrl}${rowData.img3}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.img3)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.img3)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>No Image</Text>
+          ),
+          rowData.img4 ? (
+            <TouchableOpacity onPress={() => handleImagePress(`${baseUrl}${rowData.img4}` )}>
+              <Image
+                source={{ uri: `${baseUrl}${rowData.img4}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.img4)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.img4)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>No Image</Text>
+          ),
+          rowData.img5 ? (
+            <TouchableOpacity onPress={() => handleImagePress(`${baseUrl}${rowData.img5}`)}>
+              <Image
+               source={{ uri: `${baseUrl}${rowData.img5}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.img5)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.img5)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>No Image</Text>
+          ),
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => handleShare(`${baseUrl}${rowData.img1}`)}>
+            <FontAwesome name="share-alt" color="#625bc5" size={25} />
+          </TouchableOpacity>,
         ]}
         widthArr={widthArr}
         style={[
@@ -144,6 +222,10 @@ const Inventory = ({ navigation }) => {
       </ScrollView>
 
       {renderPagination()}
+
+      <Modal visible={modalVisible} transparent={true} onRequestClose={() => setModalVisible(false)}>
+        <ImageViewer imageUrls={selectedImage} />
+      </Modal>
     </View>
   );
 };
@@ -190,9 +272,10 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 60,
     resizeMode: 'cover',
+    alignSelf: 'center',
   },
   pagination: {
     flexDirection: 'row',
@@ -209,6 +292,15 @@ const styles = StyleSheet.create({
     color: '#625bc5',
     marginLeft: 10,
     marginRight: 10,
+  },
+  actionButton: {
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

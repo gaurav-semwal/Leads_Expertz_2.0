@@ -8,16 +8,18 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
-  ScrollView
+  ScrollView,
+  Linking,
+  Platform
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Get_Lead,Get_Lead_Data } from '../../../Api/authApi';
+import { Get_Lead_Booked ,Get_Lead_Data} from '../../../Api/authApi';
 import { Colors } from '../../Comman/Styles';
 import moment from 'moment';
 import Toast from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Cancelled = ({navigation}) => {
+const Cancelled = ({ navigation }) => {
   const [activeButton, setActiveButton] = useState('All');
   const [leadData, setLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,12 +32,10 @@ const Cancelled = ({navigation}) => {
   }, [activeButton]);
 
   const getUser = async () => {
-    setLoading(true);
     try {
-      const response = await Get_Lead();
+      const response = await Get_Lead_Booked('Booked');
       if (response.msg === 'Load successfully') {
-        console.log("HI THERE CHECKING NEW LEAD", response);
-        const filteredLeads = response.data?.filter(lead => lead.status === 'CANCELLED') || [];
+        const filteredLeads = response.data?.filter(lead => lead.conversion_type === 'CANCELLED') || [];
         setLeadData(filteredLeads);
       }
     } catch (error) {
@@ -71,8 +71,25 @@ const Cancelled = ({navigation}) => {
     }
   };
 
-  const handlePhonePress = phone => {
-    console.log('Phone press:', phone);
+  const handlePhonePress = phoneNumber => {
+    let phoneUrl = `tel:${phoneNumber}`;
+
+    Linking.openURL(phoneUrl)
+      .then(supported => {
+        if (!supported) {
+          console.log(`Phone dialing not supported for number: ${phoneNumber}`);
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch(err => {
+        console.error('An error occurred', err);
+        if (Platform.OS === 'android' && err.message.includes('not supported')) {
+          console.log('Android phone dialing may not be supported');
+        } else if (Platform.OS === 'ios' && err.message.includes('not allowed')) {
+          console.log('iOS phone dialing permission not allowed');
+        }
+      });
   };
 
   const closeModal = () => {
@@ -108,54 +125,22 @@ const Cancelled = ({navigation}) => {
 
               <ScrollView contentContainerStyle={{}}>
                 <View style={{ flexDirection: 'column', padding: 10 }}>
-                  <Text style={styles.modalText}>
-                    Name: {item.name || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Email: {item.email || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Mobile: {item.phone || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Address: {item.field3 || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    DOB: {item.app_dob || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    DOA: {item.app_doa || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Source: {item.source || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Type: {item.type || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Category: {item.cat_name || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    SubCategory: {item.subcatname || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    State: {item.field1 || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    City: {item.field2 || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Classification: {item.classification || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Project: {item.project_id || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Campaign: {item.campaign || 'N/A'}
-                  </Text>
-                  <Text style={styles.modalText}>
-                    Status: {item.status || 'N/A'}
-                  </Text>
+                  <Text style={styles.modalText}>Name: {item.name || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Email: {item.email || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Mobile: {item.phone || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Address: {item.field3 || 'N/A'}</Text>
+                  <Text style={styles.modalText}>DOB: {item.app_dob || 'N/A'}</Text>
+                  <Text style={styles.modalText}>DOA: {item.app_doa || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Source: {item.source || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Type: {item.type || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Category: {item.cat_name || 'N/A'}</Text>
+                  <Text style={styles.modalText}>SubCategory: {item.subcatname || 'N/A'}</Text>
+                  <Text style={styles.modalText}>State: {item.field1 || 'N/A'}</Text>
+                  <Text style={styles.modalText}>City: {item.field2 || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Classification: {item.classification || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Project: {item.project_id || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Campaign: {item.campaign || 'N/A'}</Text>
+                  <Text style={styles.modalText}>Status: {item.status || 'N/A'}</Text>
                 </View>
 
                 <View style={{ padding: 10 }}>
@@ -165,22 +150,12 @@ const Cancelled = ({navigation}) => {
                   {leadComments.length > 0 ? (
                     leadComments.map((comment, index) => (
                       <View key={index} style={styles.commentContainer}>
-                        <Text style={styles.commentText}>
-                          {comment.comment || 'No comment text'}
-                        </Text>
-                        <Text style={styles.modalText}>
-                          Status: {comment.status || 'N/A'}
-                        </Text>
-                        <Text style={styles.modalText}>
-                          Remind: {comment.remind || 'N/A'}
-                        </Text>
-                        <Text style={styles.modalText}>
-                          Created Date: {comment.created_date || 'N/A'}
-                        </Text>
+                        <Text style={styles.commentText}>{comment.comment || 'No comment text'}</Text>
+                        <Text style={styles.modalText}>Status: {comment.status || 'N/A'}</Text>
+                        <Text style={styles.modalText}>Remind: {comment.remind || 'N/A'}</Text>
+                        <Text style={styles.modalText}>Created Date: {comment.created_date || 'N/A'}</Text>
 
-                        {index !== leadComments.length - 1 && (
-                          <View style={styles.separator} />
-                        )}
+                        {index !== leadComments.length - 1 && <View style={styles.separator} />}
                       </View>
                     ))
                   ) : (
@@ -198,66 +173,45 @@ const Cancelled = ({navigation}) => {
   const editlead = item => {
     navigation.navigate('Update Lead', { leadid: item.id, status: item.status });
   };
-  
-  const LeadItem = ({ item, index }) => {
+
+  const LeadItem = ({ item }) => {
     return (
-<Pressable>
-<View style={styles.leadContainer}>
-  <View
-    style={{
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-    {/* <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
-      <Text style={styles.editButtonText}>Lead Edit</Text>
-    </Pressable> */}
-    <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
-      <Text style={styles.editButtonText1}>{item.status}</Text>
-    </Pressable>
-  </View>
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    }}>
-    <View
-      style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-      <View style={styles.profileContainer}></View>
-      <View>
-              <Text style={styles.leadInfo1}>Name: {item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
-                <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{marginLeft:10}}>
-                    <AntDesign name="phone" size={20} color="green" />
-                  </View>
-                </TouchableOpacity>
+      <Pressable onPress={() => openModal(item)}>
+        <View style={styles.leadContainer}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
+              <Text style={styles.editButtonText1}>{item.status}</Text>
+            </Pressable>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+              <View style={styles.profileContainer}></View>
+              <View>
+                <Text style={styles.leadInfo1}>Name: {item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
+                  <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
+                    <View style={{ marginLeft: 10 }}>
+                      <AntDesign name="phone" size={20} color="green" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
+            <Pressable onPress={() => editlead(item)}>
+              <AntDesign name="edit" size={25} color="orange" />
+            </Pressable>
           </View>
-          <Pressable onPress={() => editlead(item)}>
-            <AntDesign name="edit" size={25} color="orange" />
-          </Pressable>
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+            <Text style={styles.leadInfo1}>Source: {item.source}</Text>
+            <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.leadInfo1}>Date: {moment(item.lead_date).format('YYYY-MM-DD')}</Text>
+            </View>
+          </View>
         </View>
-  <View style={{marginTop: 10}}>
-    <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
-    <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-    <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      <Text style={styles.leadInfo1}>
-        Date: {moment(item.lead_date).format('YYYY-MM-DD')}
-      </Text>
-    </View>
-  </View>
-</View>
-</Pressable>
+      </Pressable>
     );
   };
 
@@ -319,16 +273,14 @@ const Cancelled = ({navigation}) => {
         <FlatList
           data={leadData}
           renderItem={LeadItem}
-          keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
+          keyExtractor={item => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingTop: 10 }}
           refreshing={refreshing}
           onRefresh={handleRefresh}
         />
       )}
-
-{selectedItem && <LeadModal item={selectedItem} />}
-
+      {selectedItem && <LeadModal item={selectedItem} />}
     </View>
   );
 };
@@ -337,53 +289,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    height: 50,
-    backgroundColor: '#625bc5',
-  },
-  text: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  row: {
-    height: 40,
-    backgroundColor: '#E7E6E1',
-  },
-  leadContainer: {
-    padding: 10,
-    borderRadius: 6,
-    borderColor: '#ede8e8',
-    borderWidth: 1,
-    backgroundColor: '#ede8e8',
-    marginBottom: 10,
-  },
-  editButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#625bc5',
-    padding: 5,
-    borderRadius: 4,
-  },
-  editButton1: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#625bc5',
-    padding: 5,
-    borderRadius: 4,
-  },
-  editButtonText1: {
-    color: '#fff',
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 10,
-  },
-  pageButton: {
-    marginHorizontal: 5,
-  },
-  pageText: {
-    color: '#625bc5',
-    fontWeight: 'bold',
   },
   body: {
     flexDirection: 'row',
@@ -400,24 +305,39 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#e6ebf5',
   },
-  itemContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+  text: {
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
-  itemText: {
+  leadContainer: {
+    padding: 10,
+    borderRadius: 6,
+    borderColor: '#ede8e8',
+    borderWidth: 1,
+    backgroundColor: '#ede8e8',
+    marginBottom: 10,
+  },
+  editButton1: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#625bc5',
+    padding: 5,
+    borderRadius: 4,
+  },
+  editButtonText1: {
+    color: '#fff',
+  },
+  profileContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ddd',
+    marginRight: 10,
+  },
+  leadInfo1: {
     fontSize: 16,
   },
   loader: {
     marginTop: 20,
-  },
-  itemContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  itemText: {
-    fontSize: 16,
   },
   centeredView: {
     flex: 1,
