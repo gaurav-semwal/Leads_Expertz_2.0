@@ -373,90 +373,123 @@ const Updatelead = ({ navigation }) => {
 };
 
 
-  const Submit = async () => {
-    console.log(
-      'leadid',
-      leadid,
+const Submit = async () => {
+  const validateFields = () => {
+    const requiredFields = {
+      comment: comments,
+      project: selectedproject,
+      size: size,
+      price: price,
+      name: applicantName,
+      contact: applicantContact,
+      city: applicantCity,
+      status: selectedStatus
+    };
+    
+    for (const [key, value] of Object.entries(requiredFields)) {
+      const stringValue = value != null ? String(value).trim() : '';
+      
+      if (stringValue === '') {
+        return key;
+      }
+    }
+    
+    return null;
+  };
+
+  const missingField = validateFields();
+  
+  if (missingField) {
+    Toast.show({
+      text1: 'Please fill the required fields',
+      type: 'error',
+    });
+    return;
+  }
+
+  console.log(
+    'leadid',
+    leadid,
+    fullname,
+    email,
+    mobilenumner,
+    selectedSource,
+    selectedtype,
+    selectedCategory,
+    selectedSubcategory,
+    selectedclassification,
+    status,
+    selectedcampigns,
+    selectedproject,
+    selectedState,
+    selectedCity,
+    address,
+    comments,
+    date,
+    time,
+    budget,
+    applicantName,
+    applicantContact,
+    applicantCity,
+    applicantDob,
+    applicantDoa,
+    price,
+    size
+  );
+
+  try {
+    const response = await Update_Lead(
+      selectedSource,
+      selectedcampigns,
+      selectedCity,
+      selectedState,
       fullname,
       email,
-      mobilenumner,
-      selectedSource,
+      date,
+      time,
+      selectedclassification,
+      status,
+      comments,
+      selectedproject,
       selectedtype,
       selectedCategory,
       selectedSubcategory,
-      selectedclassification,
-      status,
-      selectedcampigns,
+      selectedStatus,
       selectedproject,
-      selectedState,
-      selectedCity,
-      address,
-      comments,
-      date,
-      time,
-      budget,
+      size,
+      price,
       applicantName,
       applicantContact,
       applicantCity,
       applicantDob,
       applicantDoa,
-      price,
-      size
+      whatsapp,
+      address,
+      leadid
     );
-    try {
-      const response = await Update_Lead(
-        selectedSource,
-        selectedcampigns,
-        selectedCity,
-        selectedState,
-        fullname,
-        email,
-        date,
-        time,
-        selectedclassification,
-        status,
-        comments,
-        selectedproject,
-        selectedtype,
-        selectedCategory,
-        selectedSubcategory,
-        selectedStatus,
-        selectedproject,
-        size,
-        price,
-        applicantName,
-        applicantContact,
-        applicantCity,
-        applicantDob,
-        applicantDoa,
-        whatsapp,
-        address,
-        leadid
-      );
 
-      console.log(response);
+    console.log(response);
 
-      if (response.msg === 'Save successfully') {
-        Toast.show({
-          text1: 'Save Successfully',
-          type: 'success',
-        });
-        navigation.navigate('All Leads');
-      } else {
-        Toast.show({
-          text1: response.msg,
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log(error);
+    if (response.msg === 'Save successfully') {
       Toast.show({
-        text1: 'Error',
+        text1: 'Save Successfully',
+        type: 'success',
+      });
+      navigation.navigate('All Leads');
+    } else {
+      Toast.show({
+        text1: response.msg,
         type: 'error',
       });
     }
-  };
-
+  } catch (error) {
+    console.log(error);
+    Toast.show({
+      text1: 'Error',
+      type: 'error',
+    });
+  }
+};
 
   const handleStatusChange = (value) => {
     setStatus(value);

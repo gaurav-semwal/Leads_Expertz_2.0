@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
@@ -42,12 +42,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AddInventory from '../Screens/Inventory/AddInventory';
 import Updatelead from '../Screens/UpdateLead';
 import Updateuser from '../Screens/Staff Managment/UpdateUser';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Modal, StyleSheet} from 'react-native';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigation = () => {
+const BottomTabNavigation = ({navigation}) => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -77,27 +79,94 @@ const BottomTabNavigation = () => {
       <Tab.Screen
         name="Home"
         component={Homescreen}
-        options={{headerShown: false}}
+        options={{
+          headerShown: true,
+          headerTitle: 'Dashboard',
+          headerStyle: {
+            backgroundColor: '#625bc5',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={30}
+              color="#fff"
+              style={{marginLeft: 10, top: 2}}
+              onPress={() => navigation.openDrawer()}
+            />
+          ),
+        }}
       />
       <Tab.Screen
         name="All Leads"
         component={Allleads}
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#625bc5',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={30}
+              color="#fff"
+              style={{marginLeft: 10, top: 2}}
+              onPress={() => navigation.openDrawer()}
+            />
+          ),
         }}
       />
       <Tab.Screen
         name="User List"
         component={Userlist}
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#625bc5',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={30}
+              color="#fff"
+              style={{marginLeft: 10, top: 2}}
+              onPress={() => navigation.openDrawer()}
+            />
+          ),
         }}
       />
       <Tab.Screen
         name="Settings"
         component={Settingsscreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#625bc5',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={30}
+              color="#fff"
+              style={{marginLeft: 10, top: 2}}
+              onPress={() => navigation.openDrawer()}
+            />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -111,7 +180,7 @@ const DrawerNavigation = () => {
         name="Dashboard"
         component={BottomTabNavigation}
         options={{
-          headerShown: true,
+          headerShown: false,
           headerStyle: {
             backgroundColor: '#625bc5',
           },
@@ -141,7 +210,7 @@ const Stacknavigation = () => {
             component={DrawerNavigation}
             options={{headerShown: false}}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Update Lead"
             component={Updatelead}
             options={{
@@ -188,7 +257,17 @@ const Stacknavigation = () => {
           <Stack.Screen
             name="Setting"
             component={Settingsscreen}
-            options={{title: 'Profile Screen', headerShown: true}}
+            options={{
+              title: 'Profile Screen',
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
           />
           <Stack.Screen
             name="Category"
@@ -234,16 +313,19 @@ const Stacknavigation = () => {
             }}
           />
 
-          <Stack.Screen name="AddInventory" component={AddInventory} options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
+          <Stack.Screen
+            name="AddInventory"
+            component={AddInventory}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
           />
 
           <Stack.Screen
@@ -610,7 +692,6 @@ const Stacknavigation = () => {
               },
             }}
           />
-         
         </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>

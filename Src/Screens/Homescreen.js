@@ -1,19 +1,55 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, Pressable, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+  Modal,
+  BackHandler,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import Leadshomegrid from '../Components/Leadshomegrid';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { TextInput } from 'react-native-paper';
+import {TextInput} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Add_Quick_Lead } from '../../Api/authApi';
+import {Add_Quick_Lead} from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
+import Dialog from 'react-native-dialog';
 
-const Homescreen = ({ navigation }) => {
+const Homescreen = ({navigation}) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [leads, setLeads] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      setVisible(true);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
+  const handleExit = async () => {
+    try {
+      BackHandler.exitApp();
+      setVisible(false);
+    } catch (error) {
+      console.error('Failed to clear AsyncStorage:', error);
+    }
+  };
 
   const onPressPlusButton = () => {
     navigation.navigate('Add Lead');
@@ -30,9 +66,13 @@ const Homescreen = ({ navigation }) => {
   const addquicklead = async () => {
     try {
       const response = await Add_Quick_Lead(name, number);
-      console.log('add', response)
-      if (response.statusCode === 200 && response.result && response.result.msg === 'Save successfully') {
-        console.log('enter')
+      console.log('add', response);
+      if (
+        response.statusCode === 200 &&
+        response.result &&
+        response.result.msg === 'Save successfully'
+      ) {
+        console.log('enter');
         setModalVisible(false);
         setName('');
         setNumber('');
@@ -44,73 +84,81 @@ const Homescreen = ({ navigation }) => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.button}>
-        <Pressable style={styles.buttoncontainer1} onPress={openModal}>
-          <Text style={styles.text}>Add Quick Lead</Text>
-        </Pressable>
-      </View>
-      <View style={styles.dropdowncontainer1}>
-        <Picker
-          selectedValue={selectedValue}
-          onValueChange={(itemValue) => setSelectedValue(itemValue)}
-        >
-          <Picker.Item label="All" value="All" />
-          <Picker.Item label="Self" value="Self" />
-          <Picker.Item label="Team" value="Team" />
-        </Picker>
-      </View>
-      <Leadshomegrid />
-      <View style={styles.plusButtonContainer}>
-        <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
-          <AntDesign name="plus" size={28} color="#dbdad3" />
-        </Pressable>
-      </View>
+    <>
+      <View style={styles.container}>
+        <View style={styles.button}>
+          <Pressable style={styles.buttoncontainer1} onPress={openModal}>
+            <Text style={styles.text}>Add Quick Lead</Text>
+          </Pressable>
+        </View>
+        <View style={styles.dropdowncontainer1}>
+          <Picker
+            selectedValue={selectedValue}
+            onValueChange={itemValue => setSelectedValue(itemValue)}>
+            <Picker.Item label="All" value="All" />
+            <Picker.Item label="Self" value="Self" />
+            <Picker.Item label="Team" value="Team" />
+          </Picker>
+        </View>
+        <Leadshomegrid />
+        <View style={styles.plusButtonContainer}>
+          <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+            <AntDesign name="plus" size={28} color="#dbdad3" />
+          </Pressable>
+        </View>
 
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Quick Lead</Text>
-              <Pressable onPress={closeModal}>
-                <MaterialCommunityIcons
-                  name="close-circle"
-                  size={25}
-                  color="#625bc5"
-                />
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={closeModal}>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Add Quick Lead</Text>
+                <Pressable onPress={closeModal}>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={25}
+                    color="#625bc5"
+                  />
+                </Pressable>
+              </View>
+              <TextInput
+                placeholder="Enter Your Name"
+                value={name}
+                onChangeText={text => setName(text)}
+                style={styles.textinput}
+                mode="outlined"
+              />
+              <TextInput
+                placeholder="Enter Your Number"
+                value={number}
+                onChangeText={text => setNumber(text)}
+                style={styles.textinput}
+                mode="outlined"
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <Pressable style={styles.submitButton} onPress={addquicklead}>
+                <Text style={styles.submitButtonText}>Submit</Text>
               </Pressable>
             </View>
-            <TextInput
-              placeholder="Enter Your Name"
-              value={name}
-              onChangeText={text => setName(text)}
-              style={styles.textinput}
-              mode="outlined"
-            />
-            <TextInput
-              placeholder="Enter Your Number"
-              value={number}
-              onChangeText={text => setNumber(text)}
-              style={styles.textinput}
-              mode="outlined"
-              keyboardType='numeric'
-              maxLength={10}
-            />
-            <Pressable style={styles.submitButton} onPress={addquicklead}>
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </Pressable>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Exit App</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to exit the app ?
+        </Dialog.Description>
+        <Dialog.Button label="Cancel" onPress={handleCancel} />
+        <Dialog.Button label="Yes" onPress={handleExit} />
+      </Dialog.Container>
+    </>
   );
 };
 
@@ -190,18 +238,18 @@ const styles = StyleSheet.create({
   },
   textinput: {
     width: '100%',
-    marginBottom: 15, // Added margin for spacing
-    marginTop: 10
+    marginBottom: 15,
+    marginTop: 10,
   },
   submitButton: {
-    backgroundColor: '#625bc5', // Custom background color for the button
+    backgroundColor: '#625bc5',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     width: '100%',
   },
   submitButtonText: {
-    color: '#fff', // Text color for the button
+    color: '#fff',
     fontSize: 16,
   },
 });
