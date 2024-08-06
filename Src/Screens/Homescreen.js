@@ -6,6 +6,7 @@ import {
   Pressable,
   Modal,
   BackHandler,
+  Alert
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import Leadshomegrid from '../Components/Leadshomegrid';
@@ -14,7 +15,7 @@ import {TextInput} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Add_Quick_Lead} from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
-import Dialog from 'react-native-dialog';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const Homescreen = ({navigation}) => {
   const [selectedValue, setSelectedValue] = useState('');
@@ -22,34 +23,31 @@ const Homescreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [visible, setVisible] = useState(false);
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const backAction = () => {
-      setVisible(true);
+      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => BackHandler.exitApp() },
+      ]);
       return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+    if (isFocused) {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
 
-    return () => backHandler.remove();
-  }, []);
-
-  const handleCancel = () => {
-    setVisible(false);
-  };
-
-  const handleExit = async () => {
-    try {
-      BackHandler.exitApp();
-      setVisible(false);
-    } catch (error) {
-      console.error('Failed to clear AsyncStorage:', error);
+      return () => backHandler.remove();
     }
-  };
+  }, [isFocused]);
 
   const onPressPlusButton = () => {
     navigation.navigate('Add Lead');
@@ -87,7 +85,6 @@ const Homescreen = ({navigation}) => {
   };
 
   return (
-    <>
       <View style={styles.container}>
         <View style={styles.button}>
           <Pressable style={styles.buttoncontainer1} onPress={openModal}>
@@ -150,15 +147,6 @@ const Homescreen = ({navigation}) => {
           </View>
         </Modal>
       </View>
-      <Dialog.Container visible={visible}>
-        <Dialog.Title>Exit App</Dialog.Title>
-        <Dialog.Description>
-          Are you sure you want to exit the app ?
-        </Dialog.Description>
-        <Dialog.Button label="Cancel" onPress={handleCancel} />
-        <Dialog.Button label="Yes" onPress={handleExit} />
-      </Dialog.Container>
-    </>
   );
 };
 
