@@ -1,35 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, Text, Pressable, Linking } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Colors } from '../Comman/Styles';
+import { Dashboard } from '../../Api/authApi';
 
 const HomeScheduletable = () => {
   const navigation = useNavigation();
 
   const [activeButton, setActiveButton] = useState('Call Schedule');
-  const [callScheduleData, setCallScheduleData] = useState([
-    { id: 1, name: 'John Doe', campaign: 'Campaign A', classification: 'High', last_updated: '2023-01-01', comments: 'Lorem ipsum', mobile: '1234567890' },
-    { id: 2, name: 'Alice Smith', campaign: 'Campaign B', classification: 'Medium', last_updated: '2023-01-02', comments: 'Dolor sit amet', mobile: '9876543210' },
-  ]);
-  const [visitScheduleData, setVisitScheduleData] = useState([
-    { id: 1, name: 'Bob Brown', campaign: 'Campaign C', classification: 'Low', last_updated: '2023-01-03', comments: 'Consectetur adipiscing elit', mobile: '4567890123' },
-    { id: 2, name: 'Emily Johnson', campaign: 'Campaign D', classification: 'High', last_updated: '2023-01-04', comments: 'Sed do eiusmod tempor', mobile: '2345678901' },
-  ]);
-  const [missedFollowUpData, setMissedFollowUpData] = useState([
-    { id: 1, name: 'David Lee', campaign: 'Campaign E', classification: 'Medium', last_updated: '2023-01-05', comments: 'Ut labore et dolore magna', mobile: '3456789012' },
-    { id: 2, name: 'Sarah Clark', campaign: 'Campaign F', classification: 'High', last_updated: '2023-01-06', comments: 'Ut enim ad minim veniam', mobile: '5678901234' },
-  ]);
-  const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
-  const [widthArr] = useState([100, 150, 100, 100, 150, 150]);
-  const [tableData, setTableData] = useState(callScheduleData);
+  const [callScheduleData, setCallScheduleData] = useState([]);
+  const [visitScheduleData, setVisitScheduleData] = useState([]);
+  const [missedFollowUpData, setMissedFollowUpData] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [itemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
+  const [widthArr] = useState([100, 150, 100, 100, 150, 150]);
+
+  useEffect(() => {
+    getDashboard();
+  }, []);
+
+  const getDashboard = async () => {
+    try {
+      const response = await Dashboard();
+      console.log('D A S H B O A R D -->', response.data);
+
+      if (response.data) {
+        const missedFollowUp = response.data.missedFollowUp || [];
+
+        const callScheduledData = missedFollowUp.filter(item => item.status === 'CALL SCHEDULED');
+        const visitScheduledData = missedFollowUp.filter(item => item.status === 'VISIT SCHEDULED');
+
+        setCallScheduleData(callScheduledData);
+        setVisitScheduleData(visitScheduledData);
+        setMissedFollowUpData(missedFollowUp);
+        setTableData(callScheduledData);
+      } else {
+        console.warn('Unexpected response format:', response);
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useFocusEffect(
-    React.useCallback(() => {
-    }, []),
+    React.useCallback(() => {}, [])
   );
 
   const onPressButton = (type) => {
@@ -55,12 +81,11 @@ const HomeScheduletable = () => {
   };
 
   const renderTableRows = () => {
-    let dataToDisplay = tableData;
-
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
+    let dataToDisplay = tableData.slice(startIndex, endIndex);
 
-    return Array.isArray(dataToDisplay) && dataToDisplay.slice(startIndex, endIndex).map((rowData, index) => (
+    return dataToDisplay.map((rowData, index) => (
       <Row
         key={startIndex + index}
         data={[
@@ -69,14 +94,12 @@ const HomeScheduletable = () => {
           rowData.campaign,
           rowData.classification,
           rowData.last_updated,
-          <Pressable onPress={() => handlePhoneCall(rowData.mobile)} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}>
-            <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.comments}</Text>
+          <Pressable onPress={() => handlePhoneCall(rowData.phone)} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}>
+            <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
             <View style={{ flexDirection: 'row' }}>
-             
               <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
                 <AntDesign name="edit" color="#625bc5" size={20} />
               </Pressable>
-              
               <View style={styles.callIcon}>
                 <AntDesign name="phone" color="#625bc5" size={20} />
               </View>
@@ -90,8 +113,8 @@ const HomeScheduletable = () => {
     ));
   };
 
-  const handlePhoneCall = (mobileNumber) => {
-    const phoneNumber = `tel:${mobileNumber}`;
+  const handlePhoneCall = (phone) => {
+    const phoneNumber = `tel:${phone}`;
     Linking.openURL(phoneNumber);
   };
 
@@ -118,6 +141,14 @@ const HomeScheduletable = () => {
       </View>
     );
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

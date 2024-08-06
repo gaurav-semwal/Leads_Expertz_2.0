@@ -37,7 +37,7 @@ const Homescreen = ({ navigation }) => {
         setName('');
         setNumber('');
         Toast.show({
-          text1: response.msg,
+          text1: 'Save Successfully',
           type: 'success',
         });
       }
