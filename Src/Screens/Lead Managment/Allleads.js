@@ -105,6 +105,10 @@ const Allleads = ({ navigation }) => {
     try {
       const response = await Get_Lead();
       console.log(response)
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Load successfully') {
         let filteredData = response.data;
 
@@ -402,7 +406,6 @@ const Allleads = ({ navigation }) => {
             width: '100%',
           }}>
           <View style={{ width: '49%' }}>
-            <Text>From</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={user}
@@ -421,7 +424,6 @@ const Allleads = ({ navigation }) => {
 
 
           <View style={{ width: '49%' }}>
-            <Text>Status</Text>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={status}

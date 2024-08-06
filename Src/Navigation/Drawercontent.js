@@ -643,6 +643,7 @@ const DrawerContent = props => {
         </Modal>
       </View>
     </DrawerContentScrollView>
+    
   );
 };
 
