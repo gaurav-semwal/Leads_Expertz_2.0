@@ -377,14 +377,30 @@ const Submit = async () => {
     INTERESTED: ['selectedDate', 'selectedTime'],
     'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
     'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
-    'FUTURE LEAD': ['selectedBudget', 'selectedState', 'selectedCity',],
-    CONVERTED: ['selectedStatus', 'selectedProject', 'size', 'price', 'applicantName', 'applicantContact'],
+    'FUTURE LEAD': ['selectedBudget'],
+    CONVERTED: {
+      BOOKED: [],
+      COMPLETED: ['selectedProject', 'size', 'price'], 
+    },
   };
 
   const validateFields = () => {
     const commonRequiredFields = ['comments'];
-    const statusSpecificRequiredFields = requiredFieldsByStatus[status] || [];
-    const requiredFields = [...commonRequiredFields, ...statusSpecificRequiredFields];
+    const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
+      ? requiredFieldsByStatus[status]
+      : [];
+
+    let additionalRequiredFields = [];
+
+    if (status === 'CONVERTED' && selectedStatus) {
+      additionalRequiredFields = requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
+    }
+
+    const requiredFields = [
+      ...commonRequiredFields,
+      ...statusSpecificRequiredFields,
+      ...additionalRequiredFields,
+    ];
 
     const fieldValues = {
       comments,
@@ -395,17 +411,19 @@ const Submit = async () => {
       selectedCity,
       selectedStatus,
       selectedProject,
+      size,
       price,
       applicantName,
       applicantContact,
     };
 
+    // Check for missing fields
     for (const field of requiredFields) {
       if (!fieldValues[field]) {
-        return field;
+        return field; // Return the first missing field
       }
     }
-    return null;
+    return null; // No missing fields
   };
 
   const missingField = validateFields();
@@ -415,8 +433,9 @@ const Submit = async () => {
       text1: `Please fill the required field: ${missingField}`,
       type: 'error',
     });
-    return;
+    return; 
   }
+
   try {
     const response = await Update_Lead(
       selectedSource,
@@ -727,8 +746,8 @@ const Submit = async () => {
               />
             </View> */}
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-              <View style={{ width: '48%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, }}>
+              <View style={{ width: '50%' }}>
                 <TextInput
                   placeholder="Select Date"
                   value={selectedDate}
@@ -739,7 +758,7 @@ const Submit = async () => {
                 <Pressable
                   style={{
                     position: 'absolute',
-                    top: 10,
+                    top: 15,
                     right: 16,
                     width: 40,
                     height: 40,
@@ -750,8 +769,8 @@ const Submit = async () => {
                   <AntDesign name="calendar" color="#625bc5" size={25} />
                 </Pressable>
               </View>
-              <View style={{ width: '100%', marginLeft: 10 }}>
-                <View style={{ width: '48%' }}>
+              <View style={{ width: '100%', marginLeft: 7 }}>
+                <View style={{ width: '50%' }}>
                   <TextInput
                     placeholder="Select Time"
                     value={selectedTime}
@@ -763,7 +782,7 @@ const Submit = async () => {
                   <Pressable
                     style={{
                       position: 'absolute',
-                      top: 10,
+                      top: 17,
                       right: 16,
                       width: 40,
                       height: 40,
@@ -973,7 +992,7 @@ const Submit = async () => {
         ) : null}
 
 
-        <View style={{ top: 25 }}>
+        <View style={{ top: 23 }}>
           <TextInput
             label="Enter Address"
             value={address}

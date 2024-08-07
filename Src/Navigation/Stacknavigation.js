@@ -664,7 +664,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="All Leads"
             component={Allleads}
             options={{
@@ -677,7 +677,7 @@ const Stacknavigation = () => {
                 fontWeight: 'bold',
               },
             }}
-          />
+          /> */}
           <Stack.Screen
             name="Search Leads"
             component={Searchleads}

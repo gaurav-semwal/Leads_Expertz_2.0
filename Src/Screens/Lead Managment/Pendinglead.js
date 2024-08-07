@@ -36,7 +36,7 @@ const Pendinglead = ({navigation}) => {
       const response = await Get_Lead();
       if (response.msg === 'Load successfully') {
         console.log("HI THERE CHECKING NEW LEAD", response);
-        const filteredLeads = response.data?.filter(lead => lead.status === 'PENDING') || [];
+        const filteredLeads = response.data?.filter(lead => lead.status === 'PENDING ') || [];
         setLeadData(filteredLeads);
       }
     } catch (error) {
@@ -218,7 +218,7 @@ const Pendinglead = ({navigation}) => {
   
   const LeadItem = ({ item, index }) => {
     return (
-<Pressable>
+      <Pressable>
 <View style={styles.leadContainer}>
   <View
     style={{
@@ -279,6 +279,7 @@ const Pendinglead = ({navigation}) => {
   };
 
   return (
+    
     <View style={styles.container}>
       <View style={styles.body}>
         <Pressable
