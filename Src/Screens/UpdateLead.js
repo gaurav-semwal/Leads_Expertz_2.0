@@ -372,71 +372,51 @@ const Updatelead = ({ navigation }) => {
     }
 };
 
-
 const Submit = async () => {
+  const requiredFieldsByStatus = {
+    INTERESTED: ['selectedDate', 'selectedTime'],
+    'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
+    'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
+    'FUTURE LEAD': ['selectedBudget', 'selectedState', 'selectedCity',],
+    CONVERTED: ['selectedStatus', 'selectedProject', 'size', 'price', 'applicantName', 'applicantContact'],
+  };
+
   const validateFields = () => {
-    const requiredFields = {
-      comment: comments,
-      project: selectedproject,
-      size: size,
-      price: price,
-      name: applicantName,
-      contact: applicantContact,
-      city: applicantCity,
-      status: selectedStatus
+    const commonRequiredFields = ['comments'];
+    const statusSpecificRequiredFields = requiredFieldsByStatus[status] || [];
+    const requiredFields = [...commonRequiredFields, ...statusSpecificRequiredFields];
+
+    const fieldValues = {
+      comments,
+      selectedDate,
+      selectedTime,
+      selectedBudget,
+      selectedState,
+      selectedCity,
+      selectedStatus,
+      selectedProject,
+      price,
+      applicantName,
+      applicantContact,
     };
-    
-    for (const [key, value] of Object.entries(requiredFields)) {
-      const stringValue = value != null ? String(value).trim() : '';
-      
-      if (stringValue === '') {
-        return key;
+
+    for (const field of requiredFields) {
+      if (!fieldValues[field]) {
+        return field;
       }
     }
-    
     return null;
   };
 
   const missingField = validateFields();
-  
+
   if (missingField) {
     Toast.show({
-      text1: 'Please fill the required fields',
+      text1: `Please fill the required field: ${missingField}`,
       type: 'error',
     });
     return;
   }
-
-  console.log(
-    'leadid',
-    leadid,
-    fullname,
-    email,
-    mobilenumner,
-    selectedSource,
-    selectedtype,
-    selectedCategory,
-    selectedSubcategory,
-    selectedclassification,
-    status,
-    selectedcampigns,
-    selectedproject,
-    selectedState,
-    selectedCity,
-    address,
-    comments,
-    date,
-    time,
-    budget,
-    applicantName,
-    applicantContact,
-    applicantCity,
-    applicantDob,
-    applicantDoa,
-    price,
-    size
-  );
-
   try {
     const response = await Update_Lead(
       selectedSource,
