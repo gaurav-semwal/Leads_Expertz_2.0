@@ -325,12 +325,12 @@ const Updatelead = ({ navigation }) => {
             setselectedcampigns(leadData.campaign || '');
             setselectedproject(leadData.project_id || '');
             setselectedtype(leadData.type || '');
+            setStatus(leadData.status || '')
 
-            const commentsText = leadData.lead_comment
-                .map(comment => comment.comment)
-                .filter(comment => comment) 
-                .join('\n\n');
-            setcomments(commentsText || '');
+            const lastComment = leadData.lead_comment.length > 0 
+                ? leadData.lead_comment[leadData.lead_comment.length - 1].comment 
+                : '';
+            setcomments(lastComment || '');
 
             if (leadData.type) {
                 const typeResponse = await Get_Category(leadData.type);
@@ -371,6 +371,7 @@ const Updatelead = ({ navigation }) => {
         console.log(error);
     }
 };
+
 
 const Submit = async () => {
   const requiredFieldsByStatus = {
@@ -721,18 +722,20 @@ const Submit = async () => {
         </View>
 
         <View style={{ top: 10 }}>
-          <View style={styles.dropdowncontainer1}>
-            <Picker
-              selectedValue={status}
-              onValueChange={handleStatusChange}
-            >
-              <Picker.Item label="Select Status" value="" />
-              {statusData.map(statusItem => (
-                <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
-              ))}
-            </Picker>
-          </View>
-        </View>
+  <View style={styles.dropdowncontainer1}>
+    <Picker
+      selectedValue={status}
+      onValueChange={handleStatusChange}
+      enabled={status !== 'CONVERTED'} // Disable dropdown if status is "CONVERTED"
+    >
+      <Picker.Item label="Select Status" value="" />
+      {statusData.map(statusItem => (
+        <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+      ))}
+    </Picker>
+  </View>
+</View>
+
 
         {status === 'INTERESTED' || status === 'CALL SCHEDULED' || status === 'VISIT SCHEDULED' ? (
           <>
@@ -740,7 +743,7 @@ const Submit = async () => {
               <TextInput
                 label="Select Date"
                 value={date}
-                onChangeText={text => setDate(text)}s
+                onChangeText={text => setDate(text)}
                 style={[styles.textinput]}
                 mode="outlined"
               />
@@ -878,6 +881,7 @@ const Submit = async () => {
                 <Picker.Item label="Select Status" value="" />
                 <Picker.Item label="Booked" value="BOOKED" />
                 <Picker.Item label="Completed" value="COMPLETED" />
+                <Picker.Item label="Cancelled" value="CANCELLED" />
               </Picker>
             </View>
             {selectedStatus === 'COMPLETED' && (

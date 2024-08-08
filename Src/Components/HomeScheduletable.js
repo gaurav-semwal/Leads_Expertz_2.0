@@ -30,7 +30,7 @@ const HomeScheduletable = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
-  const [widthArr] = useState([100, 150, 100, 100, 150, 150]);
+  const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
 
   useFocusEffect(
     useCallback(() => {
@@ -42,7 +42,7 @@ const HomeScheduletable = () => {
     setLoading(true);
     try {
       const response = await Dashboard();
-      console.log('Ddfgrgertgergfr -->', response.data);
+      console.log('GETTING THE DATA FROM THE DASHBOARD -->', response.data);
 
       if (response.data) {
         const missedFollowUp = response.data.missedFollowUp || [];
@@ -94,7 +94,7 @@ const HomeScheduletable = () => {
   };
 
   const leadedit = (rowData) => {
-    navigation.navigate('leadupdate', { leadid: rowData.id, status: rowData.status });
+    navigation.navigate('Update Lead', { leadid: rowData.id, status: rowData.status });
   };
 
   const renderTableRows = () => {

@@ -36,7 +36,7 @@ const Pendinglead = ({navigation}) => {
       const response = await Get_Lead();
       if (response.msg === 'Load successfully') {
         console.log("HI THERE CHECKING NEW LEAD", response);
-        const filteredLeads = response.data?.filter(lead => lead.status === 'PENDING ') || [];
+        const filteredLeads = response.data?.filter(lead => lead.status === 'PENDING') || [];
         setLeadData(filteredLeads);
       }
     } catch (error) {
