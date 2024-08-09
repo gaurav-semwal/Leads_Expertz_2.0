@@ -32,28 +32,28 @@ const HomeScheduletable = () => {
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
   const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
     getDashboard();
-  }, [])
-);
-
+  }, []);
+  
   const getDashboard = async () => {
     setLoading(true);
     try {
       const response = await Dashboard();
       console.log('GETTING THE DATA FROM THE DASHBOARD -->', response.data);
-
+  
       if (response.data) {
         const missedFollowUp = response.data.missedFollowUp || [];
-
-        const callScheduledData = missedFollowUp.filter(item => item.status === 'CALL SCHEDULED');
-        const visitScheduledData = missedFollowUp.filter(item => item.status === 'VISIT SCHEDULED');
-
-        setCallScheduleData(callScheduledData);
-        setVisitScheduleData(visitScheduledData);
+        const todayCallSchedule = response.data.todayCallScheduled || [];
+        const todayVisitSchedule = response.data.todayVisitScheduled || [];
+  
+        // Set the states with the specific data for each schedule
+        setCallScheduleData(todayCallSchedule);
+        setVisitScheduleData(todayVisitSchedule);
         setMissedFollowUpData(missedFollowUp);
-        setTableData(callScheduledData);
+  
+        // Default to displaying the call schedule
+        setTableData(todayCallSchedule);
       } else {
         console.warn('Unexpected response format:', response);
       }
@@ -68,13 +68,7 @@ const HomeScheduletable = () => {
       setRefreshing(false);
     }
   };
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getDashboard();
-  //   }, [])
-  // );
-
+  
   const onPressButton = (type) => {
     setActiveButton(type);
     setCurrentPage(1);
