@@ -63,6 +63,10 @@ const Userlist = ({ navigation }) => {
     try {
       const response = await Get_User();
       console.log(response);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Load successfully.') {
         setUserData(response.data);
       } else {

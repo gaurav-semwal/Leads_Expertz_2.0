@@ -76,6 +76,10 @@ const Leadtransfer = () => {
   const handleSearch = async () => {
     try {
       const response = await Search_lead(selectedUserId, status);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Load Successfully') {
         setLeadData(response.data);
         setShowTransferFields(true);
@@ -106,6 +110,10 @@ const Leadtransfer = () => {
     try {
       const response = await Lead_Transfer(transferStatus, transferUserId, selectedLeads);
       console.log(response);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Save Successfully') {
         Toast.show({
           text1: 'Save Successfully',

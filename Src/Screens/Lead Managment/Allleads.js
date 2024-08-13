@@ -262,7 +262,7 @@ const Allleads = ({ navigation }) => {
         <View style={{ marginTop: 10 }}>
           <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
           <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-          <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
+          <Text style={styles.leadInfo1}>Comments: {item.last_comment || 'N/A'}</Text>
           <View
             style={{
               flexDirection: 'row',

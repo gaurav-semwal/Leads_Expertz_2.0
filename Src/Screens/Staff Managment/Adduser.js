@@ -44,6 +44,10 @@ const Adduser = () => {
 
     try {
       const response = await Add_User(name, mobile, email, password, selectedValue);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Save successfully.') {
         Toast.show({
           text1: 'Save Successfully',
