@@ -1,18 +1,18 @@
-  import {
+import {
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Colors} from '../../Comman/Styles';
-import {TextInput} from 'react-native-paper';
+import { Colors } from '../../Comman/Styles';
+import { TextInput } from 'react-native-paper';
 import Button from '../../Components/Button';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import {
-    Add_Lead,
+  Add_Lead,
   Get_Campaigns,
   Get_Category,
   Get_City,
@@ -24,7 +24,7 @@ import {
 import Toast from 'react-native-toast-message';
 import validator from 'validator';
 
-const Addlead = ({navigation}) => {
+const Addlead = ({ navigation }) => {
   const [mobilenumner, setmobilenumber] = useState('');
   const [fullname, setfullname] = useState('');
   const [email, setemail] = useState('');
@@ -60,7 +60,7 @@ const Addlead = ({navigation}) => {
     getproject();
   }, []);
 
-  const handleaddleads = async () => {};
+  const handleaddleads = async () => { };
 
   const handleSourceChange = itemValue => {
     setSelectedSource(itemValue);
@@ -131,7 +131,7 @@ const Addlead = ({navigation}) => {
     } catch (error) {
       console.log(error);
     } finally {
-    } 
+    }
   };
 
   const getcity = async itemValue => {
@@ -209,21 +209,21 @@ const Addlead = ({navigation}) => {
   };
 
   const Submit = async () => {
-    console.log(  
-        selectedtype,
-        selectedCategory,
-        selectedSubcategory,
-        selectedSource,
-        selectedcampigns,
-        selectedclassification,
-        selectedproject,
-        selectedState,
-        selectedCity,
-        address,
-        fullname,
-        email,
-        mobilenumner,
-        whatsapp,)
+    console.log(
+      selectedtype,
+      selectedCategory,
+      selectedSubcategory,
+      selectedSource,
+      selectedcampigns,
+      selectedclassification,
+      selectedproject,
+      selectedState,
+      selectedCity,
+      address,
+      fullname,
+      email,
+      mobilenumner,
+      whatsapp,)
     try {
       const response = await Add_Lead(
         selectedtype,
@@ -243,19 +243,22 @@ const Addlead = ({navigation}) => {
       );
 
       console.log(response)
-  
-      if (response.result.msg === "Save successfully") {
-        Toast.show({
-          text1: 'Save Successfully',
-          type: 'success',
-        });
-        navigation.navigate('Home');
-      } else {
-        Toast.show({
-          text1: response.msg,
-          type: 'error',
-        });
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
       }
+      else
+        if (response.result.msg === "Save successfully") {
+          Toast.show({
+            text1: 'Save Successfully',
+            type: 'success',
+          });
+          navigation.navigate('Home');
+        } else {
+          Toast.show({
+            text1: response.msg,
+            type: 'error',
+          });
+        }
     } catch (error) {
       console.log(error);
       Toast.show({
@@ -287,7 +290,7 @@ const Addlead = ({navigation}) => {
               const formattedText = text.replace(/[^0-9]/g, '');
               setmobilenumber(formattedText.slice(0, 10));
             }}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
             keyboardType="numeric"
             maxLength={10}
@@ -311,7 +314,7 @@ const Addlead = ({navigation}) => {
             label="Full Name"
             value={fullname}
             onChangeText={text => setfullname(text)}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
           />
         </View>
@@ -334,7 +337,7 @@ const Addlead = ({navigation}) => {
               label="Email"
               value={email}
               onChangeText={handleEmailChange}
-              style={[styles.textinput, {paddingLeft: 30}]}
+              style={[styles.textinput, { paddingLeft: 30 }]}
               mode="outlined"
               maxLength={100}
               keyboardType="email-address"
@@ -345,7 +348,7 @@ const Addlead = ({navigation}) => {
           </>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSource}
@@ -359,7 +362,7 @@ const Addlead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedtype}
@@ -372,7 +375,7 @@ const Addlead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedCategory}
@@ -386,7 +389,7 @@ const Addlead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSubcategory}
@@ -400,7 +403,7 @@ const Addlead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedclassification}
@@ -414,7 +417,7 @@ const Addlead = ({navigation}) => {
         </View>
 
         <View style={styles.dob}>
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedcampigns}
@@ -428,7 +431,7 @@ const Addlead = ({navigation}) => {
             </View>
           </View>
 
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedproject}
@@ -511,11 +514,11 @@ const Addlead = ({navigation}) => {
         </View>
       </View>
 
-      <Pressable style={{top: 20}} onPress={Submit}>
+      <Pressable style={{ top: 20 }} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 
-      <View style={{height: 30}}></View>
+      <View style={{ height: 30 }}></View>
     </ScrollView>
   );
 };

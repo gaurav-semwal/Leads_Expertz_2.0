@@ -1,5 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, Text, Pressable, Linking } from 'react-native';
+import React, { useState, useEffect, useCallback} from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Pressable,
+  Linking,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -17,18 +27,22 @@ const HomeScheduletable = () => {
   const [itemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
-  const [widthArr] = useState([100, 150, 100, 100, 150, 150]);
+  const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     getDashboard();
-  }, []);
+  }, [])
+);
 
   const getDashboard = async () => {
+    setLoading(true);
     try {
       const response = await Dashboard();
-      console.log('D A S H B O A R D -->', response.data);
+      console.log('GETTING THE DATA FROM THE DASHBOARD -->', response.data);
 
       if (response.data) {
         const missedFollowUp = response.data.missedFollowUp || [];
@@ -51,12 +65,9 @@ const HomeScheduletable = () => {
       });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
-
-  useFocusEffect(
-    React.useCallback(() => {}, [])
-  );
 
   const onPressButton = (type) => {
     setActiveButton(type);
@@ -77,7 +88,7 @@ const HomeScheduletable = () => {
   };
 
   const leadedit = (rowData) => {
-    navigation.navigate('leadupdate', { leadid: rowData.id, status: rowData.status });
+    navigation.navigate('Update Lead', { leadid: rowData.id, status: rowData.status });
   };
 
   const renderTableRows = () => {
@@ -93,8 +104,11 @@ const HomeScheduletable = () => {
           rowData.name,
           rowData.campaign,
           rowData.classification,
-          rowData.last_updated,
-          <Pressable onPress={() => handlePhoneCall(rowData.phone)} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}>
+          rowData.updated_date,
+          <Pressable
+            onPress={() => handlePhoneCall(rowData.phone)}
+            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
+          >
             <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
             <View style={{ flexDirection: 'row' }}>
               <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
@@ -142,10 +156,15 @@ const HomeScheduletable = () => {
     );
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    getDashboard();
+  };
+
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.Button} />
       </View>
     );
   }
@@ -181,7 +200,12 @@ const HomeScheduletable = () => {
           <Text style={[styles.text, activeButton === 'Missed Follow Up' && { color: '#625bc5' }]}>Missed Follow Up</Text>
         </Pressable>
       </View>
-      <ScrollView horizontal={true}>
+      <ScrollView
+        horizontal={true}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -202,11 +226,16 @@ const HomeScheduletable = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     height: 50,
-    backgroundColor: '#625bc5'
+    backgroundColor: '#625bc5',
   },
   text: {
     textAlign: 'center',
@@ -214,24 +243,24 @@ const styles = StyleSheet.create({
   },
   row: {
     height: 40,
-    backgroundColor: '#E7E6E1'
+    backgroundColor: '#E7E6E1',
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 10
+    marginTop: 10,
   },
   pageButton: {
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   pageText: {
     color: '#625bc5',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   body: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    margin: 10
+    margin: 10,
   },
   button: {
     borderWidth: 1,
@@ -250,7 +279,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     backgroundColor: '#f0f0f0',
-    marginRight: 10
+    marginRight: 10,
   },
 });
 

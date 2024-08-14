@@ -45,6 +45,12 @@ const Updatelead = ({ navigation }) => {
   const [city, setcity] = useState([]);
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState('');
+
+  const [cityfuture, setcityfuture] = useState([]);
+  const [statesfuture, setStatesfuture] = useState([]);
+  const [selectedStatefuture, setSelectedStatefuture] = useState('');
+  const [selectedCityfuture, setSelectedCityfuture] = useState('');
+
   const [selectedclassification, setselectedclassification] = useState('');
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
@@ -161,6 +167,11 @@ const Updatelead = ({ navigation }) => {
     getcity(itemValue);
   };
 
+  const handleStateChangefuture = (itemValue, itemIndex) => {
+    setSelectedStatefuture(itemValue);
+    getcity(itemValue);
+  };
+
   const handleCategory = (itemValue, itemIndex) => {
     setSelectedCategory(itemValue);
     getSubcategory(itemValue);
@@ -194,6 +205,7 @@ const Updatelead = ({ navigation }) => {
       if (response.msg === '') {
         const stateData = response.data.map(item => item.state);
         setStates(stateData);
+        setStatesfuture(stateData)
       } else {
       }
     } catch (error) {
@@ -238,6 +250,7 @@ const Updatelead = ({ navigation }) => {
       console.log("CITY DEKH AARI HAI", response);
       if (response.msg === '') {
         setcity(response.data);
+        setcityfuture(response.data)
       } else {
       }
     } catch (error) {
@@ -310,7 +323,10 @@ const Updatelead = ({ navigation }) => {
     try {
         const response = await Get_Lead_Data(leadid);
         console.log('GETTING LEAD DATA --->', response.data);
-
+        if (response.msg === "Unauthorized request") {
+          navigation.navigate('Login');
+      } 
+      else
         if (response.msg === 'Load successfully') {
             const leadData = response.data;
             setfullname(leadData.name || '');
@@ -325,12 +341,12 @@ const Updatelead = ({ navigation }) => {
             setselectedcampigns(leadData.campaign || '');
             setselectedproject(leadData.project_id || '');
             setselectedtype(leadData.type || '');
+            setStatus(leadData.status || '')
 
-            const commentsText = leadData.lead_comment
-                .map(comment => comment.comment)
-                .filter(comment => comment) 
-                .join('\n\n');
-            setcomments(commentsText || '');
+            const lastComment = leadData.lead_comment.length > 0 
+                ? leadData.lead_comment[leadData.lead_comment.length - 1].comment 
+                : '';
+            setcomments(lastComment || '');
 
             if (leadData.type) {
                 const typeResponse = await Get_Category(leadData.type);
@@ -372,40 +388,59 @@ const Updatelead = ({ navigation }) => {
     }
 };
 
+
 const Submit = async () => {
   const requiredFieldsByStatus = {
     INTERESTED: ['selectedDate', 'selectedTime'],
     'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
     'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
-    'FUTURE LEAD': ['selectedBudget', 'selectedState', 'selectedCity',],
-    CONVERTED: ['selectedStatus', 'selectedProject', 'size', 'price', 'applicantName', 'applicantContact'],
+    'FUTURE LEAD': ['selectedBudget'],
+    CONVERTED: {
+      BOOKED: [],
+      COMPLETED: ['selectedProject', 'size', 'price'], 
+    },
   };
 
   const validateFields = () => {
     const commonRequiredFields = ['comments'];
-    const statusSpecificRequiredFields = requiredFieldsByStatus[status] || [];
-    const requiredFields = [...commonRequiredFields, ...statusSpecificRequiredFields];
+    const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
+      ? requiredFieldsByStatus[status]
+      : [];
+
+    let additionalRequiredFields = [];
+
+    if (status === 'CONVERTED' && selectedStatus) {
+      additionalRequiredFields = requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
+    }
+
+    const requiredFields = [
+      ...commonRequiredFields,
+      ...statusSpecificRequiredFields,
+      ...additionalRequiredFields,
+    ];
 
     const fieldValues = {
       comments,
       selectedDate,
       selectedTime,
       selectedBudget,
-      selectedState,
-      selectedCity,
+      selectedStatefuture,
+      selectedCityfuture,
       selectedStatus,
       selectedProject,
+      size,
       price,
       applicantName,
       applicantContact,
     };
 
+    // Check for missing fields
     for (const field of requiredFields) {
       if (!fieldValues[field]) {
-        return field;
+        return field; // Return the first missing field
       }
     }
-    return null;
+    return null; // No missing fields
   };
 
   const missingField = validateFields();
@@ -415,8 +450,9 @@ const Submit = async () => {
       text1: `Please fill the required field: ${missingField}`,
       type: 'error',
     });
-    return;
+    return; 
   }
+
   try {
     const response = await Update_Lead(
       selectedSource,
@@ -450,6 +486,10 @@ const Submit = async () => {
 
     console.log(response);
 
+    if (response.msg === "Unauthorized request") {
+      navigation.navigate('Login');
+  } 
+  else
     if (response.msg === 'Save successfully') {
       Toast.show({
         text1: 'Save Successfully',
@@ -473,7 +513,9 @@ const Submit = async () => {
 
   const handleStatusChange = (value) => {
     setStatus(value);
-    // Reset dynamic fields when status changes
+    if (value !== 'CONVERTED') {
+      setcomments('');
+  }
     setDate('');
     setTime('');
     setBudget('');
@@ -702,18 +744,20 @@ const Submit = async () => {
         </View>
 
         <View style={{ top: 10 }}>
-          <View style={styles.dropdowncontainer1}>
-            <Picker
-              selectedValue={status}
-              onValueChange={handleStatusChange}
-            >
-              <Picker.Item label="Select Status" value="" />
-              {statusData.map(statusItem => (
-                <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
-              ))}
-            </Picker>
-          </View>
-        </View>
+  <View style={styles.dropdowncontainer1}>
+    <Picker
+      selectedValue={status}
+      onValueChange={handleStatusChange}
+      enabled={status !== 'CONVERTED'} // Disable dropdown if status is "CONVERTED"
+    >
+      <Picker.Item label="Select Status" value="" />
+      {statusData.map(statusItem => (
+        <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
+      ))}
+    </Picker>
+  </View>
+</View>
+
 
         {status === 'INTERESTED' || status === 'CALL SCHEDULED' || status === 'VISIT SCHEDULED' ? (
           <>
@@ -721,14 +765,14 @@ const Submit = async () => {
               <TextInput
                 label="Select Date"
                 value={date}
-                onChangeText={text => setDate(text)}s
+                onChangeText={text => setDate(text)}
                 style={[styles.textinput]}
                 mode="outlined"
               />
             </View> */}
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-              <View style={{ width: '48%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, }}>
+              <View style={{ width: '50%' }}>
                 <TextInput
                   placeholder="Select Date"
                   value={selectedDate}
@@ -739,7 +783,7 @@ const Submit = async () => {
                 <Pressable
                   style={{
                     position: 'absolute',
-                    top: 10,
+                    top: 15,
                     right: 16,
                     width: 40,
                     height: 40,
@@ -750,8 +794,8 @@ const Submit = async () => {
                   <AntDesign name="calendar" color="#625bc5" size={25} />
                 </Pressable>
               </View>
-              <View style={{ width: '100%', marginLeft: 10 }}>
-                <View style={{ width: '48%' }}>
+              <View style={{ width: '100%', marginLeft: 7 }}>
+                <View style={{ width: '50%' }}>
                   <TextInput
                     placeholder="Select Time"
                     value={selectedTime}
@@ -763,7 +807,7 @@ const Submit = async () => {
                   <Pressable
                     style={{
                       position: 'absolute',
-                      top: 10,
+                      top: 17,
                       right: 16,
                       width: 40,
                       height: 40,
@@ -818,12 +862,12 @@ const Submit = async () => {
             <View style={{ top: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={styles.dropdowncontainer}>
                 <Picker
-                  selectedValue={selectedState}
+                  selectedValue={selectedStatefuture}
                   dropdownIconRippleColor={1}
                   style={styles.picker}
-                  onValueChange={handleStateChange}>
+                  onValueChange={handleStateChangefuture}>
                   <Picker.Item label="Select State" value="" />
-                  {states.map((state, index) => (
+                  {statesfuture.map((state, index) => (
                     <Picker.Item key={index} label={state} value={state} />
                   ))}
                 </Picker>
@@ -831,11 +875,11 @@ const Submit = async () => {
 
               <View style={styles.dropdowncontainer}>
                 <Picker
-                  selectedValue={selectedCity}
+                  selectedValue={selectedCityfuture}
                   style={styles.picker}
-                  onValueChange={city => setSelectedCity(city)}>
+                  onValueChange={city => setSelectedCityfuture(city)}>
                   <Picker.Item label="Select City" value="" />
-                  {city.map((state, index) => (
+                  {cityfuture.map((state, index) => (
                     <Picker.Item
                       key={index}
                       label={state.city}
@@ -859,6 +903,7 @@ const Submit = async () => {
                 <Picker.Item label="Select Status" value="" />
                 <Picker.Item label="Booked" value="BOOKED" />
                 <Picker.Item label="Completed" value="COMPLETED" />
+                <Picker.Item label="Cancelled" value="CANCELLED" />
               </Picker>
             </View>
             {selectedStatus === 'COMPLETED' && (
@@ -972,17 +1017,6 @@ const Submit = async () => {
           </>
         ) : null}
 
-
-        <View style={{ top: 25 }}>
-          <TextInput
-            label="Enter Address"
-            value={address}
-            onChangeText={text => setaddress(text)}
-            style={[styles.textinput]}
-            mode="outlined"
-          />
-        </View>
-
         <View style={{ top: 25 }}>
           <TextInput
             label="Enter Comments"
@@ -992,6 +1026,17 @@ const Submit = async () => {
             mode="outlined"
           />
         </View>
+
+        <View style={{ top: 23 }}>
+          <TextInput
+            label="Enter Address"
+            value={address}
+            onChangeText={text => setaddress(text)}
+            style={[styles.textinput]}
+            mode="outlined"
+          />
+        </View>
+
 
         <View style={{ top: 25 }}>
           <TextInput

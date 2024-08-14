@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -7,13 +7,15 @@ import {
   Text,
   Modal,
 } from 'react-native';
-import {DrawerContentScrollView} from '@react-navigation/drawer';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DrawerContent = props => {
   const navigation = useNavigation();
@@ -25,6 +27,15 @@ const DrawerContent = props => {
   const [eventsactiveSubMenu, seteventsActiveSubMenu] = useState(null);
   const [profilesactiveSubMenu, setprofileActiveSubMenu] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
 
   const handleLogout = () => {
     setIsModalVisible(true);
@@ -36,6 +47,7 @@ const DrawerContent = props => {
   const cancelLogout = () => {
     setIsModalVisible(false);
   };
+
   const toggleSubMenu = index => {
     setActiveSubMenu(activeSubMenu === index ? null : index);
   };
@@ -86,15 +98,6 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Users List</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.subMenuItem}  onPress={() => navigation.navigate('PromoteList')}>
-            <Ionicons
-              name="person"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Promote List</Text>
-          </TouchableOpacity> */}
         </View>
       );
     }
@@ -369,28 +372,38 @@ const DrawerContent = props => {
       return (
         <View style={styles.subMenu}>
           <TouchableOpacity style={styles.subMenuItem}>
-            <FontAwesome
-              name="birthday-cake"
-              size={20}
+            <Octicons
+              name="dot-fill"
+              size={26}
               color="#666"
               style={styles.icon}
             />
-            <Text style={styles.subMenuText}>Birthday</Text>
+            <Text style={styles.subMenuText}>Task</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.subMenuItem}>
-            <FontAwesome
-              name="birthday-cake"
-              size={20}
+            <Octicons
+              name="dot-fill"
+              size={26}
               color="#666"
               style={styles.icon}
             />
-            <Text style={styles.subMenuText}>Anniversary</Text>
+            <Text style={styles.subMenuText}>Pending Task</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.subMenuItem}>
+            <Octicons
+              name="dot-fill"
+              size={26}
+              color="#666"
+              style={styles.icon}
+            />
+            <Text style={styles.subMenuText}>Completed Task</Text>
           </TouchableOpacity>
         </View>
       );
     }
     return null;
   };
+
   const renderinventorySubMenu = index => {
     if (inventoryActiveSubMenu === index) {
       return (
@@ -474,103 +487,127 @@ const DrawerContent = props => {
         />
       </View>
 
-      <TouchableOpacity
-        style={styles.drawerItemsingle}
-        onPress={() => navigation.navigate('Dashboard')}>
-        <Entypo name="home" size={20} color="#333" style={styles.icon} />
-        <Text style={styles.label}>Dashboard</Text>
-      </TouchableOpacity>
+      {['staff'].includes(role) && (
+        <TouchableOpacity
+          style={styles.drawerItemsingle}
+          onPress={() => navigation.navigate('Home')}>
+          <Entypo name="home" size={20} color="#333" style={styles.icon} />
+          <Text style={styles.label}>Dashboard</Text>
+        </TouchableOpacity>
+      )}
 
-      <TouchableOpacity
-        style={styles.drawerItem}
-        onPress={() => toggleSubMenu(2)}>
-        <View style={styles.drawerItem1}>
-          <Ionicons name="people" size={20} color="#333" style={styles.icon} />
-          <Text style={styles.label}>Staff Management</Text>
-        </View>
-        <Entypo
-          name={activeSubMenu === 2 ? 'chevron-down' : 'chevron-left'}
-          size={20}
-          color="#333"
-        />
-      </TouchableOpacity>
-      {renderSubMenu(2)}
+      {['team_manager', 'salesman'].includes(role) && (
+        <>
+          <TouchableOpacity
+            style={styles.drawerItemsingle}
+            onPress={() => navigation.navigate('Home')}>
+            <Entypo name="home" size={20} color="#333" style={styles.icon} />
+            <Text style={styles.label}>Dashboard</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.drawerItem}
-        onPress={() => toggleLeadSubMenu(3)}>
-        <View style={styles.drawerItem1}>
-          <MaterialCommunityIcons
-            name="account-clock"
-            size={20}
-            color="#333"
-            style={styles.icon}
-          />
-          <Text style={styles.label}>Leads Management</Text>
-        </View>
-        <Entypo
-          name={leadActiveSubMenu === 3 ? 'chevron-down' : 'chevron-left'}
-          size={20}
-          color="#333"
-        />
-      </TouchableOpacity>
-      {renderLeadSubMenu(3)}
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => toggleLeadSubMenu(3)}>
+            <View style={styles.drawerItem1}>
+              <MaterialCommunityIcons
+                name="account-clock"
+                size={20}
+                color="#333"
+                style={styles.icon}
+              />
+              <Text style={styles.label}>Leads Management</Text>
+            </View>
+            <Entypo
+              name={leadActiveSubMenu === 3 ? 'chevron-down' : 'chevron-left'}
+              size={20}
+              color="#333"
+            />
+          </TouchableOpacity>
+          {renderLeadSubMenu(3)}
 
-      <TouchableOpacity
-        style={styles.drawerItemsingle}
-        onPress={() => navigation.navigate('FutureLead')}>
-        <Ionicons
-          name="folder-outline"
-          size={20}
-          color="#333"
-          style={styles.icon}
-        />
-        <Text style={styles.label}>Future Lead</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => toggleinventorySubMenu(5)}>
+            <View style={styles.drawerItem1}>
+              <MaterialCommunityIcons
+                name="clipboard-file"
+                size={20}
+                color="#333"
+                style={styles.icon}
+              />
+              <Text style={styles.label}>Inventory</Text>
+            </View>
+            <Entypo
+              name={inventoryActiveSubMenu === 5 ? 'chevron-down' : 'chevron-left'}
+              size={20}
+              color="#333"
+            />
+          </TouchableOpacity>
+          {renderinventorySubMenu(5)}
 
-      <TouchableOpacity
-        style={styles.drawerItem}
-        onPress={() => toggleinventorySubMenu(5)}>
-        <View style={styles.drawerItem1}>
-          <MaterialCommunityIcons
-            name="clipboard-file"
-            size={20}
-            color="#333"
-            style={styles.icon}
-          />
-          <Text style={styles.label}>Inventory</Text>
-        </View>
-        <Entypo
-          name={inventoryActiveSubMenu === 5 ? 'chevron-down' : 'chevron-left'}
-          size={20}
-          color="#333"
-        />
-      </TouchableOpacity>
-      {renderinventorySubMenu(5)}
+        </>
+      )}
 
-      <TouchableOpacity
-        style={styles.drawerItemsingle}
-        onPress={() => navigation.navigate('Lead Transfer')}>
-        <Fontisto
-          name="arrow-swap"
-          size={20}
-          color="#333"
-          style={styles.icon}
-        />
-        <Text style={styles.label}>Leads Transfer</Text>
-      </TouchableOpacity>
-{/* 
+      {role === 'team_manager' && (
+        <>
+
+
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => toggleSubMenu(2)}>
+            <View style={styles.drawerItem1}>
+              <Ionicons name="people" size={20} color="#333" style={styles.icon} />
+              <Text style={styles.label}>Staff Management</Text>
+            </View>
+            <Entypo
+              name={activeSubMenu === 2 ? 'chevron-down' : 'chevron-left'}
+              size={20}
+              color="#333"
+            />
+          </TouchableOpacity>
+          {renderSubMenu(2)}
+
+
+
+          <TouchableOpacity
+            style={styles.drawerItemsingle}
+            onPress={() => navigation.navigate('FutureLead')}>
+            <Ionicons
+              name="folder-outline"
+              size={20}
+              color="#333"
+              style={styles.icon}
+            />
+            <Text style={styles.label}>Future Lead</Text>
+          </TouchableOpacity>
+
+
+
+          <TouchableOpacity
+            style={styles.drawerItemsingle}
+            onPress={() => navigation.navigate('Lead Transfer')}>
+            <Fontisto
+              name="arrow-swap"
+              size={20}
+              color="#333"
+              style={styles.icon}
+            />
+            <Text style={styles.label}>Leads Transfer</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
       <TouchableOpacity
         style={styles.drawerItem}
         onPress={() => toggleeventsSubMenu(6)}>
         <View style={styles.drawerItem1}>
-          <Fontisto
-            name="calendar"
+          <Ionicons
+            name="menu"
             size={20}
             color="#333"
             style={styles.icon}
           />
-          <Text style={styles.label}>Events</Text>
+          <Text style={styles.label}>Tasks</Text>
         </View>
         <Entypo
           name={eventsactiveSubMenu === 6 ? 'chevron-down' : 'chevron-left'}
@@ -578,14 +615,19 @@ const DrawerContent = props => {
           color="#333"
         />
       </TouchableOpacity>
-      {rendereventsSubMenu(6)} */}
-      {/* 
+      {rendereventsSubMenu(6)}
+
       <TouchableOpacity
         style={styles.drawerItemsingle}
         onPress={() => navigation.navigate('CompanyHierarchy')}>
-        <Fontisto name="calendar" size={20} color="#333" style={styles.icon} />
-        <Text style={styles.label}>Company Hierarchy</Text>
-      </TouchableOpacity> */}
+        <Ionicons
+          name="menu"
+          size={20}
+          color="#333"
+          style={styles.icon}
+        />
+        <Text style={styles.label}>Expenses</Text>
+      </TouchableOpacity>
 
       {/* <TouchableOpacity style={styles.drawerItem} onPress={() => toggleeventsSubMenu(6)}>
                 <View style={styles.drawerItem1} >
@@ -595,6 +637,7 @@ const DrawerContent = props => {
                 <Entypo name={eventsactiveSubMenu === 3 ? "chevron-down" : "chevron-left"} size={20} color="#333" />
             </TouchableOpacity>
             {rendereventsSubMenu(7)} */}
+
 
       <TouchableOpacity
         style={styles.drawerItem}
@@ -643,7 +686,7 @@ const DrawerContent = props => {
         </Modal>
       </View>
     </DrawerContentScrollView>
-    
+
   );
 };
 

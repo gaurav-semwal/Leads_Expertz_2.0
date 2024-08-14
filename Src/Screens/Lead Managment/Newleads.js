@@ -9,26 +9,51 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Linking
+  Linking,
+  Platform
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Get_Lead,Get_Lead_Data } from '../../../Api/authApi';
+import { Get_Lead, Get_Lead_Data, Get_user } from '../../../Api/authApi';
 import { Colors } from '../../Comman/Styles';
 import moment from 'moment';
 import Toast from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Picker } from '@react-native-picker/picker';
 
-const Newlead = ({navigation}) => {
+const Newlead = ({ navigation }) => {
   const [activeButton, setActiveButton] = useState('All');
   const [leadData, setLeadData] = useState([]);
+  const [filteredLeads, setFilteredLeads] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [user, setUser] = useState('');
+  const [userData, setUserData] = useState([]);
 
   useEffect(() => {
     getUser();
   }, [activeButton]);
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    filterLeads();
+  }, [user, leadData]);
+
+  const getUsers = async () => {
+    try {
+      const response = await Get_user();
+      console.log('user', response)
+      if (response.msg === 'Load successfully.') {
+        setUserData(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getUser = async () => {
     setLoading(true);
@@ -96,6 +121,14 @@ const Newlead = ({navigation}) => {
   const closeModal = () => {
     setSelectedItem(null);
     setModalVisible(false);
+  };
+
+  const filterLeads = () => {
+    if (user) {
+      setFilteredLeads(leadData.filter(lead => lead.agent === user));
+    } else {
+      setFilteredLeads(leadData);
+    }
   };
 
   const LeadModal = ({ item }) => {
@@ -216,145 +249,116 @@ const Newlead = ({navigation}) => {
   const editlead = item => {
     navigation.navigate('Update Lead', { leadid: item.id, status: item.status });
   };
-  
+
   const LeadItem = ({ item, index }) => {
     return (
-<Pressable>
-<View style={styles.leadContainer}>
-  <View
-    style={{
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-    {/* <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
-      <Text style={styles.editButtonText}>Lead Edit</Text>
-    </Pressable> */}
-    <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
-      <Text style={styles.editButtonText1}>{item.status}</Text>
-    </Pressable>
-  </View>
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    }}>
-    <View
-      style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-      <View style={styles.profileContainer}></View>
-      <View>
-              <Text style={styles.leadInfo1}>Name: {item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
-                <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{marginLeft:10}}>
-                    <AntDesign name="phone" size={20} color="green" />
-                  </View>
-                </TouchableOpacity>
+      <Pressable>
+        <View style={styles.leadContainer}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
+              <Text style={styles.editButtonText1}>{item.status}</Text>
+            </Pressable>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+              <View style={styles.profileContainer}></View>
+              <View>
+                <Text style={styles.leadInfo1}>Name: {item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
+                  <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
+                    <View style={{ marginLeft: 10 }}>
+                      <AntDesign name="phone" size={20} color="green" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.leadInfo1}>User: {item.agent}</Text>
               </View>
             </View>
+            <Pressable onPress={() => editlead(item)}>
+              <AntDesign name="edit" size={25} color="orange" />
+            </Pressable>
           </View>
-          <Pressable onPress={() => editlead(item)}>
-            <AntDesign name="edit" size={25} color="orange" />
-          </Pressable>
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+            <Text style={styles.leadInfo1}>Source: {item.source}</Text>
+            <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.leadInfo1}>
+                Date: {moment(item.lead_date).format('YYYY-MM-DD')}
+              </Text>
+            </View>
+          </View>
         </View>
-  <View style={{marginTop: 10}}>
-    <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
-    <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-    <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      <Text style={styles.leadInfo1}>
-        Date: {moment(item.lead_date).format('YYYY-MM-DD')}
-      </Text>
-    </View>
-  </View>
-</View>
-</Pressable>
+      </Pressable>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.body}>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'All' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('All')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'All' && { color: '#625bc5' },
-            ]}
-          >
-            All
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'Team' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('Team')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'Team' && { color: '#625bc5' },
-            ]}
-          >
-            Team
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'Self' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('Self')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'Self' && { color: '#625bc5' },
-            ]}
-          >
-            Self
-          </Text>
-        </Pressable>
+    <View style={styles.body}>
+      <View style={{ flexDirection: 'column', width: '100%' }}>
+        <View style={{ width: '99 %' }}>
+          <View style={styles.dropdowncontainer1}>
+            <Picker
+              selectedValue={user}
+              onValueChange={itemValue => setUser(itemValue)}
+            >
+              <Picker.Item label="Select User" value="" />
+              {userData.map(userItem => (
+                <Picker.Item
+                  key={userItem.id}
+                  label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                  value={userItem.name}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
+        <View>
+          {loading ? (
+            <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
+          ) : (
+            <FlatList
+              data={filteredLeads}
+              renderItem={LeadItem}
+              keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingTop: 10 }}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
+          )}
+        </View>
       </View>
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
-      ) : (
-        <FlatList
-          data={leadData}
-          renderItem={LeadItem}
-          keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 10 }}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-        />
-      )}
-
-{selectedItem && <LeadModal item={selectedItem} />}
-
+      {selectedItem && <LeadModal item={selectedItem} />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  dropdowncontainer1: {
+    borderWidth: 1,
+    height: 48,
+    justifyContent: 'center',
+    borderRadius: 5,
+    borderColor: '#625bc5',
+    marginTop: 6,
   },
   header: {
     height: 50,
