@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Linking
+  Linking,
+  Platform // Make sure to import Platform for error handling
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Get_Lead, Get_Lead_Data } from '../../Api/authApi';
@@ -23,15 +24,20 @@ import { TextInput } from 'react-native-paper';
 const SmartLeadSegmentation = ({ navigation }) => {
   const [activeButton, setActiveButton] = useState('All');
   const [leadData, setLeadData] = useState([]);
+  const [filteredLeadData, setFilteredLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [search, setsearch] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     getUser();
   }, [activeButton]);
+
+  useEffect(() => {
+    filterLeads();
+  }, [search, leadData]);
 
   const getUser = async () => {
     setLoading(true);
@@ -46,6 +52,19 @@ const SmartLeadSegmentation = ({ navigation }) => {
       console.log(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const filterLeads = () => {
+    if (search === '') {
+      setFilteredLeadData(leadData);
+    } else {
+      const filtered = leadData.filter(lead =>
+        lead.name.toLowerCase().includes(search.toLowerCase()) ||
+        lead.email.toLowerCase().includes(search.toLowerCase()) ||
+        lead.phone.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredLeadData(filtered);
     }
   };
 
@@ -230,9 +249,6 @@ const SmartLeadSegmentation = ({ navigation }) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            {/* <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
-      <Text style={styles.editButtonText}>Lead Edit</Text>
-    </Pressable> */}
             <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
               <Text style={styles.editButtonText1}>{item.status}</Text>
             </Pressable>
@@ -292,31 +308,26 @@ const SmartLeadSegmentation = ({ navigation }) => {
         <TextInput
           label="Search Here"
           value={search}
-          onChangeText={(text) => {
-            setsearch(text);
-
-          }}
+          onChangeText={(text) => setSearch(text)}
           style={[styles.textinput, { paddingLeft: 20 }]}
           mode="outlined"
         />
-
       </View>
-
-
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
-      ) : (
-        <FlatList
-          data={leadData}
-          renderItem={LeadItem}
-          keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 10 }}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-        />
-      )}
-
+      <View style={{ padding: 10 }}>
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
+        ) : (
+          <FlatList
+            data={filteredLeadData}
+            renderItem={LeadItem}
+            keyExtractor={item => item.id ? item.id.toString() : Math.random().toString()}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingTop: 10 }}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        )}
+      </View>
       {selectedItem && <LeadModal item={selectedItem} />}
 
     </View>
@@ -413,10 +424,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalBackground: {
-    backgroundColor: 'transparent', // Make sure this is transparent
+    backgroundColor: 'transparent', 
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,

@@ -45,6 +45,12 @@ const Updatelead = ({ navigation }) => {
   const [city, setcity] = useState([]);
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState('');
+
+  const [cityfuture, setcityfuture] = useState([]);
+  const [statesfuture, setStatesfuture] = useState([]);
+  const [selectedStatefuture, setSelectedStatefuture] = useState('');
+  const [selectedCityfuture, setSelectedCityfuture] = useState('');
+
   const [selectedclassification, setselectedclassification] = useState('');
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
@@ -161,6 +167,11 @@ const Updatelead = ({ navigation }) => {
     getcity(itemValue);
   };
 
+  const handleStateChangefuture = (itemValue, itemIndex) => {
+    setSelectedStatefuture(itemValue);
+    getcity(itemValue);
+  };
+
   const handleCategory = (itemValue, itemIndex) => {
     setSelectedCategory(itemValue);
     getSubcategory(itemValue);
@@ -194,6 +205,7 @@ const Updatelead = ({ navigation }) => {
       if (response.msg === '') {
         const stateData = response.data.map(item => item.state);
         setStates(stateData);
+        setStatesfuture(stateData)
       } else {
       }
     } catch (error) {
@@ -238,6 +250,7 @@ const Updatelead = ({ navigation }) => {
       console.log("CITY DEKH AARI HAI", response);
       if (response.msg === '') {
         setcity(response.data);
+        setcityfuture(response.data)
       } else {
       }
     } catch (error) {
@@ -411,8 +424,8 @@ const Submit = async () => {
       selectedDate,
       selectedTime,
       selectedBudget,
-      selectedState,
-      selectedCity,
+      selectedStatefuture,
+      selectedCityfuture,
       selectedStatus,
       selectedProject,
       size,
@@ -849,12 +862,12 @@ const Submit = async () => {
             <View style={{ top: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={styles.dropdowncontainer}>
                 <Picker
-                  selectedValue={selectedState}
+                  selectedValue={selectedStatefuture}
                   dropdownIconRippleColor={1}
                   style={styles.picker}
-                  onValueChange={handleStateChange}>
+                  onValueChange={handleStateChangefuture}>
                   <Picker.Item label="Select State" value="" />
-                  {states.map((state, index) => (
+                  {statesfuture.map((state, index) => (
                     <Picker.Item key={index} label={state} value={state} />
                   ))}
                 </Picker>
@@ -862,11 +875,11 @@ const Submit = async () => {
 
               <View style={styles.dropdowncontainer}>
                 <Picker
-                  selectedValue={selectedCity}
+                  selectedValue={selectedCityfuture}
                   style={styles.picker}
-                  onValueChange={city => setSelectedCity(city)}>
+                  onValueChange={city => setSelectedCityfuture(city)}>
                   <Picker.Item label="Select City" value="" />
-                  {city.map((state, index) => (
+                  {cityfuture.map((state, index) => (
                     <Picker.Item
                       key={index}
                       label={state.city}

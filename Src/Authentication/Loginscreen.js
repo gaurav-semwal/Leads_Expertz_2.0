@@ -46,7 +46,8 @@ const Loginscreen = ({ navigation }) => {
         await AsyncStorage.setItem('password', response.data.password);
         await AsyncStorage.setItem('name', response.data.name);
         await AsyncStorage.setItem('mobile', response.data.mobile);
-
+        await AsyncStorage.setItem('role', response.data.role); 
+        
         Toast.show({
           text1: 'Login Successfull',
           type: 'success',
