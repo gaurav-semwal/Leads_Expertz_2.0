@@ -11,11 +11,12 @@ import { DrawerContentScrollView } from '@react-navigation/drawer';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const DrawerContent = props => {
   const navigation = useNavigation();
@@ -366,44 +367,6 @@ const DrawerContent = props => {
     }
     return null;
   };
-
-  const rendereventsSubMenu = index => {
-    if (eventsactiveSubMenu === index) {
-      return (
-        <View style={styles.subMenu}>
-          <TouchableOpacity style={styles.subMenuItem}>
-            <Octicons
-              name="dot-fill"
-              size={26}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Task</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
-            <Octicons
-              name="dot-fill"
-              size={26}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Pending Task</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.subMenuItem}>
-            <Octicons
-              name="dot-fill"
-              size={26}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Completed Task</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-    return null;
-  };
-
   const renderinventorySubMenu = index => {
     if (inventoryActiveSubMenu === index) {
       return (
@@ -599,27 +562,29 @@ const DrawerContent = props => {
 
       <TouchableOpacity
         style={styles.drawerItem}
-        onPress={() => toggleeventsSubMenu(6)}>
+        // onPress={() => toggleeventsSubMenu(6)}
+        onPress={() => navigation.navigate('Task')}
+        >
         <View style={styles.drawerItem1}>
-          <Ionicons
-            name="menu"
+          <FontAwesome5
+            name="tasks"
             size={20}
             color="#333"
             style={styles.icon}
           />
           <Text style={styles.label}>Tasks</Text>
         </View>
-        <Entypo
+        {/* <Entypo
           name={eventsactiveSubMenu === 6 ? 'chevron-down' : 'chevron-left'}
           size={20}
           color="#333"
-        />
+        /> */}
       </TouchableOpacity>
-      {rendereventsSubMenu(6)}
+      {/* {rendereventsSubMenu(6)} */}
 
       <TouchableOpacity
         style={styles.drawerItemsingle}
-        onPress={() => navigation.navigate('CompanyHierarchy')}>
+        onPress={() => navigation.navigate('Expense')}>
         <Ionicons
           name="menu"
           size={20}
