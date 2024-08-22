@@ -76,6 +76,10 @@ const Leadtransfer = () => {
   const handleSearch = async () => {
     try {
       const response = await Search_lead(selectedUserId, status);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Load Successfully') {
         setLeadData(response.data);
         setShowTransferFields(true);
@@ -106,6 +110,10 @@ const Leadtransfer = () => {
     try {
       const response = await Lead_Transfer(transferStatus, transferUserId, selectedLeads);
       console.log(response);
+      if (response.msg === "Unauthorized request") {
+        navigation.navigate('Login');
+    } 
+    else
       if (response.msg === 'Save Successfully') {
         Toast.show({
           text1: 'Save Successfully',
@@ -115,7 +123,8 @@ const Leadtransfer = () => {
         // setTransferUserId('');
         // setTransferStatus('');
 
-        getLead();
+        // getLead();
+        handleSearch()
       } else {
       }
     } catch (error) {
@@ -182,8 +191,18 @@ const Leadtransfer = () => {
     ));
   };
 
+  const handleuser = (itemValue) => {
+    console.log('user',itemValue)
+    setSelectedUserId(itemValue);
+  };
+
+  const handletransferuser = (itemValue) => {
+    console.log('transferuser',itemValue)
+    setTransferUserId(itemValue);
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.top}>
         <View
           style={{
@@ -196,13 +215,13 @@ const Leadtransfer = () => {
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedUserId}
-                onValueChange={itemValue => setSelectedUserId(itemValue)}>
+                onValueChange={handleuser}>
                 <Picker.Item label="Select User" value="" />
                 {userData.map(userItem => (
                   <Picker.Item
                     key={userItem.id}
                     label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                    value={userItem.id} // Use ID
+                    value={userItem.id} 
                   />
                 ))}
               </Picker>
@@ -239,7 +258,7 @@ const Leadtransfer = () => {
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={transferUserId}
-              onValueChange={itemValue => setTransferUserId(itemValue)}>
+                onValueChange={handletransferuser}>
               <Picker.Item label="Select User" value="" />
               {userData.map(userItem => (
                 <Picker.Item
@@ -273,7 +292,7 @@ const Leadtransfer = () => {
         </View>
       )}
 
-      <View style={{ top: 10 }}>
+      <View style={{ top: 10,height:'48%'}}>
         <ScrollView horizontal>
           <View>
             <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
@@ -290,7 +309,7 @@ const Leadtransfer = () => {
 
         {renderPagination()}
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -344,7 +363,7 @@ const styles = StyleSheet.create({
   pagination: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    // alignItems: 'center',
     marginTop: 10,
   },
   pageButton: {
@@ -358,9 +377,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   row: {
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // height: 60,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   text: {
     textAlign: 'center',
@@ -369,9 +388,9 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   header: {
-    height: 60,
+    // height: 60,
     backgroundColor: '#f1f8ff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
 });

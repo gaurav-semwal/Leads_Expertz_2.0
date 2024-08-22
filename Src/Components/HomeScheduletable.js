@@ -32,16 +32,18 @@ const HomeScheduletable = () => {
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
   const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     getDashboard();
-  }, []);
-  
+  }, [])
+);
+
   const getDashboard = async () => {
     setLoading(true);
     try {
       const response = await Dashboard();
       console.log('GETTING THE DATA FROM THE DASHBOARD -->', response.data);
-  
+
       if (response.data) {
         const missedFollowUp = response.data.missedFollowUp || [];
         const todayCallSchedule = response.data.todayCallScheduled || [];
@@ -68,7 +70,7 @@ const HomeScheduletable = () => {
       setRefreshing(false);
     }
   };
-  
+
   const onPressButton = (type) => {
     setActiveButton(type);
     setCurrentPage(1);

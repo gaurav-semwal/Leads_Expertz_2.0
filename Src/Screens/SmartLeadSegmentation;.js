@@ -9,10 +9,11 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Linking
+  Linking,
+  Platform // Make sure to import Platform for error handling
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Get_Lead,Get_Lead_Data } from '../../Api/authApi';
+import { Get_Lead, Get_Lead_Data } from '../../Api/authApi';
 import { Colors } from '../Comman/Styles';
 import moment from 'moment';
 import Toast from 'react-native-toast-message';
@@ -20,18 +21,23 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TextInput } from 'react-native-paper';
 
-const SmartLeadSegmentation = ({navigation}) => {
+const SmartLeadSegmentation = ({ navigation }) => {
   const [activeButton, setActiveButton] = useState('All');
   const [leadData, setLeadData] = useState([]);
+  const [filteredLeadData, setFilteredLeadData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [search, setsearch] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     getUser();
   }, [activeButton]);
+
+  useEffect(() => {
+    filterLeads();
+  }, [search, leadData]);
 
   const getUser = async () => {
     setLoading(true);
@@ -46,6 +52,19 @@ const SmartLeadSegmentation = ({navigation}) => {
       console.log(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const filterLeads = () => {
+    if (search === '') {
+      setFilteredLeadData(leadData);
+    } else {
+      const filtered = leadData.filter(lead =>
+        lead.name.toLowerCase().includes(search.toLowerCase()) ||
+        lead.email.toLowerCase().includes(search.toLowerCase()) ||
+        lead.phone.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredLeadData(filtered);
     }
   };
 
@@ -219,155 +238,97 @@ const SmartLeadSegmentation = ({navigation}) => {
   const editlead = item => {
     navigation.navigate('Update Lead', { leadid: item.id, status: item.status });
   };
-  
+
   const LeadItem = ({ item, index }) => {
     return (
-<Pressable>
-<View style={styles.leadContainer}>
-  <View
-    style={{
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-    {/* <Pressable style={styles.editButton} onPress={() => leadedit(item)}>
-      <Text style={styles.editButtonText}>Lead Edit</Text>
-    </Pressable> */}
-    <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
-      <Text style={styles.editButtonText1}>{item.status}</Text>
-    </Pressable>
-  </View>
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    }}>
-    <View
-      style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-      <View style={styles.profileContainer}></View>
-      <View>
-              <Text style={styles.leadInfo1}>Name: {item.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
-                <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{marginLeft:10}}>
-                    <AntDesign name="phone" size={20} color="green" />
-                  </View>
-                </TouchableOpacity>
+      <Pressable>
+        <View style={styles.leadContainer}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Pressable style={styles.editButton1} onPress={() => openModal(item)}>
+              <Text style={styles.editButtonText1}>{item.status}</Text>
+            </Pressable>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+              <View style={styles.profileContainer}></View>
+              <View>
+                <Text style={styles.leadInfo1}>Name: {item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
+                  <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
+                    <View style={{ marginLeft: 10 }}>
+                      <AntDesign name="phone" size={20} color="green" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
+            <Pressable onPress={() => editlead(item)}>
+              <AntDesign name="edit" size={25} color="orange" />
+            </Pressable>
           </View>
-          <Pressable onPress={() => editlead(item)}>
-            <AntDesign name="edit" size={25} color="orange" />
-          </Pressable>
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
+            <Text style={styles.leadInfo1}>Source: {item.source}</Text>
+            <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.leadInfo1}>
+                Date: {moment(item.lead_date).format('YYYY-MM-DD')}
+              </Text>
+            </View>
+          </View>
         </View>
-  <View style={{marginTop: 10}}>
-    <Text style={styles.leadInfo1}>Lead ID: {item.id}</Text>
-    <Text style={styles.leadInfo1}>Source: {item.source}</Text>
-    <Text style={styles.leadInfo1}>Comments: {item.notes || 'N/A'}</Text>
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      <Text style={styles.leadInfo1}>
-        Date: {moment(item.lead_date).format('YYYY-MM-DD')}
-      </Text>
-    </View>
-  </View>
-</View>
-</Pressable>
+      </Pressable>
     );
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.body}>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'All' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('All')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'All' && { color: '#625bc5' },
-            ]}
-          >
-            All
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'Team' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('Team')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'Team' && { color: '#625bc5' },
-            ]}
-          >
-            Team
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.button,
-            activeButton === 'Self' && { backgroundColor: '#ddf' },
-          ]}
-          onPress={() => onPressButton('Self')}
-        >
-          <Text
-            style={[
-              styles.text,
-              activeButton === 'Self' && { color: '#625bc5' },
-            ]}
-          >
-            Self
-          </Text>
-        </Pressable>
-      </View>
 
-      <View style={{ width: '90%', padding:10,justifyContent:'center', alignSelf: 'center'   }}>
-          <View style={{ position: 'absolute', top: 30, left: 16, zIndex: 1, justifyContent:'flex-end' }}>
-            <Ionicons name="search" size={25} color="#625bc5" />
-          </View>
-          <TextInput
-            label="Search Here"
-            value={search}
-            onChangeText={(text) => {
-              setsearch(text);
-            
-            }}
-            style={[styles.textinput, { paddingLeft: 20 }]}
-            mode="outlined"
-          />
-
+      <View style={{ width: '90%', padding: 10, justifyContent: 'center', alignSelf: 'center' }}>
+        <View style={{ position: 'absolute', top: 30, left: 16, zIndex: 1, justifyContent: 'flex-end' }}>
+          <Ionicons name="search" size={25} color="#625bc5" />
         </View>
-
-
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
-      ) : (
-        <FlatList
-          data={leadData}
-          renderItem={LeadItem}
-          keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingTop: 10 }}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
+        <TextInput
+          label="Search Here"
+          value={search}
+          onChangeText={(text) => setSearch(text)}
+          style={[styles.textinput, { paddingLeft: 20 }]}
+          mode="outlined"
         />
-      )}
-
-{selectedItem && <LeadModal item={selectedItem} />}
+      </View>
+      <View style={{ padding: 10 }}>
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.Button} style={styles.loader} />
+        ) : (
+          <FlatList
+            data={filteredLeadData}
+            renderItem={LeadItem}
+            keyExtractor={item => item.id ? item.id.toString() : Math.random().toString()}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingTop: 10 }}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        )}
+      </View>
+      {selectedItem && <LeadModal item={selectedItem} />}
 
     </View>
   );
@@ -463,10 +424,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalBackground: {
-    backgroundColor: 'transparent', // Make sure this is transparent
+    backgroundColor: 'transparent', 
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
