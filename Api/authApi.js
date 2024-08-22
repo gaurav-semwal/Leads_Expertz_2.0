@@ -116,7 +116,7 @@ export const Get_User = async () => {
       redirect: 'follow',
     };
 
-    const response = await fetch(`${base_url}get-user`, requestOptions);
+    const response = await fetch(`${base_url}get-user`,requestOptions);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -164,7 +164,7 @@ export const Get_Role = async (email, password) => {
 
     const result = await response.json();
     console.log('Login Result:', result);
-
+ 
     return result;
   } catch (error) {
     console.error('Login Error:', error);
@@ -1194,6 +1194,236 @@ export const Dashboard = async (status, toUser, lead_ids) => {
     };
 
     const response = await fetch(`${base_url}dashboard`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Start_Day = async (lastlocation) => {
+  console.log(lastlocation)
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+    myHeaders.append("Content-Type", "multipart/form-data");
+
+    const formdata = new FormData();
+    formdata.append("last_location", lastlocation);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}start-day`, requestOptions);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Network response was not ok: ${errorText}`);
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const End_Day = async (lastlocation) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("last_location", lastlocation);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}end-day`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Update_Location = async (lastlocation) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("last_location", lastlocation);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}update-location`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Add_Task = async (task) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("task", task);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}add-task`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+export const Get_Task = async (status) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("status", status);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}get-task`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Add_Expense = async (
+  title,
+  category,
+  amount,
+  comments,
+  exp_date,
+  files,
+) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append('token', token);
+
+    const formdata = new FormData();
+    formdata.append('title', title);
+    formdata.append('category', category);
+    formdata.append('amount', amount);
+    formdata.append('comments', comments);
+    formdata.append('exp_date', exp_date);
+    formdata.append('files', files);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formdata,
+      redirect: 'follow',
+    };
+
+    const response = await fetch(`${base_url}add-expense`, requestOptions);
 
     if (!response.ok) {
       throw new Error('Network response was not ok');

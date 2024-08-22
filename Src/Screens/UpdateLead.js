@@ -1,12 +1,19 @@
-import { Pressable, ScrollView, StyleSheet, Text, View, Modal } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Colors } from '../../Comman/Styles';
-import { TextInput } from 'react-native-paper';
+import {Colors} from '../../Comman/Styles';
+import {TextInput} from 'react-native-paper';
 import Button from '../../Src/Components/Button';
 import Toast from 'react-native-toast-message';
 import validator from 'validator';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import {
   Update_Lead,
   Get_Campaigns,
@@ -17,16 +24,16 @@ import {
   Get_State,
   Get_Sub_Category,
   Get_Lead_Data,
-  Get_Status
+  Get_Status,
 } from '../../Api/authApi';
-import { useRoute } from '@react-navigation/native';
-import { Calendar } from 'react-native-calendars';
+import {useRoute} from '@react-navigation/native';
+import {Calendar} from 'react-native-calendars';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 
-const Updatelead = ({ navigation }) => {
+const Updatelead = ({navigation}) => {
   const route = useRoute();
-  const { leadid } = route.params;
+  const {leadid} = route.params;
 
   const [mobilenumner, setmobilenumber] = useState('');
   const [fullname, setfullname] = useState('');
@@ -49,8 +56,7 @@ const Updatelead = ({ navigation }) => {
   const [cityfuture, setcityfuture] = useState([]);
   const [statesfuture, setStatesfuture] = useState([]);
   const [selectedStatefuture, setSelectedStatefuture] = useState('');
-  const [selectedCityfuture, setSelectedCityfuture] = useState('');
-
+  const [selectedCityfuture, setSelectedCityfuture] = useState('');   
   const [selectedclassification, setselectedclassification] = useState('');
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
@@ -77,9 +83,9 @@ const Updatelead = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-  const [showdobmodal, setshowdobmodal] = useState(false)
-  const [showdoamodal, setshowdoamodal] = useState(false)
-  const [selectedBudget, setSelectedBudget] = useState("");
+  const [showdobmodal, setshowdobmodal] = useState(false);
+  const [showdoamodal, setshowdoamodal] = useState(false);
+  const [selectedBudget, setSelectedBudget] = useState('');
 
   const showTimePicker = () => {
     setTimePickerVisibility(true);
@@ -97,10 +103,9 @@ const Updatelead = ({ navigation }) => {
     getproject();
     getlead();
     getstatus();
-
   }, []);
 
-  const handleBudgetChange = (value) => {
+  const handleBudgetChange = value => {
     setSelectedBudget(value);
   };
 
@@ -116,11 +121,10 @@ const Updatelead = ({ navigation }) => {
     setshowdoamodal(true);
   };
 
-  const handleConfirmTime = (time) => {
+  const handleConfirmTime = time => {
     setSelectedTime(moment(time).format('HH:mm'));
     hideTimePicker();
   };
-
 
   const getstatus = async () => {
     try {
@@ -135,7 +139,6 @@ const Updatelead = ({ navigation }) => {
     }
   };
 
-
   const handleSourceChange = itemValue => {
     setSelectedSource(itemValue);
   };
@@ -149,7 +152,7 @@ const Updatelead = ({ navigation }) => {
   };
 
   const handleprojectChange = itemValue => {
-    console.log(itemValue)
+    console.log(itemValue);
     setselectedproject(itemValue);
   };
 
@@ -205,7 +208,7 @@ const Updatelead = ({ navigation }) => {
       if (response.msg === '') {
         const stateData = response.data.map(item => item.state);
         setStates(stateData);
-        setStatesfuture(stateData)
+        setStatesfuture(stateData);
       } else {
       }
     } catch (error) {
@@ -214,7 +217,7 @@ const Updatelead = ({ navigation }) => {
     }
   };
 
-  const handleDateSelect = async (date) => {
+  const handleDateSelect = async date => {
     setSelectedDate(date);
     setShowCalendarModal(false);
 
@@ -224,7 +227,7 @@ const Updatelead = ({ navigation }) => {
     }
   };
 
-  const handleDateSelectdob = async (date) => {
+  const handleDateSelectdob = async date => {
     setselectedApplicantDob(date);
     setshowdobmodal(false);
 
@@ -234,7 +237,7 @@ const Updatelead = ({ navigation }) => {
     }
   };
 
-  const handleDateSelectdoa = async (date) => {
+  const handleDateSelectdoa = async date => {
     setselectedApplicantDoa(date);
     setshowdoamodal(false);
 
@@ -247,10 +250,10 @@ const Updatelead = ({ navigation }) => {
   const getcity = async itemValue => {
     try {
       const response = await Get_City(itemValue);
-      console.log("CITY DEKH AARI HAI", response);
+      console.log('CITY DEKH AARI HAI', response);
       if (response.msg === '') {
         setcity(response.data);
-        setcityfuture(response.data)
+        setcityfuture(response.data);
       } else {
       }
     } catch (error) {
@@ -274,7 +277,7 @@ const Updatelead = ({ navigation }) => {
   const getsource = async () => {
     try {
       const response = await Get_Source();
-      console.log(response)
+      console.log(response);
       if (response.msg === 'Load successfully.') {
         setsource(response.data);
       } else {
@@ -321,201 +324,200 @@ const Updatelead = ({ navigation }) => {
 
   const getlead = async () => {
     try {
-        const response = await Get_Lead_Data(leadid);
-        console.log('GETTING LEAD DATA --->', response.data);
-        if (response.msg === "Unauthorized request") {
-          navigation.navigate('Login');
-      } 
-      else
-        if (response.msg === 'Load successfully') {
-            const leadData = response.data;
-            setfullname(leadData.name || '');
-            setmobilenumber(leadData.phone || '');
-            setemail(leadData.email || '');
-            setaddress(leadData.field3 || '');
-            setwhatsapp(leadData.whatsapp_no || '');
-            setSelectedSource(leadData.source || '');
-            setSelectedState(leadData.field2 || '');
-            setSelectedCity(leadData.field1 || '');
-            setselectedclassification(leadData.classification || '');
-            setselectedcampigns(leadData.campaign || '');
-            setselectedproject(leadData.project_id || '');
-            setselectedtype(leadData.type || '');
-            setStatus(leadData.status || '')
+      const response = await Get_Lead_Data(leadid);
+      console.log('GETTING LEAD DATA --->', response.data);
+      if (response.msg === 'Unauthorized request') {
+        navigation.navigate('Login');
+      } else if (response.msg === 'Load successfully') {
+        const leadData = response.data;
+        setfullname(leadData.name || '');
+        setmobilenumber(leadData.phone || '');
+        setemail(leadData.email || '');
+        setaddress(leadData.field3 || '');
+        setwhatsapp(leadData.whatsapp_no || '');
+        setSelectedSource(leadData.source || '');
+        setSelectedState(leadData.field2 || '');
+        setSelectedCity(leadData.field1 || '');
+        setselectedclassification(leadData.classification || '');
+        setselectedcampigns(leadData.campaign || '');
+        setselectedproject(leadData.project_id || '');
+        setselectedtype(leadData.type || '');
+        setStatus(leadData.status || '');
 
-            const lastComment = leadData.lead_comment.length > 0 
-                ? leadData.lead_comment[leadData.lead_comment.length - 1].comment 
-                : '';
-            setcomments(lastComment || '');
+        const lastComment =
+          leadData.lead_comment.length > 0
+            ? leadData.lead_comment[leadData.lead_comment.length - 1].comment
+            : '';
+        setcomments(lastComment || '');
 
-            if (leadData.type) {
-                const typeResponse = await Get_Category(leadData.type);
-                setCategory(typeResponse.data);
-                setSelectedCategory(leadData.catg_id || '');
+        if (leadData.type) {
+          const typeResponse = await Get_Category(leadData.type);
+          setCategory(typeResponse.data);
+          setSelectedCategory(leadData.catg_id || '');
 
-                const subcategoryResponse = await Get_Sub_Category(leadData.catg_id);
-                setSubcategory(subcategoryResponse.data);
-                setSelectedSubcategory(leadData.sub_catg_id || '');
-            }
-
-            if (leadData.project_id) {
-                const projectResponse = await Get_Project(leadData.project_id);
-                console.log('hiiiiiiiiiii', projectResponse.data);
-                setproject(projectResponse.data);
-            }
-
-            if (leadData.campaign) {
-                const campaignsResponse = await Get_Campaigns();
-                setcampigns(campaignsResponse.data);
-            }
-
-            if (leadData.field2) {
-                const stateResponse = await Get_State();
-                setStates(stateResponse.data.map(item => item.state));
-                setSelectedState(leadData.field2 || '');
-            }
-
-            if (leadData.field1) {
-                const cityResponse = await Get_City(leadData.field2);
-                setcity(cityResponse.data);
-                setSelectedCity(leadData.field1 || '');
-            }
-        } else {
-            // Handle error or message here if needed
+          const subcategoryResponse = await Get_Sub_Category(leadData.catg_id);
+          setSubcategory(subcategoryResponse.data);
+          setSelectedSubcategory(leadData.sub_catg_id || '');
         }
+
+        if (leadData.project_id) {
+          const projectResponse = await Get_Project(leadData.project_id);
+          console.log('hiiiiiiiiiii', projectResponse.data);
+          setproject(projectResponse.data);
+        }
+
+        if (leadData.campaign) {
+          const campaignsResponse = await Get_Campaigns();
+          setcampigns(campaignsResponse.data);
+        }
+
+        if (leadData.field2) {
+          const stateResponse = await Get_State();
+          setStates(stateResponse.data.map(item => item.state));
+          setSelectedState(leadData.field2 || '');
+        }
+
+        if (leadData.field1) {
+          const cityResponse = await Get_City(leadData.field2);
+          setcity(cityResponse.data);
+          setSelectedCity(leadData.field1 || '');
+        }
+      } else {
+        // Handle error or message here if needed
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-};
-
-
-const Submit = async () => {
-  const requiredFieldsByStatus = {
-    INTERESTED: ['selectedDate', 'selectedTime'],
-    'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
-    'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
-    'FUTURE LEAD': ['selectedBudget'],
-    CONVERTED: {
-      BOOKED: [],
-      COMPLETED: ['selectedProject', 'size', 'price'], 
-    },
   };
 
-  const validateFields = () => {
-    const commonRequiredFields = ['comments'];
-    const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
-      ? requiredFieldsByStatus[status]
-      : [];
-
-    let additionalRequiredFields = [];
-
-    if (status === 'CONVERTED' && selectedStatus) {
-      additionalRequiredFields = requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
-    }
-
-    const requiredFields = [
-      ...commonRequiredFields,
-      ...statusSpecificRequiredFields,
-      ...additionalRequiredFields,
-    ];
-
-    const fieldValues = {
-      comments,
-      selectedDate,
-      selectedTime,
-      selectedBudget,
-      selectedStatefuture,
-      selectedCityfuture,
-      selectedStatus,
-      selectedProject,
-      size,
-      price,
-      applicantName,
-      applicantContact,
+  const Submit = async () => {
+    const requiredFieldsByStatus = {
+      INTERESTED: ['selectedDate', 'selectedTime'],
+      'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
+      'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
+      'FUTURE LEAD': ['selectedBudget'],
+      CONVERTED: {
+        BOOKED: [],
+        COMPLETED: ['selectedProject', 'size', 'price'],
+      },
     };
 
-    // Check for missing fields
-    for (const field of requiredFields) {
-      if (!fieldValues[field]) {
-        return field; // Return the first missing field
+    const validateFields = () => {
+      const commonRequiredFields = ['comments'];
+      const statusSpecificRequiredFields = Array.isArray(
+        requiredFieldsByStatus[status],
+      )
+        ? requiredFieldsByStatus[status]
+        : [];
+
+      let additionalRequiredFields = [];
+
+      if (status === 'CONVERTED' && selectedStatus) {
+        additionalRequiredFields =
+          requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
       }
-    }
-    return null; // No missing fields
-  };
 
-  const missingField = validateFields();
+      const requiredFields = [
+        ...commonRequiredFields,
+        ...statusSpecificRequiredFields,
+        ...additionalRequiredFields,
+      ];
 
-  if (missingField) {
-    Toast.show({
-      text1: `Please fill the required field: ${missingField}`,
-      type: 'error',
-    });
-    return; 
-  }
+      const fieldValues = {
+        comments,
+        selectedDate,
+        selectedTime,
+        selectedBudget,
+        selectedStatefuture,
+        selectedCityfuture,
+        selectedStatus,
+        selectedProject,
+        size,
+        price,
+        applicantName,
+        applicantContact,
+      };
 
-  try {
-    const response = await Update_Lead(
-      selectedSource,
-      selectedcampigns,
-      selectedCity,
-      selectedState,
-      fullname,
-      email,
-      date,
-      time,
-      selectedclassification,
-      status,
-      comments,
-      selectedproject,
-      selectedtype,
-      selectedCategory,
-      selectedSubcategory,
-      selectedStatus,
-      selectedproject,
-      size,
-      price,
-      applicantName,
-      applicantContact,
-      applicantCity,
-      applicantDob,
-      applicantDoa,
-      whatsapp,
-      address,
-      leadid
-    );
+      // Check for missing fields
+      for (const field of requiredFields) {
+        if (!fieldValues[field]) {
+          return field; // Return the first missing field
+        }
+      }
+      return null; // No missing fields
+    };
 
-    console.log(response);
+    const missingField = validateFields();
 
-    if (response.msg === "Unauthorized request") {
-      navigation.navigate('Login');
-  } 
-  else
-    if (response.msg === 'Save successfully') {
+    if (missingField) {
       Toast.show({
-        text1: 'Save Successfully',
-        type: 'success',
+        text1: `Please fill the required field: ${missingField}`,
+        type: 'error',
       });
-      navigation.navigate('All Leads');
-    } else {
+      return;
+    }
+
+    try {
+      const response = await Update_Lead(
+        selectedSource,
+        selectedcampigns,
+        selectedCity,
+        selectedState,
+        fullname,
+        email,
+        date,
+        time,
+        selectedclassification,
+        status,
+        comments,
+        selectedproject,
+        selectedtype,
+        selectedCategory,
+        selectedSubcategory,
+        selectedStatus,
+        selectedproject,
+        size,
+        price,
+        applicantName,
+        applicantContact,
+        applicantCity,
+        applicantDob,
+        applicantDoa,
+        whatsapp,
+        address,
+        leadid,
+      );
+
+      console.log(response);
+
+      if (response.msg === 'Unauthorized request') {
+        navigation.navigate('Login');
+      } else if (response.msg === 'Save successfully') {
+        Toast.show({
+          text1: 'Save Successfully',
+          type: 'success',
+        });
+        navigation.navigate('All Leads');
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log(error);
       Toast.show({
-        text1: response.msg,
+        text1: 'Error',
         type: 'error',
       });
     }
-  } catch (error) {
-    console.log(error);
-    Toast.show({
-      text1: 'Error',
-      type: 'error',
-    });
-  }
-};
+  };
 
-  const handleStatusChange = (value) => {
+  const handleStatusChange = value => {
     setStatus(value);
     if (value !== 'CONVERTED') {
       setcomments('');
-  }
+    }
     setDate('');
     setTime('');
     setBudget('');
@@ -527,7 +529,6 @@ const Submit = async () => {
     setPrice('');
     setSize('');
   };
-
 
   return (
     <ScrollView style={styles.container}>
@@ -552,7 +553,7 @@ const Submit = async () => {
               const formattedText = text.replace(/[^0-9]/g, '');
               setmobilenumber(formattedText.slice(0, 10));
             }}
-            style={[styles.textinput, { paddingLeft: 30 }]}
+            style={[styles.textinput, {paddingLeft: 30}]}
             mode="outlined"
             keyboardType="numeric"
             maxLength={10}
@@ -576,7 +577,7 @@ const Submit = async () => {
             label="Full Name"
             value={fullname}
             onChangeText={text => setfullname(text)}
-            style={[styles.textinput, { paddingLeft: 30 }]}
+            style={[styles.textinput, {paddingLeft: 30}]}
             mode="outlined"
           />
         </View>
@@ -599,7 +600,7 @@ const Submit = async () => {
               label="Email"
               value={email}
               onChangeText={handleEmailChange}
-              style={[styles.textinput, { paddingLeft: 30 }]}
+              style={[styles.textinput, {paddingLeft: 30}]}
               mode="outlined"
               maxLength={100}
               keyboardType="email-address"
@@ -610,7 +611,7 @@ const Submit = async () => {
           </>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSource}
@@ -624,7 +625,7 @@ const Submit = async () => {
           </View>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedtype}
@@ -637,7 +638,7 @@ const Submit = async () => {
           </View>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedCategory}
@@ -651,7 +652,7 @@ const Submit = async () => {
           </View>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSubcategory}
@@ -665,7 +666,7 @@ const Submit = async () => {
           </View>
         </View>
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedclassification}
@@ -679,7 +680,7 @@ const Submit = async () => {
         </View>
 
         <View style={styles.dob}>
-          <View style={{ width: '49%' }}>
+          <View style={{width: '49%'}}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedcampigns}
@@ -693,7 +694,7 @@ const Submit = async () => {
             </View>
           </View>
 
-          <View style={{ width: '49%' }}>
+          <View style={{width: '49%'}}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedproject}
@@ -743,41 +744,51 @@ const Submit = async () => {
           </View>
         </View>
 
-        <View style={{ top: 10 }}>
-  <View style={styles.dropdowncontainer1}>
-    <Picker
-      selectedValue={status}
-      onValueChange={handleStatusChange}
-      enabled={status !== 'CONVERTED'} // Disable dropdown if status is "CONVERTED"
-    >
-      <Picker.Item label="Select Status" value="" />
-      {statusData.map(statusItem => (
-        <Picker.Item key={statusItem.id} label={statusItem.name} value={statusItem.name} />
-      ))}
-    </Picker>
-  </View>
-</View>
+        <View style={{top: 10}}>
+          <View style={styles.dropdowncontainer1}>
+            <Picker
+              selectedValue={status}
+              onValueChange={handleStatusChange}
+              enabled={status !== 'CONVERTED'} // Disable dropdown if status is "CONVERTED"
+            >
+              <Picker.Item label="Select Status" value="" />
+              {statusData.map(statusItem => (
+                <Picker.Item
+                  key={statusItem.id}
+                  label={statusItem.name}
+                  value={statusItem.name}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
 
-
-        {status === 'INTERESTED' || status === 'CALL SCHEDULED' || status === 'VISIT SCHEDULED' ? (
+        {status === 'INTERESTED' ||
+        status === 'CALL SCHEDULED' ||
+        status === 'VISIT SCHEDULED' ? (
           <>
             {/* <View style={{ top: 10 }}>
-              <TextInput
-                label="Select Date"
-                value={date}
-                onChangeText={text => setDate(text)}
-                style={[styles.textinput]}
-                mode="outlined"
-              />
-            </View> */}
+<TextInput
+  label="Select Date"
+  value={date}
+  onChangeText={text => setDate(text)}
+  style={[styles.textinput]}
+  mode="outlined"
+/>
+</View> */}
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, }}>
-              <View style={{ width: '50%' }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 10,
+              }}>
+              <View style={{width: '50%'}}>
                 <TextInput
                   placeholder="Select Date"
                   value={selectedDate}
-                  onChangeText={(date) => setSelectedDate(date)}
-                  style={[styles.textinput, { marginTop: 10 }]}
+                  onChangeText={date => setSelectedDate(date)}
+                  style={[styles.textinput, {marginTop: 10}]}
                   mode="outlined"
                 />
                 <Pressable
@@ -794,13 +805,13 @@ const Submit = async () => {
                   <AntDesign name="calendar" color="#625bc5" size={25} />
                 </Pressable>
               </View>
-              <View style={{ width: '100%', marginLeft: 7 }}>
-                <View style={{ width: '50%' }}>
+              <View style={{width: '100%', marginLeft: 7}}>
+                <View style={{width: '50%'}}>
                   <TextInput
                     placeholder="Select Time"
                     value={selectedTime}
-                    onChangeText={(time) => setSelectedTime(time)}
-                    style={[styles.textinput, { marginTop: 10 }]}
+                    onChangeText={time => setSelectedTime(time)}
+                    style={[styles.textinput, {marginTop: 10}]}
                     mode="outlined"
                     editable={false}
                   />
@@ -825,7 +836,6 @@ const Submit = async () => {
                   onConfirm={handleConfirmTime}
                   onCancel={hideTimePicker}
                 />
-
               </View>
             </View>
           </>
@@ -833,33 +843,37 @@ const Submit = async () => {
 
         {status === 'FUTURE LEAD' ? (
           <>
-       <View style={[styles.dropdowncontainer1, { top: 20 }]}>
-        <Picker
-          selectedValue={selectedBudget}
-          style={styles.picker}
-          onValueChange={handleBudgetChange}
-        >
-          <Picker.Item label="Select Budget" value="" />
-          <Picker.Item label="5-10L" value="5-10L" />
-          <Picker.Item label="10-20L" value="10-20L" />
-          <Picker.Item label="20-30L" value="20-30L" />
-          <Picker.Item label="30-45L" value="30-45L" />
-          <Picker.Item label="45-60L" value="45-60L" />
-          <Picker.Item label="60-80L" value="60-80L" />
-          <Picker.Item label="80-1cr" value="80-1cr" />
-          <Picker.Item label="1-1.25cr" value="1-1.25cr" />
-          <Picker.Item label="1.25-1.5cr" value="1.25-1.5cr" />
-          <Picker.Item label="1.5-1.75cr" value="1.5-1.75cr" />
-          <Picker.Item label="1.75-2cr" value="1.75-2cr" />
-          <Picker.Item label="2-2.50cr" value="2-2.50cr" />
-          <Picker.Item label="2.50-3cr" value="2.50-3cr" />
-          <Picker.Item label="3-3.50cr" value="3-3.50cr" />
-          <Picker.Item label="3.50-4cr" value="3.50-4cr" />
-          <Picker.Item label="4-4.50cr" value="4-4.50cr" />
-        </Picker>
-      </View>
+            <View style={[styles.dropdowncontainer1, {top: 20}]}>
+              <Picker
+                selectedValue={selectedBudget}
+                style={styles.picker}
+                onValueChange={handleBudgetChange}>
+                <Picker.Item label="Select Budget" value="" />
+                <Picker.Item label="5-10L" value="5-10L" />
+                <Picker.Item label="10-20L" value="10-20L" />
+                <Picker.Item label="20-30L" value="20-30L" />
+                <Picker.Item label="30-45L" value="30-45L" />
+                <Picker.Item label="45-60L" value="45-60L" />
+                <Picker.Item label="60-80L" value="60-80L" />
+                <Picker.Item label="80-1cr" value="80-1cr" />
+                <Picker.Item label="1-1.25cr" value="1-1.25cr" />
+                <Picker.Item label="1.25-1.5cr" value="1.25-1.5cr" />
+                <Picker.Item label="1.5-1.75cr" value="1.5-1.75cr" />
+                <Picker.Item label="1.75-2cr" value="1.75-2cr" />
+                <Picker.Item label="2-2.50cr" value="2-2.50cr" />
+                <Picker.Item label="2.50-3cr" value="2.50-3cr" />
+                <Picker.Item label="3-3.50cr" value="3-3.50cr" />
+                <Picker.Item label="3.50-4cr" value="3.50-4cr" />
+                <Picker.Item label="4-4.50cr" value="4-4.50cr" />
+              </Picker>
+            </View>
 
-            <View style={{ top: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View
+              style={{
+                top: 30,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
               <View style={styles.dropdowncontainer}>
                 <Picker
                   selectedValue={selectedStatefuture}
@@ -894,10 +908,10 @@ const Submit = async () => {
 
         {status === 'CONVERTED' ? (
           <>
-            <View style={[styles.dropdowncontainer1, { top: 20 }]}>
+            <View style={[styles.dropdowncontainer1, {top: 20}]}>
               <Picker
                 selectedValue={selectedStatus}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   setSelectedStatus(value);
                 }}>
                 <Picker.Item label="Select Status" value="" />
@@ -908,71 +922,75 @@ const Submit = async () => {
             </View>
             {selectedStatus === 'COMPLETED' && (
               <>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <View style={styles.dropdowncontainer1}>
                     <Picker
                       selectedValue={selectedProject}
                       style={styles.picker}
-                      onValueChange={(value) => setSelectedProject(value)}>
+                      onValueChange={value => setSelectedProject(value)}>
                       <Picker.Item label="Select Project" value="" />
                       {project.map((src, index) => (
-                        <Picker.Item key={index} label={src.project_name} value={src.id} />
+                        <Picker.Item
+                          key={index}
+                          label={src.project_name}
+                          value={src.id}
+                        />
                       ))}
                     </Picker>
                   </View>
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     label="Enter Size"
                     value={size}
-                    onChangeText={(text) => setSize(text)}
+                    onChangeText={text => setSize(text)}
                     style={styles.textinput}
                     mode="outlined"
                   />
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     label="Enter Price"
                     value={price}
-                    onChangeText={(text) => setPrice(text)}
+                    onChangeText={text => setPrice(text)}
                     style={styles.textinput}
                     mode="outlined"
                   />
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     label="Applicant Name"
                     value={applicantName}
-                    onChangeText={(text) => setApplicantName(text)}
+                    onChangeText={text => setApplicantName(text)}
                     style={styles.textinput}
                     mode="outlined"
                   />
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     label="Applicant Contact"
                     value={applicantContact}
-                    onChangeText={(text) => setApplicantContact(text)}
+                    onChangeText={text => setApplicantContact(text)}
                     style={styles.textinput}
                     mode="outlined"
                     keyboardType="numeric"
                   />
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     label="Applicant City"
                     value={applicantCity}
-                    onChangeText={(text) => setApplicantCity(text)}
+                    onChangeText={text => setApplicantCity(text)}
                     style={styles.textinput}
                     mode="outlined"
                   />
                 </View>
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     placeholder="Applicant DOB"
                     value={selectedapplicantDob}
-                    onChangeText={(date) => setselectedApplicantDob(date)}
-                    style={[styles.textinput, { marginTop: 10 }]}
+                    onChangeText={date => setselectedApplicantDob(date)}
+                    style={[styles.textinput, {marginTop: 10}]}
                     mode="outlined"
                   />
                   <Pressable
@@ -990,12 +1008,12 @@ const Submit = async () => {
                   </Pressable>
                 </View>
 
-                <View style={{ top: 25 }}>
+                <View style={{top: 25}}>
                   <TextInput
                     placeholder="Applicant DOA"
                     value={selectedapplicantDoa}
-                    onChangeText={(date) => setselectedApplicantDoa(date)}
-                    style={[styles.textinput, { marginTop: 10 }]}
+                    onChangeText={date => setselectedApplicantDoa(date)}
+                    style={[styles.textinput, {marginTop: 10}]}
                     mode="outlined"
                   />
                   <Pressable
@@ -1017,7 +1035,7 @@ const Submit = async () => {
           </>
         ) : null}
 
-        <View style={{ top: 25 }}>
+        <View style={{top: 25}}>
           <TextInput
             label="Enter Comments"
             value={comments}
@@ -1027,7 +1045,7 @@ const Submit = async () => {
           />
         </View>
 
-        <View style={{ top: 23 }}>
+        <View style={{top: 23}}>
           <TextInput
             label="Enter Address"
             value={address}
@@ -1037,8 +1055,7 @@ const Submit = async () => {
           />
         </View>
 
-
-        <View style={{ top: 25 }}>
+        <View style={{top: 25}}>
           <TextInput
             label="Enter Whatsapp number"
             value={whatsapp}
@@ -1056,13 +1073,11 @@ const Submit = async () => {
         transparent={true}
         visible={showCalendarModal}
         onRequestClose={() => setShowCalendarModal(false)}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-
-
+        <View style={{flex: 1, justifyContent: 'center'}}>
           <Calendar
-            onDayPress={(day) => handleDateSelect(day.dateString)}
+            onDayPress={day => handleDateSelect(day.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: 'blue' }
+              [selectedDate]: {selected: true, selectedColor: 'blue'},
             }}
           />
         </View>
@@ -1073,13 +1088,11 @@ const Submit = async () => {
         transparent={true}
         visible={showdobmodal}
         onRequestClose={() => setshowdobmodal(false)}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-
-
+        <View style={{flex: 1, justifyContent: 'center'}}>
           <Calendar
-            onDayPress={(day) => handleDateSelectdob(day.dateString)}
+            onDayPress={day => handleDateSelectdob(day.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: 'blue' }
+              [selectedDate]: {selected: true, selectedColor: 'blue'},
             }}
           />
         </View>
@@ -1090,23 +1103,21 @@ const Submit = async () => {
         transparent={true}
         visible={showdoamodal}
         onRequestClose={() => setshowdoamodal(false)}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-
-
+        <View style={{flex: 1, justifyContent: 'center'}}>
           <Calendar
-            onDayPress={(day) => handleDateSelectdoa(day.dateString)}
+            onDayPress={day => handleDateSelectdoa(day.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: 'blue' }
+              [selectedDate]: {selected: true, selectedColor: 'blue'},
             }}
           />
         </View>
       </Modal>
 
-      <Pressable style={{ top: 40 }} onPress={Submit}>
+      <Pressable style={{top: 40}} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 
-      <View style={{ height: 30 }}></View>
+      <View style={{height: 30}}></View>
     </ScrollView>
   );
 };

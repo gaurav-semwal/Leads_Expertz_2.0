@@ -46,14 +46,16 @@ const HomeScheduletable = () => {
 
       if (response.data) {
         const missedFollowUp = response.data.missedFollowUp || [];
-
-        const callScheduledData = missedFollowUp.filter(item => item.status === 'CALL SCHEDULED');
-        const visitScheduledData = missedFollowUp.filter(item => item.status === 'VISIT SCHEDULED');
-
-        setCallScheduleData(callScheduledData);
-        setVisitScheduleData(visitScheduledData);
+        const todayCallSchedule = response.data.todayCallScheduled || [];
+        const todayVisitSchedule = response.data.todayVisitScheduled || [];
+  
+        // Set the states with the specific data for each schedule
+        setCallScheduleData(todayCallSchedule);
+        setVisitScheduleData(todayVisitSchedule);
         setMissedFollowUpData(missedFollowUp);
-        setTableData(callScheduledData);
+  
+        // Default to displaying the call schedule
+        setTableData(todayCallSchedule);
       } else {
         console.warn('Unexpected response format:', response);
       }
