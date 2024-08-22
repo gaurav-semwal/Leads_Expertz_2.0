@@ -59,6 +59,7 @@ const Taskscreen = () => {
   };
 
   const updateTask = async () => {
+    console.log(updateModal.update)
     try {
       const response = await Update_Task(updateModal.id, updateModal.update);
       console.log('CHECKING THE UPDATED TASK', response);
@@ -84,9 +85,19 @@ const Taskscreen = () => {
     }
   };
 
+  const formatDatee = (date) => {
+    return date.toISOString().split('T')[0];  // This gives YYYY-MM-DD format
+  };
+
+  const formatTimee = (date) => {
+    return date.toTimeString().split(' ')[0];  // This gives HH:MM:SS format
+  };
+
   const addTask = async () => {
+    console.log(newTask, formatTimee(fromDate), formatDatee(fromDate),);
+
     try {
-      const response = await Add_Task(newTask);
+      const response = await Add_Task(newTask, formatTimee(fromDate), formatDatee(fromDate),);
       if (response.msg === 'Task created successfully.') {
         setTaskModal(false);
         fetchTasks();
@@ -163,13 +174,19 @@ const Taskscreen = () => {
 
     return filteredTasks.map(task => (
       <View key={task.id} style={styles.taskContainer}>
-        <Text style={styles.taskText}>User: {task.username}</Text>
-        <Text style={styles.taskText}>Status: {task.status}</Text>
-        <Text style={styles.taskText}>Task: {task.task}</Text>
-        <Text style={styles.taskDate}>Date: {task.created_at}</Text>
-        <TouchableOpacity onPress={() => onPressUpdateButton(task.id)}>
-          <AntDesign name="edit" size={28} color="#625bc5" />
-        </TouchableOpacity>
+        <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={styles.taskText}>User: {task.username}</Text>
+            <TouchableOpacity onPress={() => onPressUpdateButton(task.id)}>
+              <AntDesign name="edit" size={28} color="#625bc5" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.taskText}>Status: {task.status}</Text>
+          <Text style={styles.taskText}>Task: {task.task}</Text>
+          <Text style={styles.taskDate}>Date: {task.created_at}</Text>
+        </View>
+
       </View>
     ));
   };
@@ -268,13 +285,11 @@ const Taskscreen = () => {
 
               <View style={{ flexDirection: 'column', width: '90%' }}>
                 <TextInput
-                  placeholder="Enter Updated Task"
+                  placeholder="Enter Remarks"
                   value={updateModal.update}
                   onChangeText={text => setUpdateModal({ ...updateModal, update: text })}
                   style={styles.textinput}
-                >
-                </TextInput>
-                 <FontAwesome name="microphone" size={25} color="#625bc5" />
+                />
                 <Pressable onPress={updateTask} style={{ marginTop: 15 }}>
                   <Button text="Update Task" />
                 </Pressable>
@@ -313,10 +328,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
-    padding: 15,
+    padding: 10,
     alignItems: 'center',
     elevation: 5,
-    height: '36%',
+    height: '46%',
   },
   modalHeader: {
     flexDirection: 'row',

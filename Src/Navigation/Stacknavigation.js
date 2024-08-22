@@ -654,20 +654,6 @@ const Stacknavigation = () => {
               },
             }}
           />
-          {/* <Stack.Screen
-            name="User List"
-            component={Userlist}
-            options={{
-              headerShown: true,
-              headerStyle: {
-                backgroundColor: '#625bc5',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-          /> */}
           <Stack.Screen
             name="PromoteList"
             component={Promtescreen}

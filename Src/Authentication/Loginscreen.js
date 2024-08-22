@@ -9,8 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Loginscreen = ({ navigation }) => {
 
-  const [email, setemail] = useState();
-  const [password, setpassword] = useState();
+  const [email, setemail] = useState('vaibhav@clikzopinnovations.com');
+  const [password, setpassword] = useState('123456');
 
   useEffect(() => {
     checkForToken(); 

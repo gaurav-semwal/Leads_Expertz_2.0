@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,23 +8,33 @@ import {
   BackHandler,
   Alert
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import Leadshomegrid from '../Components/Leadshomegrid';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {TextInput} from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Add_Quick_Lead} from '../../Api/authApi';
+import { Add_Quick_Lead } from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Homescreen = ({navigation}) => {
+const Homescreen = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
   const [leads, setLeads] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const [role, setRole] = useState('');
 
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
 
   useEffect(() => {
     const backAction = () => {
@@ -85,68 +95,75 @@ const Homescreen = ({navigation}) => {
   };
 
   return (
-      <View style={styles.container}>
-        <View style={styles.button}>
-          <Pressable style={styles.buttoncontainer1} onPress={openModal}>
-            <Text style={styles.text}>Add Quick Lead</Text>
-          </Pressable>
-        </View>
-        <View style={styles.dropdowncontainer1}>
-          <Picker
-            selectedValue={selectedValue}
-            onValueChange={itemValue => setSelectedValue(itemValue)}>
-            <Picker.Item label="All" value="All" />
-            <Picker.Item label="Self" value="Self" />
-            <Picker.Item label="Team" value="Team" />
-          </Picker>
-        </View>
-        <Leadshomegrid />
-        <View style={styles.plusButtonContainer}>
-          <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
-            <AntDesign name="plus" size={28} color="#dbdad3" />
-          </Pressable>
-        </View>
+    <View style={styles.container}>
 
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={closeModal}>
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add Quick Lead</Text>
-                <Pressable onPress={closeModal}>
-                  <MaterialCommunityIcons
-                    name="close-circle"
-                    size={25}
-                    color="#625bc5"
-                  />
-                </Pressable>
-              </View>
-              <TextInput
-                placeholder="Enter Your Name"
-                value={name}
-                onChangeText={text => setName(text)}
-                style={styles.textinput}
-                mode="outlined"
-              />
-              <TextInput
-                placeholder="Enter Your Number"
-                value={number}
-                onChangeText={text => setNumber(text)}
-                style={styles.textinput}
-                mode="outlined"
-                keyboardType="numeric"
-                maxLength={10}
-              />
-              <Pressable style={styles.submitButton} onPress={addquicklead}>
-                <Text style={styles.submitButtonText}>Submit</Text>
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
+        <View>
+          <View style={styles.button}>
+            <Pressable style={styles.buttoncontainer1} onPress={openModal}>
+              <Text style={styles.text}>Add Quick Lead</Text>
+            </Pressable>
+          </View>
+          <View style={styles.dropdowncontainer1}>
+            <Picker
+              selectedValue={selectedValue}
+              onValueChange={itemValue => setSelectedValue(itemValue)}>
+              <Picker.Item label="All" value="All" />
+              <Picker.Item label="Self" value="Self" />
+              <Picker.Item label="Team" value="Team" />
+            </Picker>
+          </View>
+        </View>
+      )}
+      <Leadshomegrid />
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
+      <View style={styles.plusButtonContainer}>
+        <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+          <AntDesign name="plus" size={28} color="#dbdad3" />
+        </Pressable>
+      </View>
+      )}
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeModal}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Quick Lead</Text>
+              <Pressable onPress={closeModal}>
+                <MaterialCommunityIcons
+                  name="close-circle"
+                  size={25}
+                  color="#625bc5"
+                />
               </Pressable>
             </View>
+            <TextInput
+              placeholder="Enter Your Name"
+              value={name}
+              onChangeText={text => setName(text)}
+              style={styles.textinput}
+              mode="outlined"
+            />
+            <TextInput
+              placeholder="Enter Your Number"
+              value={number}
+              onChangeText={text => setNumber(text)}
+              style={styles.textinput}
+              mode="outlined"
+              keyboardType="numeric"
+              maxLength={10}
+            />
+            <Pressable style={styles.submitButton} onPress={addquicklead}>
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </Pressable>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
