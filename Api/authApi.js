@@ -801,7 +801,23 @@ export const Add_Sub_Category = async (categoryid, name) => {
   }
 };
 
-export const Add_Inventory = async (categorytype, categoryid, subcategoryid, name, description, location, price, size, file1, file2, file3, file4, file5) => {
+export const Add_Inventory = async (
+  categorytype, 
+  categoryid, 
+  subcategoryid, 
+  name, 
+  description, 
+  location, 
+  price, 
+  size, 
+  file1, 
+  file2, 
+  file3, 
+  file4, 
+  file5, 
+  video_link, 
+  pdfFile
+) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
 
@@ -822,17 +838,19 @@ export const Add_Inventory = async (categorytype, categoryid, subcategoryid, nam
     formdata.append("location", location);
     formdata.append("price", price);
     formdata.append("size", size);
+    formdata.append("video_link", video_link);
 
-    // Append files to FormData with correct URIs
-    const addFile = (uri, name) => {
+    // Function to append files with correct URIs and types
+    const addFile = (uri, name, type = 'image/jpeg') => {
       if (!uri) return null;
       return {
         uri: uri,
-        type: 'image/jpeg', // Adjust if your file is of a different type
+        type: type,
         name: name,
       };
     };
 
+    // Handle images
     const files = [file1, file2, file3, file4, file5];
     const fileNames = ['file1.jpg', 'file2.jpg', 'file3.jpg', 'file4.jpg', 'file5.jpg'];
 
@@ -846,7 +864,15 @@ export const Add_Inventory = async (categorytype, categoryid, subcategoryid, nam
       }
     });
 
-    // Make the API request
+    // Handle PDF
+    if (pdfFile) {
+      const pdf = addFile(pdfFile, 'document.pdf', 'application/pdf');
+      if (pdf) {
+        console.log('Appending PDF:', pdf);
+        formdata.append('document', pdf);
+      }
+    }
+
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -1319,7 +1345,7 @@ export const Update_Location = async (lastlocation) => {
   }
 };
 
-export const Add_Task = async (task) => {
+export const Add_Task = async (task,deadLineTime,deadLineDate) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
 
@@ -1332,6 +1358,8 @@ export const Add_Task = async (task) => {
 
     const formdata = new FormData();
     formdata.append("task", task);
+    formdata.append("deadLineTime", deadLineTime);
+formdata.append("deadLineDate", deadLineDate);
 
     const requestOptions = {
       method: "POST",
@@ -1376,6 +1404,42 @@ export const Get_Task = async (status) => {
     };
 
     const response = await fetch(`${base_url}get-task`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Update_Task = async (remarks) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("remarks", remarks);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow"
+    };
+
+    const response = await fetch(`${base_url}update-task`, requestOptions);
 
     if (!response.ok) {
       throw new Error('Network response was not ok');

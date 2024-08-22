@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,22 +7,29 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../Components/Button';
-import {Add_Task, Get_Task} from '../../Api/authApi';
+import { Add_Task, Get_Task, Update_Task } from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Taskscreen = () => {
   const [activeButton, setActiveButton] = useState('All');
-  const [taskmodal, setTaskModal] = useState(false);
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  const [showFromDatePicker, setShowFromDatePicker] = useState(false);
+  const [showToDatePicker, setShowToDatePicker] = useState(false);
+  const [taskModal, setTaskModal] = useState(false);
+  const [taskData, setTaskData] = useState([]);
   const [updateModal, setUpdateModal] = useState({
     visible: false,
     id: null,
     update: '',
   });
-  const [taskData, setTaskData] = useState([]);
   const [newTask, setNewTask] = useState('');
 
   useEffect(() => {
@@ -32,28 +39,54 @@ const Taskscreen = () => {
   const fetchTasks = async () => {
     try {
       const response = await Get_Task();
-      console.log('GETTING THE TASK DATA', response);
-
       if (response && response.data) {
         setTaskData(response.data);
       } else {
-        setTaskData([]);
         Toast.show({
           text1: response.msg,
           type: 'error',
-          position: 'bottom', 
+          position: 'bottom',
         });
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
-      setTaskData([]);
+      Toast.show({
+        text1: 'Error fetching tasks',
+        type: 'error',
+        position: 'bottom',
+      });
+    }
+  };
+
+  const updateTask = async () => {
+    try {
+      const response = await Update_Task(updateModal.id, updateModal.update);
+      console.log('CHECKING THE UPDATED TASK', response);
+      if (response.msg === 'Save successfully.') {
+        setUpdateModal({ ...updateModal, visible: false });
+        fetchTasks();
+        Toast.show({
+          text1: response.msg,
+          type: 'success',
+        });
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      Toast.show({
+        text1: 'Error updating task',
+        type: 'error',
+      });
     }
   };
 
   const addTask = async () => {
     try {
       const response = await Add_Task(newTask);
-      console.log('CHECKING THE TASK, WHETHER IT IS ADDING OR NOT', response);
       if (response.msg === 'Task created successfully.') {
         setTaskModal(false);
         fetchTasks();
@@ -61,38 +94,61 @@ const Taskscreen = () => {
         Toast.show({
           text1: response.msg,
           type: 'success',
-          position: 'top', 
+          position: 'top',
         });
-      
       } else {
         Toast.show({
           text1: response.msg,
           type: 'error',
           position: 'top',
         });
-        console.log('Failed to add task');
       }
     } catch (error) {
       console.error('Error adding task:', error);
+      Toast.show({
+        text1: 'Error adding task',
+        type: 'error',
+        position: 'top',
+      });
     }
   };
-
 
   const onPressPlusButton = () => {
     setTaskModal(true);
   };
 
   const onPressUpdateButton = id => {
-    console.log(id);
-    setUpdateModal({visible: true, id: id, update: ''});
+    setUpdateModal({ visible: true, id, update: '' });
   };
 
-  const handleCloseModalPassword = () => {
+  const handleCloseModal = () => {
     setTaskModal(false);
+    setUpdateModal({ ...updateModal, visible: false });
   };
 
-  const handleCloseModalUpdate = () => {
-    setUpdateModal({...updateModal, visible: false});
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fromDate;
+    setShowFromDatePicker(false);
+    setFromDate(currentDate);
+  };
+
+  const handleTimeChange = (event, selectedDate) => {
+    const currentDate = selectedDate || toDate;
+    setShowToDatePicker(false);
+    setToDate(currentDate);
+  };
+
+  const formatDate = date => {
+    let options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const formatTime = date => {
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
 
   const renderTasks = () => {
@@ -101,7 +157,7 @@ const Taskscreen = () => {
         ? taskData
         : taskData.filter(task => task.status === activeButton);
 
-    if (!filteredTasks || filteredTasks.length === 0) {
+    if (!filteredTasks.length) {
       return <Text>No tasks found.</Text>;
     }
 
@@ -111,87 +167,125 @@ const Taskscreen = () => {
         <Text style={styles.taskText}>Status: {task.status}</Text>
         <Text style={styles.taskText}>Task: {task.task}</Text>
         <Text style={styles.taskDate}>Date: {task.created_at}</Text>
+        <TouchableOpacity onPress={() => onPressUpdateButton(task.id)}>
+          <AntDesign name="edit" size={28} color="#625bc5" />
+        </TouchableOpacity>
       </View>
     ));
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView>{renderTasks()}</ScrollView>
+    <>
+      <View style={styles.container}>
+        <ScrollView>{renderTasks()}</ScrollView>
 
-      <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
-        <AntDesign name="plus" size={28} color="#dbdad3" />
-      </Pressable>
+        <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+          <AntDesign name="plus" size={28} color="#dbdad3" />
+        </Pressable>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={taskmodal}
-        onRequestClose={handleCloseModalPassword}>
-        <View style={[styles.centeredView, {justifyContent: 'flex-end'}]}>
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalText}>Add Task</Text>
-              <Pressable onPress={handleCloseModalPassword}>
-                <MaterialCommunityIcons
-                  name="close-circle"
-                  size={30}
-                  color="#625bc5"
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={taskModal}
+          onRequestClose={handleCloseModal}>
+          <View style={[styles.centeredView, { justifyContent: 'flex-end' }]}>
+            <View style={styles.modalView}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalText}>Add Task</Text>
+                <Pressable onPress={handleCloseModal}>
+                  <MaterialCommunityIcons
+                    name="close-circle"
+                    size={30}
+                    color="#625bc5"
+                  />
+                </Pressable>
+              </View>
+
+              <View style={styles.modalContent}>
+                <TextInput
+                  placeholder="Enter Task"
+                  value={newTask}
+                  onChangeText={text => setNewTask(text)}
+                  style={styles.textinput}
                 />
-              </Pressable>
-            </View>
 
-            <View style={styles.modalContent}>
-              <TextInput
-                placeholder="Enter Task"
-                value={newTask}
-                onChangeText={text => setNewTask(text)}
-                style={styles.textinput}
-              />
-              <Pressable onPress={addTask} style={{marginTop: 15}}>
-                <Button text="Add Task" />
-              </Pressable>
+                <View style={styles.row}>
+                  <View style={styles.datePickerContainer}>
+                    <TouchableOpacity
+                      style={styles.datePicker}
+                      onPress={() => setShowFromDatePicker(true)}>
+                      <Text>{formatDate(fromDate)}</Text>
+                      <AntDesign name="calendar" color="#625bc5" size={24} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.datePickerContainer}>
+                    <TouchableOpacity
+                      style={styles.datePicker}
+                      onPress={() => setShowToDatePicker(true)}>
+                      <Text>{formatTime(toDate)}</Text>
+                      <AntDesign name="clockcircleo" color="#625bc5" size={24} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <Pressable onPress={addTask} style={{ marginTop: 15 }}>
+                  <Button text="Add Task" />
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={updateModal.visible}
-        onRequestClose={handleCloseModalUpdate}>
-        <View style={[styles.centeredView, {justifyContent: 'flex-end'}]}>
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalText}>Update Task</Text>
-              <Pressable onPress={handleCloseModalUpdate}>
-                <MaterialCommunityIcons
-                  name="close-circle"
-                  size={25}
-                  color="#625bc5"
-                />
-              </Pressable>
-            </View>
+          {showFromDatePicker && (
+            <DateTimePicker
+              value={fromDate}
+              mode="date"
+              onChange={handleDateChange}
+            />
+          )}
 
-            <View style={styles.modalContent}>
-              <TextInput
-                placeholder="Enter Updated Task"
-                value={updateModal.update}
-                onChangeText={text =>
-                  setUpdateModal({...updateModal, update: text})
-                }
-                style={styles.textinput}
-              />
+          {showToDatePicker && (
+            <DateTimePicker
+              value={toDate}
+              mode="time"
+              display="default"
+              onChange={handleTimeChange}
+            />
+          )}
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={updateModal.visible}
+          onRequestClose={handleCloseModal}>
+          <View style={[styles.centeredView, { justifyContent: 'flex-end' }]}>
+            <View style={styles.modalView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                <Text style={styles.modalText}>Update Task</Text>
+                <Pressable onPress={handleCloseModal}>
+                  <MaterialCommunityIcons name="close-circle" size={25} color="#625bc5" />
+                </Pressable>
+              </View>
+
+              <View style={{ flexDirection: 'column', width: '90%' }}>
+                <TextInput
+                  placeholder="Enter Updated Task"
+                  value={updateModal.update}
+                  onChangeText={text => setUpdateModal({ ...updateModal, update: text })}
+                  style={styles.textinput}
+                >
+                </TextInput>
+                 <FontAwesome name="microphone" size={25} color="#625bc5" />
+                <Pressable onPress={updateTask} style={{ marginTop: 15 }}>
+                  <Button text="Update Task" />
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </>
   );
 };
-
-export default Taskscreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -222,7 +316,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     elevation: 5,
-    height: '28%',
+    height: '36%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -245,6 +339,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#625bc5',
     paddingLeft: 20,
+    marginVertical: 5,
   },
   taskContainer: {
     backgroundColor: '#fff',
@@ -254,7 +349,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
@@ -269,4 +364,25 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
+  datePickerContainer: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '102%',
+  },
+  datePicker: {
+    borderRadius: 10,
+    borderColor: '#625bc5',
+    padding: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 });
+
+export default Taskscreen;
