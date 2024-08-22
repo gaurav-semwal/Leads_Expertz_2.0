@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState ,useCallback} from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   Image,
   Modal,
+  Linking
 } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -15,6 +16,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Share from 'react-native-share';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Get_Inventory } from '../../../Api/authApi';
+import { useFocusEffect } from '@react-navigation/native';
 
 const baseUrl = 'https://pro-leadexpertz.clikzopdevp.com/';
 
@@ -24,11 +26,13 @@ const Inventory = ({ navigation }) => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 100, 100, 100, 100, 100, 100];
+  const widthArr = [50, 100, 150, 150, 150, 150, 150, 150, 150, 100, 100, 100, 100, 100, 100,190,100];
 
-  useEffect(() => {
-    fetchInventory();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchInventory();
+  }, [])
+);
 
   const fetchInventory = async () => {
     try {
@@ -141,6 +145,26 @@ const Inventory = ({ navigation }) => {
           ) : (
             <Text>No Image</Text>
           ),
+          rowData.document ? (
+            <TouchableOpacity onPress={() => handleImagePress(`${baseUrl}${rowData.document}`)}>
+              <Image
+               source={{ uri: `${baseUrl}${rowData.document}` }}
+                style={styles.image}
+                onError={() => console.log('Failed to load image:', rowData.document)}
+                onLoad={() => console.log('Image loaded successfully:', rowData.document)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <Text>No Document</Text>
+          ),
+          rowData.video_link ? (
+            <TouchableOpacity onPress={() =>Linking.openURL(rowData.video_link)}>
+         <Text style={{color:'blue', textAlign:'center'}}>{rowData.video_link} </Text> 
+          </TouchableOpacity>
+        ) : (
+          <Text>No Document</Text>
+        ),
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handleShare(`${baseUrl}${rowData.img1}`)}>
@@ -210,6 +234,8 @@ const Inventory = ({ navigation }) => {
                 'Image 3',
                 'Image 4',
                 'Image 5',
+                'Document',
+                'Video Link',
                 'Action',
               ]}
               widthArr={widthArr}
