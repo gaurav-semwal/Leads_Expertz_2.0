@@ -6,12 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState,useEffect} from 'react';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Homescreentable from './Homescreentable';
 import {Dashboard} from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Leadshomegrid = () => {
   const [leads, setLeads] = useState({});
@@ -19,12 +20,21 @@ const Leadshomegrid = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [role, setRole] = useState('');
 
   useFocusEffect(
     useCallback(() => {
       getDashboard();
     }, []),
   );
+
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
 
   const getDashboard = async () => {
     try {
@@ -133,6 +143,7 @@ const Leadshomegrid = () => {
 
   return (
     <View style={styles.container}>
+       {['team_manager', 'salesman','telecaller'].includes(role) && (
       <View style={{height: '58%'}}>
         <FlatList
           data={categories}
@@ -144,6 +155,7 @@ const Leadshomegrid = () => {
                     refreshing={refreshing}
         />
       </View>
+       )}
       <ScrollView>
         <Homescreentable />
       </ScrollView>

@@ -1418,7 +1418,7 @@ export const Get_Task = async (status) => {
   }
 };
 
-export const Update_Task = async (remarks) => {
+export const Update_Task = async (id,remarks) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
 
@@ -1430,6 +1430,7 @@ export const Update_Task = async (remarks) => {
     myHeaders.append("token", token);
 
     const formdata = new FormData();
+    formdata.append("id", id);
     formdata.append("remarks", remarks);
 
     const requestOptions = {

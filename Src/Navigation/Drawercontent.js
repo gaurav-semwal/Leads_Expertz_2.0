@@ -367,48 +367,70 @@ const DrawerContent = props => {
     }
     return null;
   };
-  const renderinventorySubMenu = index => {
+  const renderinventorySubMenu = (index) => {
     if (inventoryActiveSubMenu === index) {
       return (
         <View style={styles.subMenu}>
-          <TouchableOpacity
-            style={styles.subMenuItem}
-            onPress={() => navigation.navigate('Category')}>
-            <MaterialCommunityIcons
-              name="file"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Category</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.subMenuItem}
-            onPress={() => navigation.navigate('SubCategory')}>
-            <MaterialCommunityIcons
-              name="file"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Sub-Category</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.subMenuItem}
-            onPress={() => navigation.navigate('Inventory')}>
-            <MaterialCommunityIcons
-              name="file"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-            <Text style={styles.subMenuText}>Inventory</Text>
-          </TouchableOpacity>
+          {['salesman','telecaller'].includes(role) && (
+            <TouchableOpacity
+              style={styles.subMenuItem}
+              onPress={() => navigation.navigate('Inventory')}
+            >
+              <MaterialCommunityIcons
+                name="file"
+                size={20}
+                color="#666"
+                style={styles.icon}
+              />
+              <Text style={styles.subMenuText}>Inventory</Text>
+            </TouchableOpacity>
+          )}
+          {['team_manager'].includes(role) && (
+            <>
+              <TouchableOpacity
+                style={styles.subMenuItem}
+                onPress={() => navigation.navigate('Category')}
+              >
+                <MaterialCommunityIcons
+                  name="file"
+                  size={20}
+                  color="#666"
+                  style={styles.icon}
+                />
+                <Text style={styles.subMenuText}>Category</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.subMenuItem}
+                onPress={() => navigation.navigate('SubCategory')}
+              >
+                <MaterialCommunityIcons
+                  name="file"
+                  size={20}
+                  color="#666"
+                  style={styles.icon}
+                />
+                <Text style={styles.subMenuText}>Sub-Category</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.subMenuItem}
+                onPress={() => navigation.navigate('Inventory')}
+              >
+                <MaterialCommunityIcons
+                  name="file"
+                  size={20}
+                  color="#666"
+                  style={styles.icon}
+                />
+                <Text style={styles.subMenuText}>Inventory</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       );
     }
     return null;
   };
+  
 
   const renderprofileSubMenu = index => {
     if (profilesactiveSubMenu === index) {
@@ -459,7 +481,7 @@ const DrawerContent = props => {
         </TouchableOpacity>
       )}
 
-      {['team_manager', 'salesman'].includes(role) && (
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
         <>
           <TouchableOpacity
             style={styles.drawerItemsingle}
@@ -572,7 +594,7 @@ const DrawerContent = props => {
             color="#333"
             style={styles.icon}
           />
-          <Text style={styles.label}>Tasks</Text>
+          <Text style={styles.label}>Task Managment</Text>
         </View>
         {/* <Entypo
           name={eventsactiveSubMenu === 6 ? 'chevron-down' : 'chevron-left'}
@@ -591,10 +613,10 @@ const DrawerContent = props => {
           color="#333"
           style={styles.icon}
         />
-        <Text style={styles.label}>Expenses</Text>
+        <Text style={styles.label}>Expense Managment</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.drawerItemsingle}
         onPress={() => navigation.navigate('Post Sale')}>
         <MaterialCommunityIcons
@@ -604,7 +626,7 @@ const DrawerContent = props => {
           style={styles.icon}
         />
         <Text style={styles.label}>Post Sale</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* <TouchableOpacity style={styles.drawerItem} onPress={() => toggleeventsSubMenu(6)}>
                 <View style={styles.drawerItem1} >

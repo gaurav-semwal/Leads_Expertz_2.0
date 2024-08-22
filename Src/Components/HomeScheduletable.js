@@ -15,6 +15,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Colors } from '../Comman/Styles';
 import { Dashboard } from '../../Api/authApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Get_Task} from '../../Api/authApi';
 
 const HomeScheduletable = () => {
   const navigation = useNavigation();
@@ -28,15 +30,54 @@ const HomeScheduletable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [role, setRole] = useState('');
+  const [taskData, setTaskData] = useState([]);
 
   const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
   const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
 
+  const taskTableHead = ['S.No', 'User', 'Task', 'Deadline Time', 'Deadline Date', 'Status'];
+const taskWidthArr = [50, 100, 150, 100, 150, 100];
+
+
   useFocusEffect(
     useCallback(() => {
     getDashboard();
+    fetchTasks();
   }, [])
 );
+
+const fetchTasks = async () => {
+  try {
+    const response = await Get_Task();
+    console.log(response)
+    if (response && response.data) {
+      setTaskData(response.data);
+    } else {
+      Toast.show({
+        text1: response.msg,
+        type: 'error',
+        position: 'bottom',
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    Toast.show({
+      text1: 'Error fetching tasks',
+      type: 'error',
+      position: 'bottom',
+    });
+  }
+};
+
+useEffect(() => {
+  const getRole = async () => {
+    const storedRole = await AsyncStorage.getItem('role');
+    console.log('hhhhhhhhhhhh',storedRole)
+    setRole(storedRole);
+  };
+  getRole();
+}, []);
 
   const getDashboard = async () => {
     setLoading(true);
@@ -171,8 +212,39 @@ const HomeScheduletable = () => {
     );
   }
 
+  const renderTaskRows = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    let dataToDisplay = taskData.slice(startIndex, endIndex);
+  
+    return dataToDisplay.map((rowData, index) => (
+      <Row
+        key={startIndex + index}
+        data={[
+          (startIndex + index + 1).toString(),
+          rowData.username ,
+          rowData.task ,
+          rowData.deadLineTime,
+          rowData.deadLineDate,
+          rowData.status ,
+        ]}
+        widthArr={taskWidthArr}
+        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+        textStyle={styles.text}
+      />
+    ));
+  };
+
   return (
     <View style={styles.container}>
+
+      {['staff'].includes(role) && (
+      <View style={{bottom:5}}>
+      <Text style={{fontSize:16,fontWeight:'600',color:'black'}}>Upcoming Task</Text>
+      </View>
+      )}
+
+       {['team_manager', 'salesman','telecaller'].includes(role) && (
       <View style={styles.body}>
         <Pressable
           style={[
@@ -202,12 +274,16 @@ const HomeScheduletable = () => {
           <Text style={[styles.text, activeButton === 'Missed Follow Up' && { color: '#625bc5' }]}>Missed Follow Up</Text>
         </Pressable>
       </View>
+       )}
+
       <ScrollView
         horizontal={true}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+
+         {['team_manager', 'salesman','telecaller'].includes(role) && (
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -219,8 +295,24 @@ const HomeScheduletable = () => {
             {renderTableRows()}
           </Table>
         </View>
+         )}
+
+      {['staff'].includes(role) && (
+        <View style={{top:10}}>
+          <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+            <Row
+              data={taskTableHead}
+              widthArr={taskWidthArr}
+              style={styles.header}
+              textStyle={[styles.text, { color: '#FFFFFF' }]}
+            />
+            {renderTaskRows()}
+          </Table>
+        </View>
+      )}
+
       </ScrollView>
-      {renderPagination()}
+             {renderPagination()}
     </View>
   );
 };
@@ -236,7 +328,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    height: 50,
+    height: 60,
     backgroundColor: '#625bc5',
   },
   text: {
@@ -244,7 +336,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   row: {
-    height: 40,
+    height: 60,
     backgroundColor: '#E7E6E1',
   },
   pagination: {

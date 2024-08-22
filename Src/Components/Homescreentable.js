@@ -4,15 +4,25 @@ import { Table, Row } from 'react-native-table-component';
 import moment from 'moment';  
 import HomeScheduletable from './HomeScheduletable';
 import { Get_Birthday } from '../../Api/authApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
   const [tableData, setTableData] = useState([]);
   const [allData, setAllData] = useState([]);
-  const [widthArr] = useState([100, 150, 150, 100, 150]);
+  const [widthArr] = useState([100, 150, 150, 100, 150,150,150,150,150,150,150,150,150]);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     getBirthday();
+  }, []);
+
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
   }, []);
 
   const getBirthday = async () => {
@@ -72,6 +82,13 @@ const Homescreentable = () => {
   return (
     <View style={styles.container}>
       <HomeScheduletable />
+
+      {['staff'].includes(role) && (
+      <View style={{top:10}}>
+      <Text style={{fontSize:16,fontWeight:'600',color:'black'}}>Completed Lead</Text>
+      </View>)}
+
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
       <View style={styles.body}>
         <Pressable
           style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
@@ -86,19 +103,37 @@ const Homescreentable = () => {
           <Text style={[styles.text, activeButton === 'Upcoming Anniversary' && { color: '#625bc5' }]}>Upcoming Anniversary</Text>
         </Pressable>
       </View>
+      )}
 
       <ScrollView horizontal>
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
               data={['Agent Name', 'Applicant Name', 'App. Contact', 'App. City', 'Birthday']}
               widthArr={widthArr}
               style={styles.header}
-              textStyle={[styles.text, { color: '#000' }]}
+              textStyle={[styles.text, { color: '#FFFFFF' }]}
             />
             {renderTableRows()}
           </Table>
         </View>
+      )}
+
+{['staff'].includes(role) && (
+        <View style={{top:10}}>
+        <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+            <Row
+              data={['S.No', 'Lead ID','Agent Name','Source','Campaign','Status','Conversion Type','Name','City','Lead Date','Followup Date','Last Comment','Action']}
+              widthArr={widthArr}
+              style={styles.header}
+              textStyle={[styles.text, { color: '#FFFFFF' }]}
+            />
+            {renderTableRows()}
+          </Table>
+        </View>
+)}
+
       </ScrollView>
     </View>
   );
@@ -137,7 +172,7 @@ const styles = StyleSheet.create({
   },
   header: {
     height: 50,
-    backgroundColor: '#F7F6E7',
+    backgroundColor: '#625bc5',
   },
 });
 
