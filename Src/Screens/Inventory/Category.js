@@ -133,7 +133,7 @@ const Category = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.top}>
+            {/* <View style={styles.top}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={styles.dropdownContainer}>
                         <Picker
@@ -146,7 +146,7 @@ const Category = ({ navigation }) => {
                         </Picker>
                     </View>
                 </View>
-            </View>
+            </View> */}
 
             <Modal
                 animationType="slide"

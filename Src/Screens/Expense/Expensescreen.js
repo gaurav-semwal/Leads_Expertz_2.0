@@ -1,61 +1,83 @@
-import React, { useState,useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable, TextInput, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Install this package if not already
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { Get_user } from '../../../Api/authApi';
 
 const Expensescreen = ({ navigation }) => {
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
-  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUser, setSelectedUser] = useState('');
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [userData, setuserData] = useState([]);
-  const [user, setuser] = useState('');
+  const [userData, setUserData] = useState([]);
+  const [expenses, setExpenses] = useState([]); // Example expense data
+  const [filteredExpenses, setFilteredExpenses] = useState([]); // Filtered data to display
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   const handleFromDateChange = (event, date) => {
     setShowFromDatePicker(false);
-    if (date !== undefined) {
+    if (date) {
       setFromDate(date);
     }
   };
 
-  useEffect(() => {
-    getuser();
-  }, []);
-
-  const handleCategoryChange = (itemValue) => {
-    setSelectedCategory(itemValue);
-  };
-
   const handleToDateChange = (event, date) => {
     setShowToDatePicker(false);
-    if (date !== undefined) {
+    if (date) {
       setToDate(date);
     }
   };
 
-  const onPressPlusButton = () => {
-    navigation.navigate('Add Expense');
-  };
-
-  const onSearch = () => {
-    // Implement your search logic here
-  };
-
-  const getuser = async () => {
+  const getUser = async () => {
     try {
       const response = await Get_user();
-      console.log('user', response)
+      console.log('user', response);
       if (response.msg === 'Load successfully.') {
-        setuserData(response.data);
+        setUserData(response.data);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const onSearch = () => {
+    // Dummy expense data for filtering
+    const dummyExpenses = [
+      { id: 1, date: '2023-08-01', user: 'John', category: 'TA', amount: 100 },
+      { id: 2, date: '2023-08-05', user: 'Jane', category: 'DA', amount: 200 },
+      { id: 3, date: '2023-08-10', user: 'John', category: 'Hotels', amount: 300 },
+      // Add more dummy data here...
+    ];
+
+    // Convert dates to ISO string for comparison
+    const fromDateISO = fromDate.toISOString().split('T')[0];
+    const toDateISO = toDate.toISOString().split('T')[0];
+
+    // Filter expenses based on selected criteria
+    const filtered = dummyExpenses.filter(expense => {
+      const expenseDate = expense.date;
+      return (
+        expenseDate >= fromDateISO &&
+        expenseDate <= toDateISO &&
+        (selectedUser ? expense.user === selectedUser : true) &&
+        (selectedCategory ? expense.category === selectedCategory : true)
+      );
+    });
+
+    setFilteredExpenses(filtered);
+  };
+
+  const renderExpenseItem = ({ item }) => (
+    <View style={styles.expenseItem}>
+      <Text>{item.user} - {item.category} - {item.date} - ${item.amount}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -77,45 +99,49 @@ const Expensescreen = ({ navigation }) => {
 
         <View style={styles.row}>
           <View style={styles.inputContainer}>
-          <View style={styles.picker}> 
-          <Picker
-                selectedValue={user}
-                onValueChange={itemValue => setuser(itemValue)}>
-                <Picker.Item label="Select User" value="" />
-                {userData.map(userItem => (
-                  <Picker.Item
-                    key={userItem.id}
-                    label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                    value={userItem.name}
-                  />
-                ))}
-              </Picker>
-              </View>
+            <Picker
+              selectedValue={selectedUser}
+              onValueChange={itemValue => setSelectedUser(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select User" value="" />
+              {userData.map(userItem => (
+                <Picker.Item
+                  key={userItem.id}
+                  label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                  value={userItem.name}
+                />
+              ))}
+            </Picker>
           </View>
           <View style={styles.inputContainer}>
-            <View style={styles.picker}> 
             <Picker
-            selectedValue={selectedCategory}
-            onValueChange={handleCategoryChange}
-            mode="dropdown"
-          >
-            <Picker.Item label="Select Category" value="" />
-            <Picker.Item label="TA" value="TA" />
-            <Picker.Item label="DA" value="DA" />
-            <Picker.Item label="Hotels" value="Hotels" />
-            <Picker.Item label="Others" value="Others" />
-          </Picker>
-            </View>
-        
+              selectedValue={selectedCategory}
+              onValueChange={setSelectedCategory}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Category" value="" />
+              <Picker.Item label="TA" value="TA" />
+              <Picker.Item label="DA" value="DA" />
+              <Picker.Item label="Hotels" value="Hotels" />
+              <Picker.Item label="Others" value="Others" />
+            </Picker>
           </View>
         </View>
 
         <Pressable style={styles.searchButton} onPress={onSearch}>
-        <Text style={{color:'white'}}>Search</Text>
+          <Text style={styles.searchButtonText}>Search</Text>
         </Pressable>
       </View>
 
-      <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
+      <FlatList
+        data={filteredExpenses}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderExpenseItem}
+        ListEmptyComponent={<Text>No expenses found for the selected criteria.</Text>}
+      />
+
+      <Pressable style={styles.plusButton} onPress={() => navigation.navigate('Add Expense')}>
         <AntDesign name="plus" size={28} color="#dbdad3" />
       </Pressable>
 
@@ -161,12 +187,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     marginHorizontal: 5,
+    borderWidth:1
   },
-  picker:{
+  picker: {
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    marginVertical: 8,
   },
   label: {
     fontSize: 16,
@@ -179,30 +205,20 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
   },
-  picker: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginVertical: 8,
-  },
   dateText: {
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 10,
-    marginVertical: 5,
     fontSize: 16,
   },
   searchButton: {
     backgroundColor: '#625bc5',
     width: 90,
-    borderRadius:7,
+    borderRadius: 7,
     height: 45,
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf:'center'
+    alignSelf: 'center',
+  },
+  searchButtonText: {
+    color: 'white',
   },
   plusButton: {
     position: 'absolute',
@@ -215,6 +231,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
+  },
+  expenseItem: {
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginVertical: 5,
   },
 });
 

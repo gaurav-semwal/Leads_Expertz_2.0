@@ -288,7 +288,7 @@ export const Get_Sub_Category = async (category_id) => {
     myHeaders.append("token", token);
 
     const formdata = new FormData();
-    formdata.append("category_id", category_id);
+    formdata.append("category_id", '');
 
     const requestOptions = {
       method: "POST",

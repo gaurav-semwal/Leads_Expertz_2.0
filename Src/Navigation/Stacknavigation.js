@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -71,10 +71,11 @@ const BottomTabNavigation = ({ navigation }) => {
   useEffect(() => {
     const loadToggleState = async () => {
       try {
-        const savedToggleState = await AsyncStorage.getItem('toggleState');
-        const savedToggleDate = await AsyncStorage.getItem('toggleDate');
-        const savedHasEndedDay = await AsyncStorage.getItem('hasEndedDay');
-
+        const userId = await AsyncStorage.getItem('id'); 
+        const savedToggleState = await AsyncStorage.getItem(`toggleState_${userId}`);
+        const savedToggleDate = await AsyncStorage.getItem(`toggleDate_${userId}`);
+        const savedHasEndedDay = await AsyncStorage.getItem(`hasEndedDay_${userId}`);
+  
         if (savedToggleState !== null) {
           setIsToggled(JSON.parse(savedToggleState));
         }
@@ -88,64 +89,39 @@ const BottomTabNavigation = ({ navigation }) => {
         console.error('Error loading toggle state from AsyncStorage:', error);
       }
     };
-
-
+  
     loadToggleState();
   }, []);
-
-  const resetAttendance = async () => {
-    try {
-      // Clear AsyncStorage
-      await AsyncStorage.removeItem('toggleState');
-      await AsyncStorage.removeItem('toggleDate');
-      await AsyncStorage.removeItem('hasEndedDay');
-
-      // Reset state variables
-      setIsToggled(false);
-      setLastToggleDate(null);
-      setHasEndedDay(false);
-
-      Toast.show({
-        type: 'info',
-        text1: 'Attendance has been reset!',
-      });
-    } catch (error) {
-      console.error('Error resetting attendance:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Failed to reset attendance',
-      });
-    }
-  };
-
-
+  
   const handleToggle = async (newState) => {
     const today = new Date();
     const lastToggle = lastToggleDate ? new Date(lastToggleDate) : null;
-
+  
     try {
+      const userId = await AsyncStorage.getItem('id'); 
+  
       if (
         lastToggle &&
         today.getDate() === lastToggle.getDate() &&
         today.getMonth() === lastToggle.getMonth() &&
         today.getFullYear() === lastToggle.getFullYear()
       ) {
-        if (hasEndedDay) {
+        if (hasEndedDay && newState) {
           Toast.show({
             type: 'error',
             text1: 'You have already ended your day, now you cannot start again!',
           });
           return;
         }
-
+  
         if (!newState) {
+          await updateLocation();
+          await endDay();
           setIsToggled(newState);
           setHasEndedDay(true);
-
-          await AsyncStorage.setItem('toggleState', JSON.stringify(newState));
-          await AsyncStorage.setItem('hasEndedDay', JSON.stringify(true));
-
-
+  
+          await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
+          await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(true));
         } else {
           Toast.show({
             type: 'error',
@@ -156,34 +132,51 @@ const BottomTabNavigation = ({ navigation }) => {
         setIsToggled(newState);
         setLastToggleDate(today);
         setHasEndedDay(!newState);
-
-        await AsyncStorage.setItem('toggleState', JSON.stringify(newState));
-        await AsyncStorage.setItem('toggleDate', today.toISOString());
-        await AsyncStorage.setItem('hasEndedDay', JSON.stringify(!newState));
-
+  
+        await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
+        await AsyncStorage.setItem(`toggleDate_${userId}`, today.toISOString());
+        await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(!newState));
+  
+        await updateLocation();
+  
         if (newState) {
-
-          await startday();
-          updateLocation();
+          await startDay();
         } else {
+          await endDay();
         }
       }
     } catch (error) {
       console.error('Error toggling day:', error);
     }
   };
-
-  const confirmToggle = async () => {
-    setModalVisible(false);
-    if (pendingToggle) {
-      await handleToggle(pendingToggle);
-    } else {
-      await endday(lastLocation);
-      await handleToggle(pendingToggle);
+  
+  
+  const startDay = async () => {
+    try {
+      const response = await Start_Day(lastLocation);
+      console.log('STARTING DAY CHECKING', response);
+  
+      if (response.msg === 'Day started successfully. Good Luck.') {
+        Toast.show({
+          text1: response.msg,
+          type: 'success',
+        });
+      } else {
+        Toast.show({
+          text1: response.msg,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Error starting day:', error);
+      Toast.show({
+        text1: 'Failed to start the day',
+        type: 'error',
+      });
     }
   };
-
-  const startday = async () => {
+  
+  const updateLocation = async () => {
     Geolocation.getCurrentPosition(
       async (position) => {
         const location = {
@@ -191,72 +184,27 @@ const BottomTabNavigation = ({ navigation }) => {
           longitude: position.coords.longitude,
         };
         console.log(location);
-
-        // Format location data as a string
+  
         const locationString = `${location.latitude},${location.longitude}`;
-
+        setLastLocation(locationString);
+  
         try {
-          const response = await Start_Day(locationString);
-          console.log('STARTING DAY CHECKING', response);
-
-          if (response.msg === 'Day started successfully. Good Luck.') {
-            Toast.show({
-              text1: response.msg,
-              type: 'success',
-            });
-          } else {
-            Toast.show({
-              text1: response.msg,
-              type: 'error',
-            });
+          const response = await Update_Location(locationString);
+          if (response.msg === 'Update successfully.') {
           }
         } catch (error) {
-          console.error('Error starting day:', error);
-          Toast.show({
-            text1: 'Failed to start the day',
-            type: 'error',
-          });
+         
         }
       },
-      (error) => {
-        console.error('Error getting location:', error);
-        Toast.show({
-          text1: 'Failed to get location',
-          type: 'error',
-        });
-      },
+
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
   };
-
-  const updateLocation = async (location) => {
-    try {
-      const response = await Update_Location(lastLocation);
-      if (response.msg === 'Update successfully.') {
-        setLastLocation(location);
-        Toast.show({
-          text1: response.msg,
-          type: 'success',
-        });
-      } else {
-        Toast.show({
-          text1: response.msg,
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      Toast.show({
-        text1: response.msg,
-        type: 'error',
-      });
-    }
-  };
-
-  const endday = async (location) => {
+  
+  const endDay = async () => {
     try {
       const response = await End_Day(lastLocation);
       if (response.msg === 'Day ended successfully.') {
-        setLastLocation(location);
         Toast.show({
           text1: response.msg,
           type: 'success',
@@ -268,12 +216,21 @@ const BottomTabNavigation = ({ navigation }) => {
         });
       }
     } catch (error) {
+      console.error('Error ending day:', error);
       Toast.show({
-        text1: response.msg,
+        text1: 'Failed to end the day',
         type: 'error',
       });
     }
   };
+  
+  const confirmToggle = async () => {
+    setModalVisible(false);
+    if (pendingToggle !== null) {
+      await handleToggle(pendingToggle);
+    }
+  };
+  
   const onTogglePress = (newState) => {
     if (hasEndedDay && newState) {
       Toast.show({
@@ -285,6 +242,28 @@ const BottomTabNavigation = ({ navigation }) => {
       setModalVisible(true);
     }
   };
+
+  // const resetToggle = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('toggleState');
+  //     await AsyncStorage.removeItem('toggleDate');
+  //     await AsyncStorage.removeItem('hasEndedDay');
+  //     setIsToggled(false);
+  //     setLastToggleDate(null);
+  //     setHasEndedDay(false);
+  //     Toast.show({
+  //       text1: 'Toggle state has been reset',
+  //       type: 'success',
+  //     });
+  //   } catch (error) {
+  //     console.error('Error resetting toggle state:', error);
+  //     Toast.show({
+  //       text1: 'Failed to reset toggle state',
+  //       type: 'error',
+  //     });
+  //   }
+  // };
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -337,6 +316,7 @@ const BottomTabNavigation = ({ navigation }) => {
               />
             ),
             headerRight: () => (
+              <>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
                 <ToggleSwitch
                   isOn={isToggled}
@@ -348,6 +328,8 @@ const BottomTabNavigation = ({ navigation }) => {
                   style={styles.toggleContainer}
                 />
               </View>
+              {/* <Button title="Reset Toggle" onPress={resetToggle}  style={{  top: 20 }}/> */}
+                </>
             ),
           }}
         />

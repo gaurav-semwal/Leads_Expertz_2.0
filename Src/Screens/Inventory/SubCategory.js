@@ -34,9 +34,14 @@ const SubCategory = ({ navigation }) => {
         getSubcategory(itemValue);
     };
 
+    useEffect(() => {
+        getSubcategory()
+    }, [])
+    
     const getSubcategory = async (category_id) => {
         try {
             const response = await Get_Sub_Category(category_id);
+            console.log(response)
             if (response.msg === 'Load successfully.') {
                 setSubcategory(response.data);
                 // Update filteredCategories as well if needed
@@ -152,7 +157,7 @@ const SubCategory = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.top}>
+            {/* <View style={styles.top}>
                 <View style={{ flexDirection: 'row', alignItems: 'center',justifyContent:'space-between' }}>
                     <View style={styles.dropdownContainer}>
                         <Picker
@@ -176,7 +181,7 @@ const SubCategory = ({ navigation }) => {
                     </Picker>
                 </View>
                 </View>
-            </View>
+            </View> */}
 
             <Modal
                 animationType="slide"
@@ -337,12 +342,10 @@ const styles = StyleSheet.create({
     },
     dropdownContainer: {
         borderWidth: 1,
-        height: 48,
         justifyContent: 'center',
         borderRadius: 5,
         borderColor: '#625bc5',
-        width: '49%',
-        marginBottom: 10,
+        width: '100%',
     },
     picker: {
         height: 48,
