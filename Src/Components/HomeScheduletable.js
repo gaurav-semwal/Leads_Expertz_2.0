@@ -33,8 +33,8 @@ const HomeScheduletable = () => {
   const [role, setRole] = useState('');
   const [taskData, setTaskData] = useState([]);
 
-  const [tableHead] = useState(['Lead ID', 'Name', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
-  const [widthArr] = useState([100, 150, 100, 100, 150, 200]);
+  const [tableHead] = useState(['Lead ID', 'Name','Agent', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
+  const [widthArr] = useState([100, 150, 100,100, 100, 150, 200]);
 
   const taskTableHead = ['S.No', 'User', 'Task', 'Deadline Time', 'Deadline Date', 'Status'];
 const taskWidthArr = [50, 100, 150, 100, 150, 100];
@@ -145,6 +145,7 @@ useEffect(() => {
         data={[
           rowData.id.toString(),
           rowData.name,
+          rowData.agent,
           rowData.campaign,
           rowData.classification,
           rowData.updated_date,
