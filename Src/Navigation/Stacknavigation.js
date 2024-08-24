@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Button } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -49,7 +50,7 @@ import ToggleSwitch from 'toggle-switch-react-native';
 import { Colors } from '../Comman/Styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { End_Day, Start_Day, Update_Location } from '../../Api/authApi';
-import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import Toast from 'react-native-toast-message';
 import Taskscreen from '../Screens/TaskScreen';
 import AddExpenseForm from '../Screens/Expense/AddExpense';
@@ -68,6 +69,7 @@ const BottomTabNavigation = ({ navigation }) => {
   const [pendingToggle, setPendingToggle] = useState(false);
   const [lastLocation, setLastLocation] = useState(null);
 
+  
   useEffect(() => {
     const loadToggleState = async () => {
       try {
@@ -75,7 +77,7 @@ const BottomTabNavigation = ({ navigation }) => {
         const savedToggleState = await AsyncStorage.getItem(`toggleState_${userId}`);
         const savedToggleDate = await AsyncStorage.getItem(`toggleDate_${userId}`);
         const savedHasEndedDay = await AsyncStorage.getItem(`hasEndedDay_${userId}`);
-  
+
         if (savedToggleState !== null) {
           setIsToggled(JSON.parse(savedToggleState));
         }
@@ -89,73 +91,103 @@ const BottomTabNavigation = ({ navigation }) => {
         console.error('Error loading toggle state from AsyncStorage:', error);
       }
     };
-  
+
+    const initializeApp = async () => {
+      await requestLocationPermission();
+      await updateLocationAndStartDay();
+    };
+
     loadToggleState();
+    initializeApp();
   }, []);
-  
-  const handleToggle = async (newState) => {
-    const today = new Date();
-    const lastToggle = lastToggleDate ? new Date(lastToggleDate) : null;
-  
+
+  const requestLocationPermission = async () => {
     try {
-      const userId = await AsyncStorage.getItem('id'); 
+      const result = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
   
-      if (
-        lastToggle &&
-        today.getDate() === lastToggle.getDate() &&
-        today.getMonth() === lastToggle.getMonth() &&
-        today.getFullYear() === lastToggle.getFullYear()
-      ) {
-        if (hasEndedDay && newState) {
-          Toast.show({
-            type: 'error',
-            text1: 'You have already ended your day, now you cannot start again!',
-          });
-          return;
-        }
-  
-        if (!newState) {
-          await updateLocation();
-          await endDay();
-          setIsToggled(newState);
-          setHasEndedDay(true);
-  
-          await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
-          await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(true));
-        } else {
-          Toast.show({
-            type: 'error',
-            text1: 'You can only start your day once!',
-          });
-        }
-      } else {
-        setIsToggled(newState);
-        setLastToggleDate(today);
-        setHasEndedDay(!newState);
-  
-        await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
-        await AsyncStorage.setItem(`toggleDate_${userId}`, today.toISOString());
-        await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(!newState));
-  
-        await updateLocation();
-  
-        if (newState) {
-          await startDay();
-        } else {
-          await endDay();
-        }
+      if (result === RESULTS.GRANTED) {
+        console.log('Location permission granted');
+      } else if (result === RESULTS.DENIED) {
+        Toast.show({
+          type: 'error',
+          text1: 'Location permission denied',
+        });
+      } else if (result === RESULTS.BLOCKED) {
+        Toast.show({
+          type: 'error',
+          text1: 'Location permission blocked',
+        });
       }
     } catch (error) {
-      console.error('Error toggling day:', error);
+      console.error('Error requesting location permission:', error);
     }
   };
   
+  const updateLocationAndStartDay = async () => {
+    try {
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          const locationString = `${location.latitude},${location.longitude}`;
+          setLastLocation(locationString);
   
+          await updateLocation(locationString);
+          await startDay();
+        },
+        (error) => {
+          // Check error.code for different error types
+          switch (error.code) {
+            case Geolocation.PERMISSION_DENIED:
+              Toast.show({
+                type: 'error',
+                text1: 'Permission denied',
+              });
+              break;
+            case Geolocation.POSITION_UNAVAILABLE:
+              Toast.show({
+                type: 'error',
+                text1: 'Position unavailable',
+              });
+              break;
+            case Geolocation.TIMEOUT:
+              Toast.show({
+                type: 'error',
+                text1: 'Request timed out',
+              });
+              break;
+            default:
+              Toast.show({
+                type: 'error',
+                text1: 'An unknown error occurred',
+              });
+              break;
+          }
+          console.error('Error getting location:', error);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    } catch (error) {
+      console.error('Error updating location and starting day:', error);
+    }
+  };
+
+  const updateLocation = async (locationString) => {
+    try {
+      const response = await Update_Location(locationString);
+      if (response.msg === 'Update successfully.') {
+        console.log('Location updated successfully');
+      }
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
   const startDay = async () => {
     try {
       const response = await Start_Day(lastLocation);
-      console.log('STARTING DAY CHECKING', response);
-  
       if (response.msg === 'Day started successfully. Good Luck.') {
         Toast.show({
           text1: response.msg,
@@ -175,32 +207,64 @@ const BottomTabNavigation = ({ navigation }) => {
       });
     }
   };
-  
-  const updateLocation = async () => {
-    Geolocation.getCurrentPosition(
-      async (position) => {
-        const location = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        console.log(location);
-  
-        const locationString = `${location.latitude},${location.longitude}`;
-        setLastLocation(locationString);
-  
-        try {
-          const response = await Update_Location(locationString);
-          if (response.msg === 'Update successfully.') {
-          }
-        } catch (error) {
-         
-        }
-      },
 
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
+  const handleToggle = async (newState) => {
+    const today = new Date();
+    const lastToggle = lastToggleDate ? new Date(lastToggleDate) : null;
+
+    try {
+      const userId = await AsyncStorage.getItem('id'); 
+
+      if (
+        lastToggle &&
+        today.getDate() === lastToggle.getDate() &&
+        today.getMonth() === lastToggle.getMonth() &&
+        today.getFullYear() === lastToggle.getFullYear()
+      ) {
+        if (hasEndedDay && newState) {
+          Toast.show({
+            type: 'error',
+            text1: 'You have already ended your day, now you cannot start again!',
+          });
+          return;
+        }
+
+        if (!newState) {
+          await updateLocation(lastLocation);
+          await endDay();
+          setIsToggled(newState);
+          setHasEndedDay(true);
+
+          await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
+          await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(true));
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'You can only start your day once!',
+          });
+        }
+      } else {
+        setIsToggled(newState);
+        setLastToggleDate(today);
+        setHasEndedDay(!newState);
+
+        await AsyncStorage.setItem(`toggleState_${userId}`, JSON.stringify(newState));
+        await AsyncStorage.setItem(`toggleDate_${userId}`, today.toISOString());
+        await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(!newState));
+
+        await updateLocation(lastLocation);
+
+        if (newState) {
+          await startDay();
+        } else {
+          await endDay();
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling day:', error);
+    }
   };
-  
+
   const endDay = async () => {
     try {
       const response = await End_Day(lastLocation);
@@ -223,14 +287,14 @@ const BottomTabNavigation = ({ navigation }) => {
       });
     }
   };
-  
+
   const confirmToggle = async () => {
     setModalVisible(false);
     if (pendingToggle !== null) {
       await handleToggle(pendingToggle);
     }
   };
-  
+
   const onTogglePress = (newState) => {
     if (hasEndedDay && newState) {
       Toast.show({

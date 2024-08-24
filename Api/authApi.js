@@ -252,7 +252,7 @@ export const Get_Category = async (type) => {
     myHeaders.append("token", token);
 
     const formdata = new FormData();
-    formdata.append("type", type);
+    formdata.append("type", '');
 
     const requestOptions = {
       method: "POST",
@@ -1489,6 +1489,45 @@ export const Add_Expense = async (
     };
 
     const response = await fetch(`${base_url}add-expense`, requestOptions);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Get_Expense = async (
+  fromdate,todate
+) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append('token', token);
+
+    const formdata = new FormData();
+    formdata.append('fromDt', '');
+    formdata.append('toDt', '');
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formdata,
+      redirect: 'follow',
+    };
+
+    const response = await fetch(`${base_url}get-expense`, requestOptions);
 
     if (!response.ok) {
       throw new Error('Network response was not ok');

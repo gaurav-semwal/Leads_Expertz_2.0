@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { Get_user } from '../../../Api/authApi';
+import { Get_Expense, Get_user } from '../../../Api/authApi';
 
 const Expensescreen = ({ navigation }) => {
   const [fromDate, setFromDate] = useState(new Date());
@@ -13,11 +13,12 @@ const Expensescreen = ({ navigation }) => {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [userData, setUserData] = useState([]);
-  const [expenses, setExpenses] = useState([]); // Example expense data
-  const [filteredExpenses, setFilteredExpenses] = useState([]); // Filtered data to display
+  const [expenses, setExpenses] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
 
   useEffect(() => {
     getUser();
+    getexpense();
   }, []);
 
   const handleFromDateChange = (event, date) => {
@@ -37,45 +38,69 @@ const Expensescreen = ({ navigation }) => {
   const getUser = async () => {
     try {
       const response = await Get_user();
-      console.log('user', response);
       if (response.msg === 'Load successfully.') {
         setUserData(response.data);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const onSearch = () => {
-    // Dummy expense data for filtering
-    const dummyExpenses = [
-      { id: 1, date: '2023-08-01', user: 'John', category: 'TA', amount: 100 },
-      { id: 2, date: '2023-08-05', user: 'Jane', category: 'DA', amount: 200 },
-      { id: 3, date: '2023-08-10', user: 'John', category: 'Hotels', amount: 300 },
-      // Add more dummy data here...
-    ];
-
-    // Convert dates to ISO string for comparison
+  const getexpense = async () => {
     const fromDateISO = fromDate.toISOString().split('T')[0];
     const toDateISO = toDate.toISOString().split('T')[0];
 
-    // Filter expenses based on selected criteria
-    const filtered = dummyExpenses.filter(expense => {
-      const expenseDate = expense.date;
-      return (
-        expenseDate >= fromDateISO &&
-        expenseDate <= toDateISO &&
-        (selectedUser ? expense.user === selectedUser : true) &&
-        (selectedCategory ? expense.category === selectedCategory : true)
-      );
+    try {
+      const response = await Get_Expense(fromDateISO, toDateISO);
+      if (response.msg === 'Load Successfully') {
+        setExpenses(response.data);
+        setFilteredExpenses(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const onSearch = () => {
+    const fromDateISO = fromDate.toISOString().split('T')[0];
+    const toDateISO = toDate.toISOString().split('T')[0];
+
+    // Debugging logs
+    console.log('Filtering from:', fromDateISO);
+    console.log('Filtering to:', toDateISO);
+    console.log('Selected User:', selectedUser);
+    console.log('Selected Category:', selectedCategory);
+
+    const filtered = expenses.filter(expense => {
+      const expenseDate = expense.exp_date;
+      console.log('Expense Date:', expenseDate);
+
+      // Debugging the filter condition
+      const dateInRange = expenseDate >= fromDateISO && expenseDate <= toDateISO;
+      const userMatches = selectedUser ? expense.users === selectedUser : true;
+      const categoryMatches = selectedCategory ? expense.category === selectedCategory : true;
+
+      console.log('Date in range:', dateInRange);
+      console.log('User matches:', userMatches);
+      console.log('Category matches:', categoryMatches);
+
+      return dateInRange && userMatches && categoryMatches;
     });
 
+    // Update state with filtered expenses
     setFilteredExpenses(filtered);
+
+    // Log filtered results
+    console.log('Filtered Expenses:', filtered);
   };
 
   const renderExpenseItem = ({ item }) => (
     <View style={styles.expenseItem}>
-      <Text>{item.user} - {item.category} - {item.date} - ${item.amount}</Text>
+      <Text style={styles.text}>Users: {item.users}</Text>
+      <Text style={styles.text}>Title: {item.title}</Text>
+      <Text style={styles.text}>Category: {item.category}</Text>
+      <Text style={styles.text}>Comments: {item.comments}</Text>
+      <Text style={styles.text}>Date: {item.exp_date}</Text>
+      <Text style={styles.text}>Amount: ${item.amount}</Text>
     </View>
   );
 
@@ -85,13 +110,19 @@ const Expensescreen = ({ navigation }) => {
         <View style={styles.row}>
           <View style={styles.datePickerContainer}>
             <Text style={styles.label}>From Date</Text>
-            <Pressable style={styles.datePicker} onPress={() => setShowFromDatePicker(true)}>
+            <Pressable
+              style={styles.datePicker}
+              onPress={() => setShowFromDatePicker(true)}
+            >
               <Text style={styles.dateText}>{fromDate.toDateString()}</Text>
             </Pressable>
           </View>
           <View style={styles.datePickerContainer}>
             <Text style={styles.label}>To Date</Text>
-            <Pressable style={styles.datePicker} onPress={() => setShowToDatePicker(true)}>
+            <Pressable
+              style={styles.datePicker}
+              onPress={() => setShowToDatePicker(true)}
+            >
               <Text style={styles.dateText}>{toDate.toDateString()}</Text>
             </Pressable>
           </View>
@@ -109,7 +140,7 @@ const Expensescreen = ({ navigation }) => {
                 <Picker.Item
                   key={userItem.id}
                   label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                  value={userItem.name}
+                  value={userItem.name} // Change to match the display value
                 />
               ))}
             </Picker>
@@ -138,10 +169,15 @@ const Expensescreen = ({ navigation }) => {
         data={filteredExpenses}
         keyExtractor={item => item.id.toString()}
         renderItem={renderExpenseItem}
-        ListEmptyComponent={<Text>No expenses found for the selected criteria.</Text>}
+        ListEmptyComponent={
+          <Text>No expenses found for the selected criteria.</Text>
+        }
       />
 
-      <Pressable style={styles.plusButton} onPress={() => navigation.navigate('Add Expense')}>
+      <Pressable
+        style={styles.plusButton}
+        onPress={() => navigation.navigate('Add Expense')}
+      >
         <AntDesign name="plus" size={28} color="#dbdad3" />
       </Pressable>
 
@@ -173,7 +209,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   formContainer: {
-    marginBottom: 80,
+    marginBottom: 5,
   },
   row: {
     flexDirection: 'row',
@@ -187,7 +223,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     marginHorizontal: 5,
-    borderWidth:1
+    borderWidth: 1,
   },
   picker: {
     borderColor: '#ccc',
@@ -234,9 +270,15 @@ const styles = StyleSheet.create({
   },
   expenseItem: {
     padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    marginVertical: 5,
+    borderRadius: 6,
+    borderColor: '#ede8e8',
+    borderWidth: 1,
+    backgroundColor: '#ede8e8',
+    marginBottom: 10,
+  },
+  text: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
 
