@@ -284,7 +284,7 @@ useEffect(() => {
         }
       >
 
-         {['team_manager', 'salesman','telecaller'].includes(role) && (
+         {/* {['team_manager', 'salesman','telecaller'].includes(role) && ( */}
         <View>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -296,9 +296,9 @@ useEffect(() => {
             {renderTableRows()}
           </Table>
         </View>
-         )}
+         {/* )} */}
 
-      {['staff'].includes(role) && (
+      {/* {['staff'].includes(role) && (
         <View style={{top:10}}>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -310,7 +310,7 @@ useEffect(() => {
             {renderTaskRows()}
           </Table>
         </View>
-      )}
+      )} */}
 
       </ScrollView>
              {renderPagination()}

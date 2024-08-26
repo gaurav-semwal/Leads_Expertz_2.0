@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Button } from 'react-native';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -68,12 +68,13 @@ const BottomTabNavigation = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [pendingToggle, setPendingToggle] = useState(false);
   const [lastLocation, setLastLocation] = useState(null);
+  const [locationInterval, setLocationInterval] = useState(null);
 
   
   useEffect(() => {
     const loadToggleState = async () => {
       try {
-        const userId = await AsyncStorage.getItem('id'); 
+        const userId = await AsyncStorage.getItem('id');
         const savedToggleState = await AsyncStorage.getItem(`toggleState_${userId}`);
         const savedToggleDate = await AsyncStorage.getItem(`toggleDate_${userId}`);
         const savedHasEndedDay = await AsyncStorage.getItem(`hasEndedDay_${userId}`);
@@ -94,17 +95,29 @@ const BottomTabNavigation = ({ navigation }) => {
 
     const initializeApp = async () => {
       await requestLocationPermission();
-      await updateLocationAndStartDay();
+      if (isToggled) {
+        await updateLocationAndStartDay();
+      }
     };
 
     loadToggleState();
     initializeApp();
   }, []);
 
+  useEffect(() => {
+    if (isToggled) {
+      updateLocationPeriodically();
+    } else {
+      clearInterval(locationInterval);
+    }
+
+    return () => clearInterval(locationInterval);
+  }, [isToggled]);
+
   const requestLocationPermission = async () => {
     try {
       const result = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-  
+
       if (result === RESULTS.GRANTED) {
         console.log('Location permission granted');
       } else if (result === RESULTS.DENIED) {
@@ -122,53 +135,42 @@ const BottomTabNavigation = ({ navigation }) => {
       console.error('Error requesting location permission:', error);
     }
   };
-  
-  const updateLocationAndStartDay = async () => {
-    try {
+
+  const updateLocationPeriodically = () => {
+    const interval = setInterval(async () => {
+      try {
+        const location = await getCurrentLocation();
+        setLastLocation(location);
+        await Update_Location(location);
+      } catch (error) {
+        console.error('Error updating location:', error);
+      }
+    }, 5000);
+
+    setLocationInterval(interval);
+  };
+
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
-        async (position) => {
-          const location = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          const locationString = `${location.latitude},${location.longitude}`;
-          setLastLocation(locationString);
-  
-          await updateLocation(locationString);
-          await startDay();
+        (position) => {
+          const locationString = `${position.coords.latitude},${position.coords.longitude}`;
+          resolve(locationString);
         },
         (error) => {
-          // Check error.code for different error types
-          switch (error.code) {
-            case Geolocation.PERMISSION_DENIED:
-              Toast.show({
-                type: 'error',
-                text1: 'Permission denied',
-              });
-              break;
-            case Geolocation.POSITION_UNAVAILABLE:
-              Toast.show({
-                type: 'error',
-                text1: 'Position unavailable',
-              });
-              break;
-            case Geolocation.TIMEOUT:
-              Toast.show({
-                type: 'error',
-                text1: 'Request timed out',
-              });
-              break;
-            default:
-              Toast.show({
-                type: 'error',
-                text1: 'An unknown error occurred',
-              });
-              break;
-          }
-          console.error('Error getting location:', error);
+          reject(error);
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
       );
+    });
+  };
+
+  const updateLocationAndStartDay = async () => {
+    try {
+      const location = await getCurrentLocation();
+      setLastLocation(location);
+      await updateLocation(location);
+      await startDay();
     } catch (error) {
       console.error('Error updating location and starting day:', error);
     }
@@ -213,7 +215,7 @@ const BottomTabNavigation = ({ navigation }) => {
     const lastToggle = lastToggleDate ? new Date(lastToggleDate) : null;
 
     try {
-      const userId = await AsyncStorage.getItem('id'); 
+      const userId = await AsyncStorage.getItem('id');
 
       if (
         lastToggle &&
@@ -252,11 +254,10 @@ const BottomTabNavigation = ({ navigation }) => {
         await AsyncStorage.setItem(`toggleDate_${userId}`, today.toISOString());
         await AsyncStorage.setItem(`hasEndedDay_${userId}`, JSON.stringify(!newState));
 
-        await updateLocation(lastLocation);
-
         if (newState) {
-          await startDay();
+          await updateLocationAndStartDay();
         } else {
+          await updateLocation(lastLocation);
           await endDay();
         }
       }
@@ -307,26 +308,27 @@ const BottomTabNavigation = ({ navigation }) => {
     }
   };
 
-  // const resetToggle = async () => {
-  //   try {
-  //     await AsyncStorage.removeItem('toggleState');
-  //     await AsyncStorage.removeItem('toggleDate');
-  //     await AsyncStorage.removeItem('hasEndedDay');
-  //     setIsToggled(false);
-  //     setLastToggleDate(null);
-  //     setHasEndedDay(false);
-  //     Toast.show({
-  //       text1: 'Toggle state has been reset',
-  //       type: 'success',
-  //     });
-  //   } catch (error) {
-  //     console.error('Error resetting toggle state:', error);
-  //     Toast.show({
-  //       text1: 'Failed to reset toggle state',
-  //       type: 'error',
-  //     });
-  //   }
-  // };
+  const resetToggle = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('id');
+      await AsyncStorage.removeItem(`toggleState_${userId}`);
+      await AsyncStorage.removeItem(`toggleDate_${userId}`);
+      await AsyncStorage.removeItem(`hasEndedDay_${userId}`);
+      setIsToggled(false);
+      setLastToggleDate(null);
+      setHasEndedDay(false);
+      Toast.show({
+        text1: 'Toggle state has been reset',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error('Error resetting toggle state:', error);
+      Toast.show({
+        text1: 'Failed to reset toggle state',
+        type: 'error',
+      });
+    }
+  };
 
 
   return (
@@ -392,7 +394,7 @@ const BottomTabNavigation = ({ navigation }) => {
                   style={styles.toggleContainer}
                 />
               </View>
-              {/* <Button title="Reset Toggle" onPress={resetToggle}  style={{  top: 20 }}/> */}
+              {/* <Button title="Reset Toggle" onPress={resetToggle} style={{ marginLeft: 10 }} /> */}
                 </>
             ),
           }}

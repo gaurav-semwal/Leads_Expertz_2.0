@@ -84,10 +84,10 @@ const Homescreentable = () => {
     <View style={styles.container}>
       <HomeScheduletable />
 
-      {['staff'].includes(role) && (
+      {/* {['staff'].includes(role) && (
       <View style={{top:10}}>
       <Text style={{fontSize:16,fontWeight:'600',color:'black'}}>Completed Lead</Text>
-      </View>)}
+      </View>)} */}
 
       {['team_manager', 'salesman','telecaller'].includes(role) && (
       <View style={styles.body}>
@@ -121,7 +121,7 @@ const Homescreentable = () => {
         </View>
       )}
 
-{['staff'].includes(role) && (
+{/* {['staff'].includes(role) && (
         <View style={{top:10}}>
         <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
@@ -133,7 +133,7 @@ const Homescreentable = () => {
             {renderTableRows()}
           </Table>
         </View>
-)}
+)} */}
 
       </ScrollView>
     </View>

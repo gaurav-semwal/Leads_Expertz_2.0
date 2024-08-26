@@ -472,7 +472,7 @@ const DrawerContent = props => {
         />
       </View>
 
-      {['staff'].includes(role) && (
+      {['staff','postsale'].includes(role) && (
         <TouchableOpacity
           style={styles.drawerItemsingle}
           onPress={() => navigation.navigate('Home')}>
