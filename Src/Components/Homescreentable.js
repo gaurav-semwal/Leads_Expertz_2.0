@@ -10,7 +10,8 @@ const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
   const [tableData, setTableData] = useState([]);
   const [allData, setAllData] = useState([]);
-  const [widthArr] = useState([100, 150, 150, 100, 150,150,150,150,150,150,150,150,150]);
+  const [widthArr] = useState([100, 150, 150, 100, 150]);
+  const [widthArray] = useState([100, 150, 150, 100, 150,150,150,150,150,150,150,150,150]);
   const [role, setRole] = useState('');
 
   useEffect(() => {
@@ -125,7 +126,7 @@ const Homescreentable = () => {
         <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row
               data={['S.No', 'Lead ID','Agent Name','Source','Campaign','Status','Conversion Type','Name','City','Lead Date','Followup Date','Last Comment','Action']}
-              widthArr={widthArr}
+              widthArr={widthArray}
               style={styles.header}
               textStyle={[styles.text, { color: '#FFFFFF' }]}
             />

@@ -30,6 +30,7 @@ import {useRoute} from '@react-navigation/native';
 import {Calendar} from 'react-native-calendars';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Updatelead = ({navigation}) => {
   const route = useRoute();
@@ -56,7 +57,7 @@ const Updatelead = ({navigation}) => {
   const [cityfuture, setcityfuture] = useState([]);
   const [statesfuture, setStatesfuture] = useState([]);
   const [selectedStatefuture, setSelectedStatefuture] = useState('');
-  const [selectedCityfuture, setSelectedCityfuture] = useState('');   
+  const [selectedCityfuture, setSelectedCityfuture] = useState('');
   const [selectedclassification, setselectedclassification] = useState('');
   const [comments, setcomments] = useState('');
   const [address, setaddress] = useState('');
@@ -80,7 +81,7 @@ const Updatelead = ({navigation}) => {
   const [applicantDoa, setApplicantDoa] = useState('');
   const [selectedapplicantDoa, setselectedApplicantDoa] = useState('');
   const [showCalendarModal, setShowCalendarModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [showdobmodal, setshowdobmodal] = useState(false);
@@ -217,13 +218,24 @@ const Updatelead = ({navigation}) => {
     }
   };
 
-  const handleDateSelect = async date => {
-    setSelectedDate(date);
-    setShowCalendarModal(false);
+  // const handleDateSelect = async (event, date) => {
+  //   if (date) {
+  //     setSelectedDate(date);
+  //     setShowCalendarModal(false);
 
+  //     // Format the selected date
+  //     const formattedDate = moment(date).format('YYYY-MM-DD');
+  //     console.log(formattedDate); // Log the formatted date if needed
+  //   } else {
+  //     setShowCalendarModal(false); // Close the calendar if no date is selected
+  //   }
+  // };
+
+  const handleDateSelect = (event, date) => {
+    setShowCalendarModal(false);
     if (date) {
-      setSelectedDate(date);
-      const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+      const formattedDate = moment(date).format('YYYY-MM-DD'); // Format date
+      setSelectedDate(formattedDate);
     }
   };
 
@@ -465,8 +477,8 @@ const Updatelead = ({navigation}) => {
         selectedState,
         fullname,
         email,
-        date,
-        time,
+        selectedDate,
+        selectedTime,
         selectedclassification,
         status,
         comments,
@@ -744,6 +756,30 @@ const Updatelead = ({navigation}) => {
           </View>
         </View>
 
+        <View>
+          <TextInput
+            label="Enter Address"
+            value={address}
+            onChangeText={text => setaddress(text)}
+            style={[styles.textinput]}
+            mode="outlined"
+          />
+        </View>
+
+        <View>
+          <TextInput
+            label="Enter Whatsapp number"
+            value={whatsapp}
+            onChangeText={text => setwhatsapp(text)}
+            style={[styles.textinput]}
+            mode="outlined"
+            maxLength={10}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
+
+      <View style={{margin: 10}}>
         <View style={{top: 10}}>
           <View style={styles.dropdowncontainer1}>
             <Picker
@@ -784,6 +820,14 @@ const Updatelead = ({navigation}) => {
                 padding: 10,
               }}>
               <View style={{width: '50%'}}>
+                {showCalendarModal && (
+                  <DateTimePicker
+                    value={selectedDate ? new Date(selectedDate) : new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={(event, date) => handleDateSelect(event, date)}
+                  />
+                )}
                 <TextInput
                   placeholder="Select Date"
                   value={selectedDate}
@@ -1044,44 +1088,26 @@ const Updatelead = ({navigation}) => {
             mode="outlined"
           />
         </View>
-
-        <View style={{top: 23}}>
-          <TextInput
-            label="Enter Address"
-            value={address}
-            onChangeText={text => setaddress(text)}
-            style={[styles.textinput]}
-            mode="outlined"
-          />
-        </View>
-
-        <View style={{top: 25}}>
-          <TextInput
-            label="Enter Whatsapp number"
-            value={whatsapp}
-            onChangeText={text => setwhatsapp(text)}
-            style={[styles.textinput]}
-            mode="outlined"
-            maxLength={10}
-            keyboardType="numeric"
-          />
-        </View>
       </View>
 
+      {/* 
       <Modal
         animationType="slide"
         transparent={true}
         visible={showCalendarModal}
         onRequestClose={() => setShowCalendarModal(false)}>
         <View style={{flex: 1, justifyContent: 'center'}}>
-          <Calendar
-            onDayPress={day => handleDateSelect(day.dateString)}
-            markedDates={{
-              [selectedDate]: {selected: true, selectedColor: 'blue'},
-            }}
-          />
+        <DateTimePicker
+  value={selectedDate}
+  mode="date"
+  display="default"
+  onChange={(event, date) => {
+    handleDateSelect(date);
+  }}
+/>
+
         </View>
-      </Modal>
+      </Modal> */}
 
       <Modal
         animationType="slide"

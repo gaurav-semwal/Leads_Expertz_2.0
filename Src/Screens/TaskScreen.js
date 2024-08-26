@@ -16,6 +16,7 @@ import Button from '../Components/Button';
 import { Add_Task, Get_Task, Update_Task } from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Colors } from '../Comman/Styles';
 
 const Taskscreen = () => {
   const [activeButton, setActiveButton] = useState('All');
@@ -59,7 +60,7 @@ const Taskscreen = () => {
   };
 
   const updateTask = async () => {
-    console.log(updateModal.update)
+    console.log(updateModal.update);
     try {
       const response = await Update_Task(updateModal.id, updateModal.update);
       console.log('CHECKING THE UPDATED TASK', response);
@@ -86,11 +87,11 @@ const Taskscreen = () => {
   };
 
   const formatDatee = (date) => {
-    return date.toISOString().split('T')[0];  // This gives YYYY-MM-DD format
+    return date.toISOString().split('T')[0];  
   };
 
   const formatTimee = (date) => {
-    return date.toTimeString().split(' ')[0];  // This gives HH:MM:SS format
+    return date.toTimeString().split(' ')[0];  
   };
 
   const addTask = async () => {
@@ -194,6 +195,35 @@ const Taskscreen = () => {
   return (
     <>
       <View style={styles.container}>
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              activeButton === 'All' && styles.activeFilterButton,
+            ]}
+            onPress={() => setActiveButton('All')}>
+            <Text style={styles.filterText}>All</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              activeButton === 'Pending' && styles.activeFilterButton,
+            ]}
+            onPress={() => setActiveButton('Pending')}>
+            <Text style={styles.filterText}>Pending</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              activeButton === 'Completed' && styles.activeFilterButton,
+            ]}
+            onPress={() => setActiveButton('Completed')}>
+            <Text style={styles.filterText}>Completed</Text>
+          </TouchableOpacity>
+        </View>
+
         <ScrollView>{renderTasks()}</ScrollView>
 
         <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
@@ -397,6 +427,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  filterButton: {
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: Colors.Button,
+    backgroundColor: '#fff',
+    width:'30%',
+    alignItems:'center'
+  },
+  activeFilterButton: {
+    backgroundColor: '#625bc5',
+  },
+  filterText: {
+    color: 'black',
+    fontWeight: 'bold',
   },
 });
 

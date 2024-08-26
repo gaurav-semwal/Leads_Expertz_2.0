@@ -9,8 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Loginscreen = ({ navigation }) => {
 
-  const [email, setemail] = useState('vaibhav@clikzopinnovations.com');
-  const [password, setpassword] = useState('123456');
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
 
   useEffect(() => {
     checkForToken(); 
@@ -47,6 +47,7 @@ const Loginscreen = ({ navigation }) => {
         await AsyncStorage.setItem('name', response.data.name);
         await AsyncStorage.setItem('mobile', response.data.mobile);
         await AsyncStorage.setItem('role', response.data.role); 
+        await AsyncStorage.setItem('id', response.data.id.toString());
         
         Toast.show({
           text1: 'Login Successfull',
