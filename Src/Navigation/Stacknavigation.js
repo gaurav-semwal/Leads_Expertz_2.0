@@ -69,7 +69,7 @@ const BottomTabNavigation = ({ navigation }) => {
   const [pendingToggle, setPendingToggle] = useState(false);
   const [lastLocation, setLastLocation] = useState(null);
   const [locationInterval, setLocationInterval] = useState(null);
-
+  const [role, setRole] = useState('');
   
   useEffect(() => {
     const loadToggleState = async () => {
@@ -145,7 +145,7 @@ const BottomTabNavigation = ({ navigation }) => {
       } catch (error) {
         console.error('Error updating location:', error);
       }
-    }, 5000);
+    }, 300000);
 
     setLocationInterval(interval);
   };
@@ -329,7 +329,14 @@ const BottomTabNavigation = ({ navigation }) => {
       });
     }
   };
-
+  
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -399,6 +406,7 @@ const BottomTabNavigation = ({ navigation }) => {
             ),
           }}
         />
+      {['team_manager', 'salesman','telecaller'].includes(role) && (
         <Tab.Screen
           name="All Leads"
           component={Allleads}
@@ -422,7 +430,8 @@ const BottomTabNavigation = ({ navigation }) => {
             ),
           }}
         />
-        <Tab.Screen
+      )}
+        {/* <Tab.Screen
           name="User List"
           component={Userlist}
           options={{
@@ -445,7 +454,7 @@ const BottomTabNavigation = ({ navigation }) => {
             ),
           }}
         />
-       
+        */}
         <Tab.Screen
           name="Settings"
           component={Settingsscreen}

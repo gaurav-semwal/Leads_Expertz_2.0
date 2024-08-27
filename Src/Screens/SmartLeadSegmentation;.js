@@ -322,7 +322,8 @@ const SmartLeadSegmentation = ({ navigation }) => {
             renderItem={LeadItem}
             keyExtractor={item => item.id ? item.id.toString() : Math.random().toString()}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingTop: 10 }}
+            contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
+              ListFooterComponent={<View style={{ height: 100 }} />}
             refreshing={refreshing}
             onRefresh={handleRefresh}
           />

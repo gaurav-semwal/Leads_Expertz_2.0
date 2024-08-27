@@ -604,7 +604,6 @@ export const Get_Birthday = async () => {
   }
 };
 
-
 export const Update_Lead = async (
   source,
   campaign,
@@ -708,35 +707,22 @@ export const Update_Lead = async (
 
     // Fetch request
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: myHeaders,
       body: formdata,
-      redirect: "follow"
     };
 
     const response = await fetch(`${base_url}update-lead`, requestOptions);
-    console.log('Response:', response);
+    const data = await response.json();
 
-    const statusCode = response.status;
-    console.log('Status Code:', statusCode);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${statusCode}`);
-    }
-
-    const result = await response.json();
-    console.log('Result:', result);
-
-    return { statusCode, result };
+    // Return the response data
+    return data;
   } catch (error) {
     // Handle and log errors
     console.error('Error:', error);
     throw error;
   }
 };
-
-
-
 export const Add_Category = async (type, name) => {
   try {
     const token = await AsyncStorage.getItem('authToken');

@@ -270,7 +270,7 @@ const Allleads = ({ navigation }) => {
               alignItems: 'center',
             }}>
             <Text style={styles.leadInfo1}>
-              Date: {moment(item.lead_date).format('YYYY-MM-DD')}
+              Date: {moment(item.remind_date).format('YYYY-MM-DD')}
             </Text>
           </View>
         </View>
@@ -515,7 +515,8 @@ const Allleads = ({ navigation }) => {
         renderItem={({ item }) => <Item item={item} />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 10 }}
+        contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
+              ListFooterComponent={<View style={{ height: 100 }} />}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />

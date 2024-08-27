@@ -40,6 +40,7 @@ const Taskscreen = () => {
   const fetchTasks = async () => {
     try {
       const response = await Get_Task();
+      console.log(response)
       if (response && response.data) {
         setTaskData(response.data);
       } else {
@@ -185,7 +186,7 @@ const Taskscreen = () => {
 
           <Text style={styles.taskText}>Status: {task.status}</Text>
           <Text style={styles.taskText}>Task: {task.task}</Text>
-          <Text style={styles.taskDate}>Date: {task.created_at}</Text>
+          <Text style={styles.taskDate}>Date: {task.deadLineDate}</Text>
         </View>
 
       </View>

@@ -79,9 +79,7 @@ const Updatelead = ({navigation}) => {
   const [applicantContact, setApplicantContact] = useState('');
   const [applicantCity, setApplicantCity] = useState('');
   const [applicantDob, setApplicantDob] = useState('');
-  const [selectedapplicantDob, setselectedApplicantDob] = useState('');
   const [applicantDoa, setApplicantDoa] = useState('');
-  const [selectedapplicantDoa, setselectedApplicantDoa] = useState('');
 
   const [selectedApplicantDob, setSelectedApplicantDob] = useState(new Date());
   const [dobOpen, setDobOpen] = useState(false);
@@ -124,8 +122,10 @@ const Updatelead = ({navigation}) => {
     setShowCalendarModal(true);
   };
 
-  const handleConfirmTime = time => {
-    setSelectedTime(moment(time).format('HH:mm'));
+  const handleConfirmTime = (time) => {
+    if (time) {
+      setSelectedTime(time.toLocaleTimeString()); // Format time as needed
+    }
     hideTimePicker();
   };
 
@@ -234,11 +234,11 @@ const Updatelead = ({navigation}) => {
   };
 
   const handleDateSelect = (event, date) => {
-    setShowCalendarModal(false);
     if (date) {
-      const formattedDate = moment(date).format('YYYY-MM-DD'); // Format date
-      setSelectedDate(formattedDate);
+      setSelectedDate(date.toISOString().split('T')[0]); // Format date as needed
     }
+    // Hide the calendar modal
+    setShowCalendarModal(false);
   };
 
   const handleDateSelectdob = async date => {
@@ -418,23 +418,25 @@ const Updatelead = ({navigation}) => {
   };
 
   const Submit = async () => {
-    const formattedDoa = new Date(selectedApplicantDoa).toLocaleDateString();
-    const formattedDob = new Date(selectedApplicantDob).toLocaleDateString();
+    
+    
+    const dobDate = new Date(selectedApplicantDob);
+    const doaDate = new Date(selectedApplicantDoa);
+    const submissionDate = new Date(selectedDate); 
   
-    const formattedDate = new Date(selectedDate).toLocaleDateString();
-    const formattedTime = new Date(selectedTime).toLocaleTimeString(); 
-  
-    console.log(
-      formattedDate,
-      formattedTime,
-      applicantName,
-      applicantContact,
-      selectedCityfuture,
-      formattedDoa,
-      formattedDob,
-      whatsapp
-    );
-  
+    const formattedDob = dobDate.toISOString().split('T')[0]; 
+    const formattedDoa = doaDate.toISOString().split('T')[0]; 
+    const formattedSubmissionDate = submissionDate.toISOString().split('T')[0]; 
+console.log(
+  selectedproject,
+  size,
+  price,
+  applicantName,
+  applicantContact,
+  applicantCity,
+  formattedDob,
+  formattedDoa,
+)
     const requiredFieldsByStatus = {
       INTERESTED: ['selectedDate', 'selectedTime'],
       'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
@@ -442,7 +444,7 @@ const Updatelead = ({navigation}) => {
       'FUTURE LEAD': ['selectedBudget'],
       CONVERTED: {
         BOOKED: [],
-        COMPLETED: ['selectedProject', 'size', 'price'],
+        COMPLETED: ['selectedProject', 'size', 'price'], 
       },
     };
   
@@ -469,8 +471,8 @@ const Updatelead = ({navigation}) => {
         selectedDate,
         selectedTime,
         selectedBudget,
-        selectedStatefuture,
-        selectedCityfuture,
+        selectedState,
+        selectedCity,
         selectedStatus,
         selectedProject,
         size,
@@ -481,10 +483,10 @@ const Updatelead = ({navigation}) => {
   
       for (const field of requiredFields) {
         if (!fieldValues[field]) {
-          return field;
+          return field; // Return the first missing field
         }
       }
-      return null;
+      return null; // No missing fields
     };
   
     const missingField = validateFields();
@@ -494,7 +496,7 @@ const Updatelead = ({navigation}) => {
         text1: `Please fill the required field: ${missingField}`,
         type: 'error',
       });
-      return;
+      return; 
     }
   
     try {
@@ -505,8 +507,8 @@ const Updatelead = ({navigation}) => {
         selectedState,
         fullname,
         email,
-        formattedDate,
-        formattedTime, // Pass the formatted time here
+        formattedSubmissionDate,
+       selectedTime,
         selectedclassification,
         status,
         comments,
@@ -520,21 +522,22 @@ const Updatelead = ({navigation}) => {
         price,
         applicantName,
         applicantContact,
-        selectedCityfuture,
+        applicantCity,
         formattedDob,
         formattedDoa,
         whatsapp,
         address,
-        leadid,
+        leadid
       );
   
       console.log(response);
   
-      if (response.msg === 'Unauthorized request') {
+      if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-      } else if (response.msg === 'Save successfully') {
+      } 
+      else if (response.msg === 'Save successfully') {
         Toast.show({
-          text1: response.msg,
+          text1: 'Save Successfully',
           type: 'success',
         });
         navigation.navigate('All Leads');
@@ -553,7 +556,6 @@ const Updatelead = ({navigation}) => {
     }
   };
   
-
   const handleStatusChange = value => {
     setStatus(value);
     setcomments('');
@@ -844,13 +846,13 @@ const Updatelead = ({navigation}) => {
                     onChange={(event, date) => handleDateSelect(event, date)}
                   />
                 )}
-                <TextInput
-                  placeholder="Select Date"
-                  value={selectedDate}
-                  onChangeText={date => setSelectedDate(date)}
-                  style={[styles.textinput, {marginTop: 10}]}
-                  mode="outlined"
-                />
+               <TextInput
+  label="Select Date"
+  value={selectedDate || ''}
+  onChangeText={date => setSelectedDate(date)}
+  style={[styles.textinput, {marginTop: 10}]}
+  mode="outlined"
+/>
                 <TouchableOpacity
                   style={{
                     position: 'absolute',
@@ -867,14 +869,13 @@ const Updatelead = ({navigation}) => {
               </View>
               <View style={{width: '100%', marginLeft: 7}}>
                 <View style={{width: '50%'}}>
-                  <TextInput
-                    placeholder="Select Time"
-                    value={selectedTime}
-                    onChangeText={time => setSelectedTime(time)}
-                    style={[styles.textinput, {marginTop: 10}]}
-                    mode="outlined"
-                    editable={false}
-                  />
+                <TextInput
+  label="Select Time"
+  value={selectedTime || ''}
+  onChangeText={time => setSelectedTime(time)}
+  style={[styles.textinput, {marginTop: 10}]}
+  mode="outlined"
+/>
                   <TouchableOpacity
                     style={{
                       position: 'absolute',
@@ -1007,6 +1008,7 @@ const Updatelead = ({navigation}) => {
                     style={styles.textinput}
                     maxLength={10}
                     mode="outlined"
+                    keyboardType='numeric'
                   />
                 </View>
                 <View style={{top: 25}}>
@@ -1017,6 +1019,8 @@ const Updatelead = ({navigation}) => {
                     style={styles.textinput}
                     maxLength={10}
                     mode="outlined"
+                    keyboardType='numeric'
+
                   />
                 </View>
                 <View style={{top: 25}}>

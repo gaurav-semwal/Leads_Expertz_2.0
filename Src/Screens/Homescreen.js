@@ -104,6 +104,7 @@ const Homescreen = ({ navigation }) => {
               <Text style={styles.text}>Add Quick Lead</Text>
             </Pressable>
           </View>
+          {['team_manager', 'salesman'].includes(role) && (
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedValue}
@@ -113,6 +114,7 @@ const Homescreen = ({ navigation }) => {
               <Picker.Item label="Team" value="Team" />
             </Picker>
           </View>
+          )}
         </View>
       )}
       <Leadshomegrid />

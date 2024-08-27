@@ -120,6 +120,8 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Add Lead</Text>
           </TouchableOpacity>
+
+          {['team_manager'].includes(role) && (
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('Allocate Leads')}>
@@ -131,6 +133,8 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Allocate Lead</Text>
           </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('New Leads')}>
@@ -142,6 +146,8 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>New Leads</Text>
           </TouchableOpacity>
+
+          {['team_manager'].includes(role) && (
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('Sales Manage')}>
@@ -153,6 +159,8 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Sales Manager Leads</Text>
           </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('Pending Lead')}>
@@ -197,6 +205,9 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Call Schedule</Text>
           </TouchableOpacity>
+
+          {['team_manager'].includes(role) && (
+            <>
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('Visit Scheduled')}>
@@ -252,6 +263,8 @@ const DrawerContent = props => {
             />
             <Text style={styles.subMenuText}>Cancelled</Text>
           </TouchableOpacity>
+          </>
+          )}
 
           <TouchableOpacity
             style={styles.drawerItem}

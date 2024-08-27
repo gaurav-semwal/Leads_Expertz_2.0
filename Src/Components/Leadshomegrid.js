@@ -143,7 +143,7 @@ const Leadshomegrid = () => {
 
   return (
     <View style={styles.container}>
-       {['team_manager', 'salesman','telecaller'].includes(role) && (
+       {['team_manager', 'salesman'].includes(role) && (
       <View style={{height: '58%'}}>
         <FlatList
           data={categories}

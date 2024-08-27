@@ -340,7 +340,8 @@ const Notreachable = ({ navigation }) => {
               renderItem={LeadItem}
               keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
+              ListFooterComponent={<View style={{ height: 100 }} />}
               refreshing={refreshing}
               onRefresh={handleRefresh}
             />
