@@ -418,8 +418,6 @@ const Updatelead = ({navigation}) => {
   };
 
   const Submit = async () => {
-    
-    
     const dobDate = new Date(selectedApplicantDob);
     const doaDate = new Date(selectedApplicantDoa);
     const submissionDate = new Date(selectedDate); 
@@ -427,16 +425,18 @@ const Updatelead = ({navigation}) => {
     const formattedDob = dobDate.toISOString().split('T')[0]; 
     const formattedDoa = doaDate.toISOString().split('T')[0]; 
     const formattedSubmissionDate = submissionDate.toISOString().split('T')[0]; 
-console.log(
-  selectedproject,
-  size,
-  price,
-  applicantName,
-  applicantContact,
-  applicantCity,
-  formattedDob,
-  formattedDoa,
-)
+    
+    console.log(
+      selectedProject,
+      size,
+      price,
+      applicantName,
+      applicantContact,
+      selectedCityfuture,
+      formattedDob,
+      formattedDoa,
+    );
+
     const requiredFieldsByStatus = {
       INTERESTED: ['selectedDate', 'selectedTime'],
       'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
@@ -444,10 +444,13 @@ console.log(
       'FUTURE LEAD': ['selectedBudget'],
       CONVERTED: {
         BOOKED: [],
-        COMPLETED: ['selectedProject', 'size', 'price'], 
+        COMPLETED: [
+          'selectedProject', 'size', 'price', 'applicantName', 'applicantContact',
+          'selectedCityfuture', 'formattedDoa', 'formattedDob', 'selectedStatefuture'
+        ],
       },
     };
-  
+
     const validateFields = () => {
       const commonRequiredFields = ['comments'];
       const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
@@ -479,6 +482,10 @@ console.log(
         price,
         applicantName,
         applicantContact,
+        selectedCityfuture,
+        formattedDoa,
+        formattedDob,
+        selectedStatefuture,
       };
   
       for (const field of requiredFields) {
@@ -508,7 +515,7 @@ console.log(
         fullname,
         email,
         formattedSubmissionDate,
-       selectedTime,
+        selectedTime,
         selectedclassification,
         status,
         comments,
@@ -522,7 +529,7 @@ console.log(
         price,
         applicantName,
         applicantContact,
-        applicantCity,
+        selectedCityfuture,
         formattedDob,
         formattedDoa,
         whatsapp,
@@ -555,6 +562,8 @@ console.log(
       });
     }
   };
+
+
   
   const handleStatusChange = value => {
     setStatus(value);

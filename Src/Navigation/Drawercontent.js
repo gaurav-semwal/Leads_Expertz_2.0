@@ -147,7 +147,7 @@ const DrawerContent = props => {
             <Text style={styles.subMenuText}>New Leads</Text>
           </TouchableOpacity>
 
-          {['team_manager'].includes(role) && (
+          {['team_manager','salesman'].includes(role) && (
           <TouchableOpacity
             style={styles.subMenuItem}
             onPress={() => navigation.navigate('Sales Manage')}>
@@ -206,7 +206,7 @@ const DrawerContent = props => {
             <Text style={styles.subMenuText}>Call Schedule</Text>
           </TouchableOpacity>
 
-          {['team_manager'].includes(role) && (
+          {['team_manager','salesman'].includes(role) && (
             <>
           <TouchableOpacity
             style={styles.subMenuItem}

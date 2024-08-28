@@ -431,7 +431,8 @@ const BottomTabNavigation = ({ navigation }) => {
           }}
         />
       )}
-        {/* <Tab.Screen
+      {['team_manager'].includes(role) && (
+        <Tab.Screen
           name="User List"
           component={Userlist}
           options={{
@@ -454,7 +455,8 @@ const BottomTabNavigation = ({ navigation }) => {
             ),
           }}
         />
-        */}
+        
+)}
         <Tab.Screen
           name="Settings"
           component={Settingsscreen}

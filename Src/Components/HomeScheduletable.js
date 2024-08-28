@@ -168,36 +168,43 @@ useEffect(() => {
     const endIndex = startIndex + itemsPerPage;
     let dataToDisplay = tableData.slice(startIndex, endIndex);
 
-    return dataToDisplay.map((rowData, index) => (
-      <Row
-        key={startIndex + index}
-        data={[
-          rowData.id.toString(),
-          rowData.name,
-          rowData.agent,
-          rowData.campaign,
-          rowData.classification,
-          rowData.remind_date,
-          <Pressable
-            onPress={() => handlePhoneCall(rowData.phone)}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
-          >
-            <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
-                <AntDesign name="edit" color="#625bc5" size={20} />
-              </Pressable>
-              <View style={styles.callIcon}>
-                <AntDesign name="phone" color="#625bc5" size={20} />
+    return dataToDisplay.map((rowData, index) => {
+      const remindDateTime = new Date(rowData.remind_date);
+      const formattedRemindDate = remindDateTime.toLocaleDateString();
+      const formattedRemindTime = remindDateTime.toLocaleTimeString(); 
+    
+      return (
+        <Row
+          key={startIndex + index}
+          data={[
+            rowData.id.toString(),
+            rowData.name,
+            rowData.agent,
+            rowData.campaign,
+            rowData.classification,
+            `${formattedRemindDate} ${formattedRemindTime}`,  
+            <Pressable
+              onPress={() => handlePhoneCall(rowData.phone)}
+              style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
+            >
+              <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
+                  <AntDesign name="edit" color="#625bc5" size={20} />
+                </Pressable>
+                <View style={styles.callIcon}>
+                  <AntDesign name="phone" color="#625bc5" size={20} />
+                </View>
               </View>
-            </View>
-          </Pressable>
-        ]}
-        widthArr={widthArr}
-        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-        textStyle={styles.text}
-      />
-    ));
+            </Pressable>
+          ]}
+          widthArr={widthArr}
+          style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+          textStyle={styles.text}
+        />
+      );
+    });
+    
   };
 
   const handlePhoneCall = (phone) => {
