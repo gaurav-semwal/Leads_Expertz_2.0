@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
+import React, { useState, useEffect,useCallback } from 'react';
+import { StyleSheet, Text, View, Pressable, ScrollView,   RefreshControl} from 'react-native';
 import { Table, Row } from 'react-native-table-component';
-import moment from 'moment';  
+import moment from 'moment';
 import HomeScheduletable from './HomeScheduletable';
 import { Get_Birthday } from '../../Api/authApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
   const [tableData, setTableData] = useState([]);
   const [allData, setAllData] = useState([]);
-  const [widthArr] = useState([100, 150, 150, 100, 150]);
-  const [widthArray] = useState([100, 150, 150, 100, 150,150,150,150,150,150,150,150,150]);
+  const [widthArr] = useState([120, 150, 150, 100, 150]);
   const [role, setRole] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    getBirthday();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getBirthday();
+    }, []),
+  );
 
   useEffect(() => {
     const getRole = async () => {
@@ -29,29 +32,27 @@ const Homescreentable = () => {
   const getBirthday = async () => {
     try {
       const response = await Get_Birthday();
+      console.log('resssss', response);
       if (response.msg === '') {
         setAllData(response.data);
-        filterData(response.data, activeButton);
       }
     } catch (error) {
       console.log(error);
-      Toast.show({
-        text1: 'Error',
-        type: 'error',
-      });
+      setRefreshing(false);
     }
   };
 
   const filterData = (data, type) => {
     const today = moment();
-    const startOfMonth = today.clone().startOf('month');
-    const endOfMonth = today.clone().endOf('month');
-    const upcomingRange = 14; 
+    const upcomingRange = 15; // 15 days range
 
     const filteredData = data.filter(item => {
-      const itemDate = moment(item.lead_date);
+      const itemDate = moment(type === 'Upcoming Birthday' ? item.app_dob : item.app_doa);
       const isUpcoming = itemDate.isBetween(today, today.clone().add(upcomingRange, 'days'), 'day', '[]');
-      return type === 'Upcoming Birthday' && isUpcoming && item.type === 'Birthday';
+      return (
+        (type === 'Upcoming Birthday' && isUpcoming && item.type === 'Birthday') ||
+        (type === 'Upcoming Anniversary' && isUpcoming && item.type === 'Anniversary')
+      );
     });
 
     setTableData(filteredData);
@@ -62,16 +63,21 @@ const Homescreentable = () => {
     filterData(allData, type);
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    getDashboard();
+  };
+
   const renderTableRows = () => {
-    return tableData.map((rowData, index) => (
+    return allData.map((rowData, index) => (
       <Row
         key={index}
         data={[
-          rowData.agent,
+          rowData.agent || 'N/A',
           rowData.name || 'N/A',
           rowData.phone || 'N/A',
-          rowData.field1 || 'N/A',
-          rowData.lead_date || 'N/A'
+          rowData.app_city || 'N/A',
+          activeButton === 'Upcoming Birthday' ? rowData.app_dob || 'N/A' : rowData.app_doa || 'N/A',
         ]}
         widthArr={widthArr}
         style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
@@ -84,58 +90,45 @@ const Homescreentable = () => {
     <View style={styles.container}>
       <HomeScheduletable />
 
-      {['staff'].includes(role) && (
-      <View style={{top:10}}>
-      <Text style={{fontSize:16,fontWeight:'600',color:'black'}}>Completed Lead</Text>
-      </View>)}
+      {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+<>
+    
+          {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+            <View style={styles.body}>
+              <Pressable
+                style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
+                onPress={() => onPressButton('Upcoming Birthday')}
+              >
+                <Text style={[styles.text, activeButton === 'Upcoming Birthday' && { color: '#625bc5' }]}>Upcoming Birthday</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, activeButton === 'Upcoming Anniversary' && { backgroundColor: '#ddf' }]}
+                onPress={() => onPressButton('Upcoming Anniversary')}
+              >
+                <Text style={[styles.text, activeButton === 'Upcoming Anniversary' && { color: '#625bc5' }]}>Upcoming Anniversary</Text>
+              </Pressable>
+            </View>
+          )}
 
-      {['team_manager', 'salesman','telecaller'].includes(role) && (
-      <View style={styles.body}>
-        <Pressable
-          style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
-          onPress={() => onPressButton('Upcoming Birthday')}
-        >
-          <Text style={[styles.text, activeButton === 'Upcoming Birthday' && { color: '#625bc5' }]}>Upcoming Birthday</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.button, activeButton === 'Upcoming Anniversary' && { backgroundColor: '#ddf' }]}
-          onPress={() => onPressButton('Upcoming Anniversary')}
-        >
-          <Text style={[styles.text, activeButton === 'Upcoming Anniversary' && { color: '#625bc5' }]}>Upcoming Anniversary</Text>
-        </Pressable>
-      </View>
-      )}
-
-      <ScrollView horizontal>
-      {['team_manager', 'salesman','telecaller'].includes(role) && (
-        <View>
-          <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-            <Row
-              data={['Agent Name', 'Applicant Name', 'App. Contact', 'App. City', 'Birthday']}
-              widthArr={widthArr}
-              style={styles.header}
-              textStyle={[styles.text, { color: '#FFFFFF' }]}
-            />
-            {renderTableRows()}
-          </Table>
-        </View>
-      )}
-
-{['staff'].includes(role) && (
-        <View style={{top:10}}>
-        <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-            <Row
-              data={['S.No', 'Lead ID','Agent Name','Source','Campaign','Status','Conversion Type','Name','City','Lead Date','Followup Date','Last Comment','Action']}
-              widthArr={widthArray}
-              style={styles.header}
-              textStyle={[styles.text, { color: '#FFFFFF' }]}
-            />
-            {renderTableRows()}
-          </Table>
-        </View>
-)}
-
-      </ScrollView>
+          <ScrollView horizontal  refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+            {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+              <View>
+                <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                  <Row
+                    data={['Agent Name', 'Applicant Name', 'App. Contact', 'App. City', activeButton === 'Upcoming Birthday' ? 'Birthday' : 'Anniversary']}
+                    widthArr={widthArr}
+                    style={styles.header}
+                    textStyle={[styles.text, { color: '#FFFFFF' }]}
+                  />
+                  {renderTableRows()}
+                </Table>
+              </View>
+            )}
+          </ScrollView>
+      </>
+    )}
     </View>
   );
 };

@@ -59,6 +59,7 @@ const Callschedule = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await Get_Lead();
+      console.log('leeeeeeeee',response)
       if (response.msg === 'Load successfully') {
         console.log("HI THERE CHECKING NEW LEAD", response);
         const filteredLeads = response.data?.filter(lead => lead.status === 'CALL SCHEDULED') || [];
@@ -301,7 +302,7 @@ const Callschedule = ({ navigation }) => {
                 alignItems: 'center',
               }}>
               <Text style={styles.leadInfo1}>
-                Date: {moment(item.lead_date).format('YYYY-MM-DD')}
+                Date: {moment(item.remind_date).format('YYYY-MM-DD')}
               </Text>
             </View>
           </View>
@@ -339,7 +340,8 @@ const Callschedule = ({ navigation }) => {
               renderItem={LeadItem}
               keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
+              ListFooterComponent={<View style={{ height: 100 }} />}
               refreshing={refreshing}
               onRefresh={handleRefresh}
             />

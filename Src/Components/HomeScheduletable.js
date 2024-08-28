@@ -26,12 +26,16 @@ const HomeScheduletable = () => {
   const [visitScheduleData, setVisitScheduleData] = useState([]);
   const [missedFollowUpData, setMissedFollowUpData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [tableData1, setTableData1] = useState([]);
   const [itemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [role, setRole] = useState('');
   const [taskData, setTaskData] = useState([]);
+  const [todayTaskData, setTodayTaskData] = useState([]);
+  const [upcomingTaskData, setUpcomingTaskData] = useState([]);
+  const [missedTaskData, setmissedTaskData] = useState([]);
 
   const [tableHead] = useState(['Lead ID', 'Name','Agent', 'Campaign', 'Classification', 'Remind', 'Last Comment']);
   const [widthArr] = useState([100, 150, 100,100, 100, 150, 200]);
@@ -89,14 +93,20 @@ useEffect(() => {
         const missedFollowUp = response.data.missedFollowUp || [];
         const todayCallSchedule = response.data.todayCallScheduled || [];
         const todayVisitSchedule = response.data.todayVisitScheduled || [];
-  
-        // Set the states with the specific data for each schedule
+        const todayTask = response.data.today_task || [];
+        const upcomingTask = response.data.upcoming_task || [];
+        const missedTask = response.data.missed_task || [];
+
         setCallScheduleData(todayCallSchedule);
         setVisitScheduleData(todayVisitSchedule);
         setMissedFollowUpData(missedFollowUp);
+        setTodayTaskData(todayTask);
+        setUpcomingTaskData(upcomingTask);
+        setmissedTaskData(missedTask);
   
-        // Default to displaying the call schedule
         setTableData(todayCallSchedule);
+        setTableData1(todayTask);
+
       } else {
         console.warn('Unexpected response format:', response);
       }
@@ -130,6 +140,25 @@ useEffect(() => {
     }
   };
 
+  const onPressButton1 = (type) => {
+    setActiveButton(type);
+    setCurrentPage(1);
+    switch (type) {
+      case 'Today Task':
+        setTableData1(todayTaskData);
+        break;
+      case 'Upcoming Task':
+        setTableData1(upcomingTaskData);
+        break;
+      case 'Missed Follow Up':
+        setTableData1(missedTaskData);
+        break;
+      default:
+        setTableData1(todayTaskData);
+    }
+  };
+  
+
   const leadedit = (rowData) => {
     navigation.navigate('Update Lead', { leadid: rowData.id, status: rowData.status });
   };
@@ -139,36 +168,43 @@ useEffect(() => {
     const endIndex = startIndex + itemsPerPage;
     let dataToDisplay = tableData.slice(startIndex, endIndex);
 
-    return dataToDisplay.map((rowData, index) => (
-      <Row
-        key={startIndex + index}
-        data={[
-          rowData.id.toString(),
-          rowData.name,
-          rowData.agent,
-          rowData.campaign,
-          rowData.classification,
-          rowData.updated_date,
-          <Pressable
-            onPress={() => handlePhoneCall(rowData.phone)}
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
-          >
-            <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
-                <AntDesign name="edit" color="#625bc5" size={20} />
-              </Pressable>
-              <View style={styles.callIcon}>
-                <AntDesign name="phone" color="#625bc5" size={20} />
+    return dataToDisplay.map((rowData, index) => {
+      const remindDateTime = new Date(rowData.remind_date);
+      const formattedRemindDate = remindDateTime.toLocaleDateString();
+      const formattedRemindTime = remindDateTime.toLocaleTimeString(); 
+    
+      return (
+        <Row
+          key={startIndex + index}
+          data={[
+            rowData.id.toString(),
+            rowData.name,
+            rowData.agent,
+            rowData.campaign,
+            rowData.classification,
+            `${formattedRemindDate} ${formattedRemindTime}`,  
+            <Pressable
+              onPress={() => handlePhoneCall(rowData.phone)}
+              style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
+            >
+              <Text style={{ fontWeight: '700', fontSize: 14 }}>{rowData.last_comment}</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Pressable onPress={() => leadedit(rowData)} style={styles.callIcon}>
+                  <AntDesign name="edit" color="#625bc5" size={20} />
+                </Pressable>
+                <View style={styles.callIcon}>
+                  <AntDesign name="phone" color="#625bc5" size={20} />
+                </View>
               </View>
-            </View>
-          </Pressable>
-        ]}
-        widthArr={widthArr}
-        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-        textStyle={styles.text}
-      />
-    ));
+            </Pressable>
+          ]}
+          widthArr={widthArr}
+          style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+          textStyle={styles.text}
+        />
+      );
+    });
+    
   };
 
   const handlePhoneCall = (phone) => {
@@ -216,18 +252,18 @@ useEffect(() => {
   const renderTaskRows = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    let dataToDisplay = taskData.slice(startIndex, endIndex);
+    let dataToDisplay = tableData1.slice(startIndex, endIndex);
   
     return dataToDisplay.map((rowData, index) => (
       <Row
         key={startIndex + index}
         data={[
           (startIndex + index + 1).toString(),
-          rowData.username ,
-          rowData.task ,
-          rowData.deadLineTime,
-          rowData.deadLineDate,
-          rowData.status ,
+          rowData.username || 'N/A',
+          rowData.task || 'N/A',
+          rowData.deadLineTime || 'N/A',
+          rowData.deadLineDate || 'N/A',
+          rowData.status || 'N/A',
         ]}
         widthArr={taskWidthArr}
         style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
@@ -239,10 +275,36 @@ useEffect(() => {
   return (
     <View style={styles.container}>
 
-      {['staff'].includes(role) && (
-      <View style={{bottom:5}}>
-      <Text style={{fontSize:16,fontWeight:'600',color:'black'}}>Upcoming Task</Text>
-      </View>
+      {['staff','postsale'].includes(role) && (
+    <View style={styles.body}>
+    <Pressable
+      style={[
+        styles.button,
+        activeButton === 'Today Task' && { backgroundColor: '#ddf' },
+      ]}
+      onPress={() => onPressButton1('Today Task')}
+    >
+      <Text style={[styles.text, activeButton === 'Today Task' && { color: '#625bc5' }]}>Today Task</Text>
+    </Pressable>
+    <Pressable
+      style={[
+        styles.button,
+        activeButton === 'Upcoming Task' && { backgroundColor: '#ddf' }
+      ]}
+      onPress={() => onPressButton1('Upcoming Task')}
+    >
+      <Text style={[styles.text, activeButton === 'Upcoming Task' && { color: '#625bc5' }]}>Upcoming Task</Text>
+    </Pressable>
+    <Pressable
+      style={[
+        styles.button,
+        activeButton === 'Missed Follow Up' && { backgroundColor: '#ddf' }
+      ]}
+      onPress={() => onPressButton1('Missed Follow Up')}
+    >
+      <Text style={[styles.text, activeButton === 'Missed Follow Up' && { color: '#625bc5' }]}>Missed Follow Up</Text>
+    </Pressable>
+  </View>
       )}
 
        {['team_manager', 'salesman','telecaller'].includes(role) && (
@@ -296,9 +358,9 @@ useEffect(() => {
             {renderTableRows()}
           </Table>
         </View>
-         )}
+          )} 
 
-      {['staff'].includes(role) && (
+      {['staff','postsale'].includes(role) && (
         <View style={{top:10}}>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
             <Row

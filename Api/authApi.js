@@ -604,7 +604,6 @@ export const Get_Birthday = async () => {
   }
 };
 
-
 export const Update_Lead = async (
   source,
   campaign,
@@ -724,9 +723,6 @@ export const Update_Lead = async (
     throw error;
   }
 };
-
-
-
 export const Add_Category = async (type, name) => {
   try {
     const token = await AsyncStorage.getItem('authToken');

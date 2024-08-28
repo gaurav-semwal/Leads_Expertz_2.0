@@ -5,6 +5,7 @@ import {
   Text,
   View,
   Modal,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -14,6 +15,7 @@ import Button from '../../Src/Components/Button';
 import Toast from 'react-native-toast-message';
 import validator from 'validator';
 import {Picker} from '@react-native-picker/picker';
+import DatePicker from 'react-native-date-picker';
 import {
   Update_Lead,
   Get_Campaigns,
@@ -77,9 +79,14 @@ const Updatelead = ({navigation}) => {
   const [applicantContact, setApplicantContact] = useState('');
   const [applicantCity, setApplicantCity] = useState('');
   const [applicantDob, setApplicantDob] = useState('');
-  const [selectedapplicantDob, setselectedApplicantDob] = useState('');
   const [applicantDoa, setApplicantDoa] = useState('');
-  const [selectedapplicantDoa, setselectedApplicantDoa] = useState('');
+
+  const [selectedApplicantDob, setSelectedApplicantDob] = useState(new Date());
+  const [dobOpen, setDobOpen] = useState(false);
+
+  const [selectedApplicantDoa, setSelectedApplicantDoa] = useState(new Date());
+  const [doaOpen, setDoaOpen] = useState(false);
+
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
@@ -98,6 +105,7 @@ const Updatelead = ({navigation}) => {
 
   useEffect(() => {
     getstate();
+    getstate1();
     gecategoryapi();
     getsource();
     getcampaigns();
@@ -114,16 +122,10 @@ const Updatelead = ({navigation}) => {
     setShowCalendarModal(true);
   };
 
-  const adddob = () => {
-    setshowdobmodal(true);
-  };
-
-  const adddoa = () => {
-    setshowdoamodal(true);
-  };
-
-  const handleConfirmTime = time => {
-    setSelectedTime(moment(time).format('HH:mm'));
+  const handleConfirmTime = (time) => {
+    if (time) {
+      setSelectedTime(time.toLocaleTimeString()); // Format time as needed
+    }
     hideTimePicker();
   };
 
@@ -173,7 +175,7 @@ const Updatelead = ({navigation}) => {
 
   const handleStateChangefuture = (itemValue, itemIndex) => {
     setSelectedStatefuture(itemValue);
-    getcity(itemValue);
+    getcity1(itemValue);
   };
 
   const handleCategory = (itemValue, itemIndex) => {
@@ -209,6 +211,19 @@ const Updatelead = ({navigation}) => {
       if (response.msg === '') {
         const stateData = response.data.map(item => item.state);
         setStates(stateData);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  const getstate1 = async () => {
+    try {
+      const response = await Get_State();
+      if (response.msg === '') {
+        const stateData = response.data.map(item => item.state);
         setStatesfuture(stateData);
       } else {
       }
@@ -218,25 +233,12 @@ const Updatelead = ({navigation}) => {
     }
   };
 
-  // const handleDateSelect = async (event, date) => {
-  //   if (date) {
-  //     setSelectedDate(date);
-  //     setShowCalendarModal(false);
-
-  //     // Format the selected date
-  //     const formattedDate = moment(date).format('YYYY-MM-DD');
-  //     console.log(formattedDate); // Log the formatted date if needed
-  //   } else {
-  //     setShowCalendarModal(false); // Close the calendar if no date is selected
-  //   }
-  // };
-
   const handleDateSelect = (event, date) => {
-    setShowCalendarModal(false);
     if (date) {
-      const formattedDate = moment(date).format('YYYY-MM-DD'); // Format date
-      setSelectedDate(formattedDate);
+      setSelectedDate(date.toISOString().split('T')[0]); // Format date as needed
     }
+    // Hide the calendar modal
+    setShowCalendarModal(false);
   };
 
   const handleDateSelectdob = async date => {
@@ -265,6 +267,19 @@ const Updatelead = ({navigation}) => {
       console.log('CITY DEKH AARI HAI', response);
       if (response.msg === '') {
         setcity(response.data);
+      } else {
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  const getcity1 = async itemValue => {
+    try {
+      const response = await Get_City(itemValue);
+      console.log('CITY RESPONSE--->', response);
+      if (response.msg === '') {
         setcityfuture(response.data);
       } else {
       }
@@ -403,6 +418,25 @@ const Updatelead = ({navigation}) => {
   };
 
   const Submit = async () => {
+    const dobDate = new Date(selectedApplicantDob);
+    const doaDate = new Date(selectedApplicantDoa);
+    const submissionDate = new Date(selectedDate); 
+  
+    const formattedDob = dobDate.toISOString().split('T')[0]; 
+    const formattedDoa = doaDate.toISOString().split('T')[0]; 
+    const formattedSubmissionDate = submissionDate.toISOString().split('T')[0]; 
+    
+    console.log(
+      selectedProject,
+      size,
+      price,
+      applicantName,
+      applicantContact,
+      selectedCityfuture,
+      formattedDob,
+      formattedDoa,
+    );
+
     const requiredFieldsByStatus = {
       INTERESTED: ['selectedDate', 'selectedTime'],
       'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
@@ -410,47 +444,50 @@ const Updatelead = ({navigation}) => {
       'FUTURE LEAD': ['selectedBudget'],
       CONVERTED: {
         BOOKED: [],
-        COMPLETED: ['selectedProject', 'size', 'price'],
+        COMPLETED: [
+          'selectedProject', 'size', 'price', 'applicantName', 'applicantContact',
+          'selectedCityfuture', 'formattedDoa', 'formattedDob', 'selectedStatefuture'
+        ],
       },
     };
 
     const validateFields = () => {
       const commonRequiredFields = ['comments'];
-      const statusSpecificRequiredFields = Array.isArray(
-        requiredFieldsByStatus[status],
-      )
+      const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
         ? requiredFieldsByStatus[status]
         : [];
-
+  
       let additionalRequiredFields = [];
-
+  
       if (status === 'CONVERTED' && selectedStatus) {
-        additionalRequiredFields =
-          requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
+        additionalRequiredFields = requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
       }
-
+  
       const requiredFields = [
         ...commonRequiredFields,
         ...statusSpecificRequiredFields,
         ...additionalRequiredFields,
       ];
-
+  
       const fieldValues = {
         comments,
         selectedDate,
         selectedTime,
         selectedBudget,
-        selectedStatefuture,
-        selectedCityfuture,
+        selectedState,
+        selectedCity,
         selectedStatus,
         selectedProject,
         size,
         price,
         applicantName,
         applicantContact,
+        selectedCityfuture,
+        formattedDoa,
+        formattedDob,
+        selectedStatefuture,
       };
-
-      // Check for missing fields
+  
       for (const field of requiredFields) {
         if (!fieldValues[field]) {
           return field; // Return the first missing field
@@ -458,17 +495,17 @@ const Updatelead = ({navigation}) => {
       }
       return null; // No missing fields
     };
-
+  
     const missingField = validateFields();
-
+  
     if (missingField) {
       Toast.show({
         text1: `Please fill the required field: ${missingField}`,
         type: 'error',
       });
-      return;
+      return; 
     }
-
+  
     try {
       const response = await Update_Lead(
         selectedSource,
@@ -477,7 +514,7 @@ const Updatelead = ({navigation}) => {
         selectedState,
         fullname,
         email,
-        selectedDate,
+        formattedSubmissionDate,
         selectedTime,
         selectedclassification,
         status,
@@ -492,19 +529,20 @@ const Updatelead = ({navigation}) => {
         price,
         applicantName,
         applicantContact,
-        applicantCity,
-        applicantDob,
-        applicantDoa,
+        selectedCityfuture,
+        formattedDob,
+        formattedDoa,
         whatsapp,
         address,
-        leadid,
+        leadid
       );
-
+  
       console.log(response);
-
-      if (response.msg === 'Unauthorized request') {
+  
+      if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-      } else if (response.msg === 'Save successfully') {
+      } 
+      else if (response.msg === 'Save successfully') {
         Toast.show({
           text1: 'Save Successfully',
           type: 'success',
@@ -525,11 +563,11 @@ const Updatelead = ({navigation}) => {
     }
   };
 
+
+  
   const handleStatusChange = value => {
     setStatus(value);
-    if (value !== 'CONVERTED') {
-      setcomments('');
-    }
+    setcomments('');
     setDate('');
     setTime('');
     setBudget('');
@@ -785,8 +823,7 @@ const Updatelead = ({navigation}) => {
             <Picker
               selectedValue={status}
               onValueChange={handleStatusChange}
-              enabled={status !== 'CONVERTED'} // Disable dropdown if status is "CONVERTED"
-            >
+              enabled={status !== 'CONVERTED'}>
               <Picker.Item label="Select Status" value="" />
               {statusData.map(statusItem => (
                 <Picker.Item
@@ -803,16 +840,6 @@ const Updatelead = ({navigation}) => {
         status === 'CALL SCHEDULED' ||
         status === 'VISIT SCHEDULED' ? (
           <>
-            {/* <View style={{ top: 10 }}>
-<TextInput
-  label="Select Date"
-  value={date}
-  onChangeText={text => setDate(text)}
-  style={[styles.textinput]}
-  mode="outlined"
-/>
-</View> */}
-
             <View
               style={{
                 flexDirection: 'row',
@@ -828,50 +855,49 @@ const Updatelead = ({navigation}) => {
                     onChange={(event, date) => handleDateSelect(event, date)}
                   />
                 )}
-                <TextInput
-                  placeholder="Select Date"
-                  value={selectedDate}
-                  onChangeText={date => setSelectedDate(date)}
-                  style={[styles.textinput, {marginTop: 10}]}
-                  mode="outlined"
-                />
-                <Pressable
+               <TextInput
+  label="Select Date"
+  value={selectedDate || ''}
+  onChangeText={date => setSelectedDate(date)}
+  style={[styles.textinput, {marginTop: 10}]}
+  mode="outlined"
+/>
+                <TouchableOpacity
                   style={{
                     position: 'absolute',
-                    top: 15,
+                    top: 17,
                     right: 16,
-                    width: 40,
+                    width: 30,
                     height: 40,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                   onPress={addleads}>
                   <AntDesign name="calendar" color="#625bc5" size={25} />
-                </Pressable>
+                </TouchableOpacity>
               </View>
               <View style={{width: '100%', marginLeft: 7}}>
                 <View style={{width: '50%'}}>
-                  <TextInput
-                    placeholder="Select Time"
-                    value={selectedTime}
-                    onChangeText={time => setSelectedTime(time)}
-                    style={[styles.textinput, {marginTop: 10}]}
-                    mode="outlined"
-                    editable={false}
-                  />
-                  <Pressable
+                <TextInput
+  label="Select Time"
+  value={selectedTime || ''}
+  onChangeText={time => setSelectedTime(time)}
+  style={[styles.textinput, {marginTop: 10}]}
+  mode="outlined"
+/>
+                  <TouchableOpacity
                     style={{
                       position: 'absolute',
                       top: 17,
                       right: 16,
-                      width: 40,
+                      width: 30,
                       height: 40,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}
                     onPress={showTimePicker}>
                     <AntDesign name="clockcircleo" color="#625bc5" size={25} />
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
 
                 <DateTimePickerModal
@@ -989,7 +1015,9 @@ const Updatelead = ({navigation}) => {
                     value={size}
                     onChangeText={text => setSize(text)}
                     style={styles.textinput}
+                    maxLength={10}
                     mode="outlined"
+                    keyboardType='numeric'
                   />
                 </View>
                 <View style={{top: 25}}>
@@ -998,7 +1026,10 @@ const Updatelead = ({navigation}) => {
                     value={price}
                     onChangeText={text => setPrice(text)}
                     style={styles.textinput}
+                    maxLength={10}
                     mode="outlined"
+                    keyboardType='numeric'
+
                   />
                 </View>
                 <View style={{top: 25}}>
@@ -1017,62 +1048,127 @@ const Updatelead = ({navigation}) => {
                     onChangeText={text => setApplicantContact(text)}
                     style={styles.textinput}
                     mode="outlined"
+                    maxLength={10}
                     keyboardType="numeric"
                   />
                 </View>
-                <View style={{top: 25}}>
-                  <TextInput
-                    label="Applicant City"
-                    value={applicantCity}
-                    onChangeText={text => setApplicantCity(text)}
-                    style={styles.textinput}
-                    mode="outlined"
-                  />
-                </View>
-                <View style={{top: 25}}>
-                  <TextInput
-                    placeholder="Applicant DOB"
-                    value={selectedapplicantDob}
-                    onChangeText={date => setselectedApplicantDob(date)}
-                    style={[styles.textinput, {marginTop: 10}]}
-                    mode="outlined"
-                  />
-                  <Pressable
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 16,
-                      width: 40,
-                      height: 40,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    onPress={adddob}>
-                    <AntDesign name="calendar" color="#625bc5" size={25} />
-                  </Pressable>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: '10%',
+                  }}>
+                  <View
+                    style={[
+                      styles.dropdowncontainer,
+                      {flex: 1, marginRight: 5},
+                    ]}>
+                    <Picker
+                      selectedValue={selectedStatefuture}
+                      dropdownIconRippleColor={1}
+                      style={styles.picker}
+                      onValueChange={handleStateChangefuture}>
+                      <Picker.Item label="Applicant State" value="" />
+                      {statesfuture.map((state, index) => (
+                        <Picker.Item key={index} label={state} value={state} />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.dropdowncontainer,
+                      {flex: 1, marginLeft: 5},
+                    ]}>
+                    <Picker
+                      selectedValue={selectedCityfuture}
+                      style={styles.picker}
+                      onValueChange={city => setSelectedCityfuture(city)}>
+                      <Picker.Item label="Applicant City" value="" />
+                      {cityfuture.map((state, index) => (
+                        <Picker.Item
+                          key={index}
+                          label={state.city}
+                          value={state.city}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
 
-                <View style={{top: 25}}>
-                  <TextInput
-                    placeholder="Applicant DOA"
-                    value={selectedapplicantDoa}
-                    onChangeText={date => setselectedApplicantDoa(date)}
-                    style={[styles.textinput, {marginTop: 10}]}
-                    mode="outlined"
-                  />
-                  <Pressable
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 16,
-                      width: 40,
-                      height: 40,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    onPress={adddoa}>
-                    <AntDesign name="calendar" color="#625bc5" size={25} />
+                <View>
+                  <Pressable onPress={() => setDobOpen(true)}>
+                    <TextInput
+                      placeholder="Applicant DOB"
+                      value={selectedApplicantDob.toLocaleDateString()}
+                      editable={false}
+                      style={[styles.textinput, {marginTop: 10}]}
+                      mode="outlined"
+                    />
+                    <Pressable
+                      style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        width: 40,
+                        height: 40,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      onPress={() => setDobOpen(true)}>
+                      <AntDesign name="calendar" color="#625bc5" size={25} />
+                    </Pressable>
                   </Pressable>
+
+                  <DatePicker
+                    modal
+                    open={dobOpen}
+                    date={selectedApplicantDob}
+                    mode="date"
+                    onConfirm={date => {
+                      setDobOpen(false);
+                      setSelectedApplicantDob(date);
+                    }}
+                    onCancel={() => setDobOpen(false)}
+                  />
+                </View>
+
+                <View>
+                  <Pressable onPress={() => setDoaOpen(true)}>
+                    <TextInput
+                      placeholder="Applicant DOA"
+                      value={selectedApplicantDoa.toLocaleDateString()}
+                      editable={false}
+                      style={[styles.textinput, {marginTop: 10}]}
+                      mode="outlined"
+                    />
+                    <Pressable
+                      style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        width: 40,
+                        height: 40,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      onPress={() => setDoaOpen(true)}>
+                      <AntDesign name="calendar" color="#625bc5" size={25} />
+                    </Pressable>
+                  </Pressable>
+
+                  <DatePicker
+                    modal
+                    open={doaOpen}
+                    date={selectedApplicantDoa}
+                    mode="date"
+                    onConfirm={date => {
+                      setDoaOpen(false);
+                      setSelectedApplicantDoa(date);
+                    }}
+                    onCancel={() => setDoaOpen(false)}
+                  />
                 </View>
               </>
             )}
@@ -1089,25 +1185,6 @@ const Updatelead = ({navigation}) => {
           />
         </View>
       </View>
-
-      {/* 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showCalendarModal}
-        onRequestClose={() => setShowCalendarModal(false)}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-        <DateTimePicker
-  value={selectedDate}
-  mode="date"
-  display="default"
-  onChange={(event, date) => {
-    handleDateSelect(date);
-  }}
-/>
-
-        </View>
-      </Modal> */}
 
       <Modal
         animationType="slide"
@@ -1161,10 +1238,7 @@ const styles = StyleSheet.create({
   form: {
     margin: 10,
   },
-  // textinput: {
-  //   // marginBottom: 10,
-  //   backgroundColor: '#fff',
-  // },
+
   errorText: {
     color: 'red',
     fontSize: 12,

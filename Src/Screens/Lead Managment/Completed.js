@@ -10,7 +10,8 @@ import {
   Modal,
   ScrollView,
   Linking,
-  Platform
+  Platform,
+  SafeAreaView
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Get_Lead, Get_Lead_Data, Get_user } from '../../../Api/authApi';
@@ -311,6 +312,7 @@ const Completed = ({ navigation }) => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1}}>
     <View style={styles.body}>
       <View style={{ flexDirection: 'column', width: '100%' }}>
         <View style={{ width: '99 %' }}>
@@ -339,15 +341,17 @@ const Completed = ({ navigation }) => {
               renderItem={LeadItem}
               keyExtractor={item => item.lead_id ? item.lead_id.toString() : Math.random().toString()}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 10 }}
               refreshing={refreshing}
               onRefresh={handleRefresh}
+              contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
+              ListFooterComponent={<View style={{ height: 100 }} />}
             />
           )}
         </View>
       </View>
       {selectedItem && <LeadModal item={selectedItem} />}
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -360,17 +364,9 @@ const styles = StyleSheet.create({
     borderColor: '#625bc5',
     marginTop: 6,
   },
-  header: {
-    height: 50,
-    backgroundColor: '#625bc5',
-  },
   text: {
     textAlign: 'center',
     fontWeight: 'bold',
-  },
-  row: {
-    height: 40,
-    backgroundColor: '#E7E6E1',
   },
   leadContainer: {
     padding: 10,
@@ -395,18 +391,6 @@ const styles = StyleSheet.create({
   editButtonText1: {
     color: '#fff',
   },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 10,
-  },
-  pageButton: {
-    marginHorizontal: 5,
-  },
-  pageText: {
-    color: '#625bc5',
-    fontWeight: 'bold',
-  },
   body: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -421,14 +405,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     backgroundColor: '#e6ebf5',
-  },
-  itemContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  itemText: {
-    fontSize: 16,
   },
   loader: {
     marginTop: 20,

@@ -249,20 +249,20 @@ const Addlead = ({ navigation }) => {
       else
         if (response.result.msg === "Save successfully") {
           Toast.show({
-            text1: 'Save Successfully',
+            text1: response.result.msg,
             type: 'success',
           });
           navigation.navigate('Home');
         } else {
           Toast.show({
-            text1: response.msg,
+            text1: response.result.msg,
             type: 'error',
           });
         }
     } catch (error) {
       console.log(error);
       Toast.show({
-        text1: response.msg,
+        text1: response.result.msg,
         type: 'error',
       });
     }
