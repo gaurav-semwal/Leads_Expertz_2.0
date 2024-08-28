@@ -7,14 +7,14 @@ import {
   Modal,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Colors} from '../../Comman/Styles';
-import {TextInput} from 'react-native-paper';
+import { Colors } from '../../Comman/Styles';
+import { TextInput } from 'react-native-paper';
 import Button from '../../Src/Components/Button';
 import Toast from 'react-native-toast-message';
 import validator from 'validator';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import {
   Update_Lead,
@@ -28,15 +28,15 @@ import {
   Get_Lead_Data,
   Get_Status,
 } from '../../Api/authApi';
-import {useRoute} from '@react-navigation/native';
-import {Calendar} from 'react-native-calendars';
+import { useRoute } from '@react-navigation/native';
+import { Calendar } from 'react-native-calendars';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Updatelead = ({navigation}) => {
+const Updatelead = ({ navigation }) => {
   const route = useRoute();
-  const {leadid} = route.params;
+  const { leadid } = route.params;
 
   const [mobilenumner, setmobilenumber] = useState('');
   const [fullname, setfullname] = useState('');
@@ -420,13 +420,15 @@ const Updatelead = ({navigation}) => {
   const Submit = async () => {
     const dobDate = new Date(selectedApplicantDob);
     const doaDate = new Date(selectedApplicantDoa);
-    const submissionDate = new Date(selectedDate); 
-  
-    const formattedDob = dobDate.toISOString().split('T')[0]; 
-    const formattedDoa = doaDate.toISOString().split('T')[0]; 
-    const formattedSubmissionDate = submissionDate.toISOString().split('T')[0]; 
-    
+    const submissionDate = new Date(selectedDate);
+
+    const formattedDob = dobDate.toISOString().split('T')[0];
+    const formattedDoa = doaDate.toISOString().split('T')[0];
+    const formattedSubmissionDate = submissionDate.toISOString().split('T')[0];
+
     console.log(
+     'source', selectedSource,
+     selectedcampigns,
       selectedProject,
       size,
       price,
@@ -441,12 +443,14 @@ const Updatelead = ({navigation}) => {
       INTERESTED: ['selectedDate', 'selectedTime'],
       'CALL SCHEDULED': ['selectedDate', 'selectedTime'],
       'VISIT SCHEDULED': ['selectedDate', 'selectedTime'],
-      'FUTURE LEAD': ['selectedBudget'],
+      'FUTURE LEAD': ['selectedBudget', 'selectedclassification'],
       CONVERTED: {
-        BOOKED: [],
+        BOOKED: ['selectedclassification'],
         COMPLETED: [
           'selectedProject', 'size', 'price', 'applicantName', 'applicantContact',
-          'selectedCityfuture', 'formattedDoa', 'formattedDob', 'selectedStatefuture'
+          'selectedCityfuture', 'formattedDoa', 'formattedDob', 'selectedStatefuture',
+          'selectedSource', 'selectedcampigns', 'selectedCity', 'selectedState',
+          'selectedclassification','selectedtype'
         ],
       },
     };
@@ -456,20 +460,24 @@ const Updatelead = ({navigation}) => {
       const statusSpecificRequiredFields = Array.isArray(requiredFieldsByStatus[status])
         ? requiredFieldsByStatus[status]
         : [];
-  
+
       let additionalRequiredFields = [];
-  
+
       if (status === 'CONVERTED' && selectedStatus) {
         additionalRequiredFields = requiredFieldsByStatus.CONVERTED[selectedStatus] || [];
       }
-  
+
       const requiredFields = [
         ...commonRequiredFields,
         ...statusSpecificRequiredFields,
         ...additionalRequiredFields,
       ];
-  
+
       const fieldValues = {
+        selectedSource,
+        selectedtype,
+        selectedcampigns,
+        selectedclassification,
         comments,
         selectedDate,
         selectedTime,
@@ -487,7 +495,7 @@ const Updatelead = ({navigation}) => {
         formattedDob,
         selectedStatefuture,
       };
-  
+
       for (const field of requiredFields) {
         if (!fieldValues[field]) {
           return field; // Return the first missing field
@@ -495,17 +503,17 @@ const Updatelead = ({navigation}) => {
       }
       return null; // No missing fields
     };
-  
+
     const missingField = validateFields();
-  
+
     if (missingField) {
       Toast.show({
         text1: `Please fill the required field: ${missingField}`,
         type: 'error',
       });
-      return; 
+      return;
     }
-  
+
     try {
       const response = await Update_Lead(
         selectedSource,
@@ -536,12 +544,12 @@ const Updatelead = ({navigation}) => {
         address,
         leadid
       );
-  
+
       console.log(response);
-  
+
       if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-      } 
+      }
       else if (response.msg === 'Save successfully') {
         Toast.show({
           text1: 'Save Successfully',
@@ -563,8 +571,6 @@ const Updatelead = ({navigation}) => {
     }
   };
 
-
-  
   const handleStatusChange = value => {
     setStatus(value);
     setcomments('');
@@ -603,7 +609,7 @@ const Updatelead = ({navigation}) => {
               const formattedText = text.replace(/[^0-9]/g, '');
               setmobilenumber(formattedText.slice(0, 10));
             }}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
             keyboardType="numeric"
             maxLength={10}
@@ -627,7 +633,7 @@ const Updatelead = ({navigation}) => {
             label="Full Name"
             value={fullname}
             onChangeText={text => setfullname(text)}
-            style={[styles.textinput, {paddingLeft: 30}]}
+            style={[styles.textinput, { paddingLeft: 30 }]}
             mode="outlined"
           />
         </View>
@@ -650,7 +656,7 @@ const Updatelead = ({navigation}) => {
               label="Email"
               value={email}
               onChangeText={handleEmailChange}
-              style={[styles.textinput, {paddingLeft: 30}]}
+              style={[styles.textinput, { paddingLeft: 30 }]}
               mode="outlined"
               maxLength={100}
               keyboardType="email-address"
@@ -661,7 +667,7 @@ const Updatelead = ({navigation}) => {
           </>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSource}
@@ -675,7 +681,7 @@ const Updatelead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedtype}
@@ -688,7 +694,7 @@ const Updatelead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedCategory}
@@ -702,7 +708,7 @@ const Updatelead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedSubcategory}
@@ -716,7 +722,7 @@ const Updatelead = ({navigation}) => {
           </View>
         </View>
 
-        <View style={{marginTop: 10}}>
+        <View style={{ marginTop: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedclassification}
@@ -730,7 +736,7 @@ const Updatelead = ({navigation}) => {
         </View>
 
         <View style={styles.dob}>
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedcampigns}
@@ -744,7 +750,7 @@ const Updatelead = ({navigation}) => {
             </View>
           </View>
 
-          <View style={{width: '49%'}}>
+          <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
                 selectedValue={selectedproject}
@@ -817,8 +823,8 @@ const Updatelead = ({navigation}) => {
         </View>
       </View>
 
-      <View style={{margin: 10}}>
-        <View style={{top: 10}}>
+      <View style={{ margin: 10 }}>
+        <View style={{ top: 10 }}>
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={status}
@@ -837,8 +843,8 @@ const Updatelead = ({navigation}) => {
         </View>
 
         {status === 'INTERESTED' ||
-        status === 'CALL SCHEDULED' ||
-        status === 'VISIT SCHEDULED' ? (
+          status === 'CALL SCHEDULED' ||
+          status === 'VISIT SCHEDULED' ? (
           <>
             <View
               style={{
@@ -846,7 +852,7 @@ const Updatelead = ({navigation}) => {
                 justifyContent: 'space-between',
                 padding: 10,
               }}>
-              <View style={{width: '50%'}}>
+              <View style={{ width: '50%' }}>
                 {showCalendarModal && (
                   <DateTimePicker
                     value={selectedDate ? new Date(selectedDate) : new Date()}
@@ -855,13 +861,13 @@ const Updatelead = ({navigation}) => {
                     onChange={(event, date) => handleDateSelect(event, date)}
                   />
                 )}
-               <TextInput
-  label="Select Date"
-  value={selectedDate || ''}
-  onChangeText={date => setSelectedDate(date)}
-  style={[styles.textinput, {marginTop: 10}]}
-  mode="outlined"
-/>
+                <TextInput
+                  label="Select Date"
+                  value={selectedDate || ''}
+                  onChangeText={date => setSelectedDate(date)}
+                  style={[styles.textinput, { marginTop: 10 }]}
+                  mode="outlined"
+                />
                 <TouchableOpacity
                   style={{
                     position: 'absolute',
@@ -876,15 +882,15 @@ const Updatelead = ({navigation}) => {
                   <AntDesign name="calendar" color="#625bc5" size={25} />
                 </TouchableOpacity>
               </View>
-              <View style={{width: '100%', marginLeft: 7}}>
-                <View style={{width: '50%'}}>
-                <TextInput
-  label="Select Time"
-  value={selectedTime || ''}
-  onChangeText={time => setSelectedTime(time)}
-  style={[styles.textinput, {marginTop: 10}]}
-  mode="outlined"
-/>
+              <View style={{ width: '100%', marginLeft: 7 }}>
+                <View style={{ width: '50%' }}>
+                  <TextInput
+                    label="Select Time"
+                    value={selectedTime || ''}
+                    onChangeText={time => setSelectedTime(time)}
+                    style={[styles.textinput, { marginTop: 10 }]}
+                    mode="outlined"
+                  />
                   <TouchableOpacity
                     style={{
                       position: 'absolute',
@@ -913,7 +919,7 @@ const Updatelead = ({navigation}) => {
 
         {status === 'FUTURE LEAD' ? (
           <>
-            <View style={[styles.dropdowncontainer1, {top: 20}]}>
+            <View style={[styles.dropdowncontainer1, { top: 20 }]}>
               <Picker
                 selectedValue={selectedBudget}
                 style={styles.picker}
@@ -978,7 +984,7 @@ const Updatelead = ({navigation}) => {
 
         {status === 'CONVERTED' ? (
           <>
-            <View style={[styles.dropdowncontainer1, {top: 20}]}>
+            <View style={[styles.dropdowncontainer1, { top: 20 }]}>
               <Picker
                 selectedValue={selectedStatus}
                 onValueChange={value => {
@@ -992,7 +998,7 @@ const Updatelead = ({navigation}) => {
             </View>
             {selectedStatus === 'COMPLETED' && (
               <>
-                <View style={{top: 25}}>
+                <View style={{ top: 25 }}>
                   <View style={styles.dropdowncontainer1}>
                     <Picker
                       selectedValue={selectedProject}
@@ -1009,7 +1015,7 @@ const Updatelead = ({navigation}) => {
                     </Picker>
                   </View>
                 </View>
-                <View style={{top: 25}}>
+                <View style={{ top: 25 }}>
                   <TextInput
                     label="Enter Size"
                     value={size}
@@ -1020,7 +1026,7 @@ const Updatelead = ({navigation}) => {
                     keyboardType='numeric'
                   />
                 </View>
-                <View style={{top: 25}}>
+                <View style={{ top: 25 }}>
                   <TextInput
                     label="Enter Price"
                     value={price}
@@ -1032,7 +1038,7 @@ const Updatelead = ({navigation}) => {
 
                   />
                 </View>
-                <View style={{top: 25}}>
+                <View style={{ top: 25 }}>
                   <TextInput
                     label="Applicant Name"
                     value={applicantName}
@@ -1041,7 +1047,7 @@ const Updatelead = ({navigation}) => {
                     mode="outlined"
                   />
                 </View>
-                <View style={{top: 25}}>
+                <View style={{ top: 25 }}>
                   <TextInput
                     label="Applicant Contact"
                     value={applicantContact}
@@ -1062,7 +1068,7 @@ const Updatelead = ({navigation}) => {
                   <View
                     style={[
                       styles.dropdowncontainer,
-                      {flex: 1, marginRight: 5},
+                      { flex: 1, marginRight: 5 },
                     ]}>
                     <Picker
                       selectedValue={selectedStatefuture}
@@ -1079,7 +1085,7 @@ const Updatelead = ({navigation}) => {
                   <View
                     style={[
                       styles.dropdowncontainer,
-                      {flex: 1, marginLeft: 5},
+                      { flex: 1, marginLeft: 5 },
                     ]}>
                     <Picker
                       selectedValue={selectedCityfuture}
@@ -1103,7 +1109,7 @@ const Updatelead = ({navigation}) => {
                       placeholder="Applicant DOB"
                       value={selectedApplicantDob.toLocaleDateString()}
                       editable={false}
-                      style={[styles.textinput, {marginTop: 10}]}
+                      style={[styles.textinput, { marginTop: 10 }]}
                       mode="outlined"
                     />
                     <Pressable
@@ -1140,7 +1146,7 @@ const Updatelead = ({navigation}) => {
                       placeholder="Applicant DOA"
                       value={selectedApplicantDoa.toLocaleDateString()}
                       editable={false}
-                      style={[styles.textinput, {marginTop: 10}]}
+                      style={[styles.textinput, { marginTop: 10 }]}
                       mode="outlined"
                     />
                     <Pressable
@@ -1175,7 +1181,7 @@ const Updatelead = ({navigation}) => {
           </>
         ) : null}
 
-        <View style={{top: 25}}>
+        <View style={{ top: 25 }}>
           <TextInput
             label="Enter Comments"
             value={comments}
@@ -1191,11 +1197,11 @@ const Updatelead = ({navigation}) => {
         transparent={true}
         visible={showdobmodal}
         onRequestClose={() => setshowdobmodal(false)}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <Calendar
             onDayPress={day => handleDateSelectdob(day.dateString)}
             markedDates={{
-              [selectedDate]: {selected: true, selectedColor: 'blue'},
+              [selectedDate]: { selected: true, selectedColor: 'blue' },
             }}
           />
         </View>
@@ -1206,21 +1212,21 @@ const Updatelead = ({navigation}) => {
         transparent={true}
         visible={showdoamodal}
         onRequestClose={() => setshowdoamodal(false)}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
           <Calendar
             onDayPress={day => handleDateSelectdoa(day.dateString)}
             markedDates={{
-              [selectedDate]: {selected: true, selectedColor: 'blue'},
+              [selectedDate]: { selected: true, selectedColor: 'blue' },
             }}
           />
         </View>
       </Modal>
 
-      <Pressable style={{top: 40}} onPress={Submit}>
+      <Pressable style={{ top: 40 }} onPress={Submit}>
         <Button text="Submit" />
       </Pressable>
 
-      <View style={{height: 30}}></View>
+      <View style={{ height: 30 }}></View>
     </ScrollView>
   );
 };

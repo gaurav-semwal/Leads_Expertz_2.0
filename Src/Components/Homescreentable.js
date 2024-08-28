@@ -11,7 +11,7 @@ const Homescreentable = () => {
   const [activeButton, setActiveButton] = useState('Upcoming Birthday');
   const [tableData, setTableData] = useState([]);
   const [allData, setAllData] = useState([]);
-  const [widthArr] = useState([120, 150, 150, 100, 150]);
+  const [widthArr] = useState([120, 150, 150, 150, 150]);
   const [role, setRole] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -69,21 +69,29 @@ const Homescreentable = () => {
   };
 
   const renderTableRows = () => {
-    return allData.map((rowData, index) => (
-      <Row
-        key={index}
-        data={[
-          rowData.agent || 'N/A',
-          rowData.name || 'N/A',
-          rowData.phone || 'N/A',
-          rowData.app_city || 'N/A',
-          activeButton === 'Upcoming Birthday' ? rowData.app_dob || 'N/A' : rowData.app_doa || 'N/A',
-        ]}
-        widthArr={widthArr}
-        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-        textStyle={styles.text}
-      />
-    ));
+    return allData
+      .filter(rowData => {
+        if (activeButton === 'Upcoming Birthday') {
+          return rowData.app_dob && rowData.app_dob !== 'N/A';
+        } else {
+          return rowData.app_doa && rowData.app_doa !== 'N/A';
+        }
+      })
+      .map((rowData, index) => (
+        <Row
+          key={index}
+          data={[
+            rowData.agent || 'N/A',
+            rowData.name || 'N/A',
+            rowData.phone || 'N/A',
+            rowData.app_city || 'N/A',
+            activeButton === 'Upcoming Birthday' ? rowData.app_dob : rowData.app_doa,
+          ]}
+          widthArr={widthArr}
+          style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+          textStyle={styles.text}
+        />
+      ));
   };
 
   return (

@@ -156,11 +156,11 @@ const Userlist = ({ navigation }) => {
               </View>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => editleadnavigate()}
                 style={{ right: '50%' }}>
                 <AntDesign name="edit" size={25} color="orange" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               {/* <TouchableOpacity onPress={() => openModal(item)}>
                 <FontAwesome name="edit" size={25} color="green" />
               </TouchableOpacity> */}
