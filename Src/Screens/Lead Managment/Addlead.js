@@ -412,6 +412,7 @@ const Addlead = ({ navigation }) => {
               <Picker.Item label="Select Classification" value="" />
               <Picker.Item label="Hot" value="hot" />
               <Picker.Item label="Cold" value="cold" />
+              <Picker.Item label="Warm" value="warm" />
             </Picker>
           </View>
         </View>

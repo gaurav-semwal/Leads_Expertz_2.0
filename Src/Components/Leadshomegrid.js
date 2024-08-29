@@ -6,12 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React, {useCallback, useState,useEffect} from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Homescreentable from './Homescreentable';
-import {Dashboard} from '../../Api/authApi';
+import { Dashboard } from '../../Api/authApi';
 import Toast from 'react-native-toast-message';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Leadshomegrid = () => {
@@ -52,13 +52,35 @@ const Leadshomegrid = () => {
         const leadData = response.data.leads[0];
         setLeads(leadData);
 
-        const categoriesList = Object.keys(leadData)
-          .filter(key => key !== 'converted_leads' && key !== 'others')
-          .map(key => ({
-            id: key,
-            title: formatTitle(key),
-            key: key,
-          }));
+        let categoriesList = [];
+
+        if (role === 'telecaller') {
+          categoriesList = Object.keys(leadData)
+            .filter(
+              key =>
+                key === 'new_leads' ||
+                key === 'pending_leads' ||
+                key === 'processing_leads' ||
+                key === 'interested_leads' ||
+                key === 'call_scheduled'||
+                key === 'others'
+            )
+            .map(key => ({
+              id: key,
+              title: formatTitle(key),
+              key: key,
+            }));
+        } else {
+          // Show all categories for other roles
+          categoriesList = Object.keys(leadData)
+            .filter(key => key !== 'converted_leads' && key !== 'others')
+            .map(key => ({
+              id: key,
+              title: formatTitle(key),
+              key: key,
+            }));
+        }
+
         setCategories(categoriesList);
       } else {
         console.warn('Unexpected response format:', response);
@@ -105,23 +127,23 @@ const Leadshomegrid = () => {
       console.warn(`No screen mapped for key: ${key}`);
     }
   };
-  
+
   const onRefresh = () => {
     setRefreshing(true);
     getDashboard();
-};
+  };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
     const leadCount = leads[item.key] || '0';
 
-    
+
     return (
       <TouchableOpacity
         style={styles.item}
         onPress={() => handlePress(item.key)}>
         <View style={styles.content}>
-          <View style={[styles.icon, {backgroundColor: randomColor}]}>
+          <View style={[styles.icon, { backgroundColor: randomColor }]}>
             <FontAwesome5 name="funnel-dollar" size={20} color="white" />
           </View>
           <View style={styles.textContainer}>
@@ -143,19 +165,19 @@ const Leadshomegrid = () => {
 
   return (
     <View style={styles.container}>
-       {['team_manager', 'salesman'].includes(role) && (
-      <View style={{height: '58%'}}>
-        <FlatList
-          data={categories}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          onRefresh={onRefresh}
-                    refreshing={refreshing}
-        />
-      </View>
-       )}
+      {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+        <View style={{ height: '58%' }}>
+          <FlatList
+            data={categories}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+          />
+        </View>
+      )}
       <ScrollView>
         <Homescreentable />
       </ScrollView>
@@ -176,7 +198,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 10,
     shadowColor: '#e0dad3',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1,
     elevation: 6,
@@ -206,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

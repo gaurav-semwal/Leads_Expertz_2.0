@@ -298,7 +298,7 @@ useEffect(() => {
       ]}
       onPress={() => onPressButton1('Missed Follow Up')}
     >
-      <Text style={[styles.text, activeButton === 'Missed Follow Up' && { color: '#625bc5' }]}>Missed Follow Up</Text>
+      <Text style={[styles.text, activeButton === 'Missed Follow Up' && { color: '#625bc5' }]}>Missed Task</Text>
     </Pressable>
   </View>
       )}

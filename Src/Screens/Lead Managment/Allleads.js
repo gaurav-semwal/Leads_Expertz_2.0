@@ -42,6 +42,7 @@ const Allleads = ({ navigation }) => {
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [role, setRole] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -278,6 +279,15 @@ const Allleads = ({ navigation }) => {
     </Pressable>
   );
 
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      console.log('hhhhhhhhhhhh',storedRole)
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
+
   const LeadModal = ({ item }) => {
     if (!item) return null;
 
@@ -405,6 +415,7 @@ const Allleads = ({ navigation }) => {
             justifyContent: 'space-between',
             width: '100%',
           }}>
+      {['team_manager'].includes(role) && (
           <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
@@ -421,7 +432,7 @@ const Allleads = ({ navigation }) => {
               </Picker>
             </View>
           </View>
-
+      )}
 
           <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>

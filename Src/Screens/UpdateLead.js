@@ -80,11 +80,10 @@ const Updatelead = ({ navigation }) => {
   const [applicantCity, setApplicantCity] = useState('');
   const [applicantDob, setApplicantDob] = useState('');
   const [applicantDoa, setApplicantDoa] = useState('');
-
-  const [selectedApplicantDob, setSelectedApplicantDob] = useState(new Date());
   const [dobOpen, setDobOpen] = useState(false);
-
-  const [selectedApplicantDoa, setSelectedApplicantDoa] = useState(new Date());
+  const [selectedApplicantDob, setSelectedApplicantDob] = useState(null);
+  const [selectedApplicantDoa, setSelectedApplicantDoa] = useState(null);
+  
   const [doaOpen, setDoaOpen] = useState(false);
 
   const [showCalendarModal, setShowCalendarModal] = useState(false);
@@ -448,7 +447,7 @@ const Updatelead = ({ navigation }) => {
         BOOKED: ['selectedclassification'],
         COMPLETED: [
           'selectedProject', 'size', 'price', 'applicantName', 'applicantContact',
-          'selectedCityfuture', 'formattedDoa', 'formattedDob', 'selectedStatefuture',
+          'selectedCityfuture','selectedStatefuture',
           'selectedSource', 'selectedcampigns', 'selectedCity', 'selectedState',
           'selectedclassification','selectedtype'
         ],
@@ -491,8 +490,6 @@ const Updatelead = ({ navigation }) => {
         applicantName,
         applicantContact,
         selectedCityfuture,
-        formattedDoa,
-        formattedDob,
         selectedStatefuture,
       };
 
@@ -731,6 +728,7 @@ const Updatelead = ({ navigation }) => {
               <Picker.Item label="Select Classification" value="" />
               <Picker.Item label="Hot" value="hot" />
               <Picker.Item label="Cold" value="cold" />
+              <Picker.Item label="Warm" value="warm" />
             </Picker>
           </View>
         </View>
@@ -1107,7 +1105,7 @@ const Updatelead = ({ navigation }) => {
                   <Pressable onPress={() => setDobOpen(true)}>
                     <TextInput
                       placeholder="Applicant DOB"
-                      value={selectedApplicantDob.toLocaleDateString()}
+                      value={selectedApplicantDob ? selectedApplicantDob.toLocaleDateString() : ''} 
                       editable={false}
                       style={[styles.textinput, { marginTop: 10 }]}
                       mode="outlined"
@@ -1130,7 +1128,7 @@ const Updatelead = ({ navigation }) => {
                   <DatePicker
                     modal
                     open={dobOpen}
-                    date={selectedApplicantDob}
+                    date={selectedApplicantDob || new Date()} 
                     mode="date"
                     onConfirm={date => {
                       setDobOpen(false);
@@ -1144,7 +1142,7 @@ const Updatelead = ({ navigation }) => {
                   <Pressable onPress={() => setDoaOpen(true)}>
                     <TextInput
                       placeholder="Applicant DOA"
-                      value={selectedApplicantDoa.toLocaleDateString()}
+                      value={selectedApplicantDoa ? selectedApplicantDoa.toLocaleDateString() : ''} 
                       editable={false}
                       style={[styles.textinput, { marginTop: 10 }]}
                       mode="outlined"
@@ -1167,7 +1165,7 @@ const Updatelead = ({ navigation }) => {
                   <DatePicker
                     modal
                     open={doaOpen}
-                    date={selectedApplicantDoa}
+                    date={selectedApplicantDoa || new Date()} 
                     mode="date"
                     onConfirm={date => {
                       setDoaOpen(false);

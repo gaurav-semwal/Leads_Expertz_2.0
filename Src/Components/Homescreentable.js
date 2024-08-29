@@ -33,8 +33,21 @@ const Homescreentable = () => {
     try {
       const response = await Get_Birthday();
       console.log('resssss', response);
+  
       if (response.msg === '') {
-        setAllData(response.data);
+        const currentMonth = moment().month(); 
+        const currentYear = moment().year(); 
+  
+        const filteredData = response.data.filter(item => {
+          const dobIsCurrentMonthAndYear =
+            item.app_dob && moment(item.app_dob).month() === currentMonth && moment(item.app_dob).year() === currentYear;
+          const doaIsCurrentMonthAndYear =
+            item.app_doa && moment(item.app_doa).month() === currentMonth && moment(item.app_doa).year() === currentYear;
+  
+          return dobIsCurrentMonthAndYear || doaIsCurrentMonthAndYear;
+        });
+  
+        setAllData(filteredData);
       }
     } catch (error) {
       console.log(error);
@@ -137,6 +150,7 @@ const Homescreentable = () => {
           </ScrollView>
       </>
     )}
+    <View style={{height:100}}></View>
     </View>
   );
 };
