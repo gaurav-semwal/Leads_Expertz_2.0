@@ -169,10 +169,6 @@ useEffect(() => {
     let dataToDisplay = tableData.slice(startIndex, endIndex);
 
     return dataToDisplay.map((rowData, index) => {
-      const remindDateTime = new Date(rowData.remind_date);
-      const formattedRemindDate = remindDateTime.toLocaleDateString();
-      const formattedRemindTime = remindDateTime.toLocaleTimeString(); 
-    
       return (
         <Row
           key={startIndex + index}
@@ -182,7 +178,7 @@ useEffect(() => {
             rowData.agent,
             rowData.campaign,
             rowData.classification,
-            `${formattedRemindDate} ${formattedRemindTime}`,  
+            `${rowData.remind_date} ${rowData.remind_time}`,  
             <Pressable
               onPress={() => handlePhoneCall(rowData.phone)}
               style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 }}
