@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, Pressable, FlatList } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { Get_Expense, Get_user } from '../../../Api/authApi';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Expensescreen = ({ navigation }) => {
   const [fromDate, setFromDate] = useState(new Date());
@@ -16,10 +17,13 @@ const Expensescreen = ({ navigation }) => {
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
 
-  useEffect(() => {
-    getUser();
-    getexpense();
-  }, []);
+  
+  useFocusEffect(
+    useCallback(() => {
+      getUser();
+      getexpense();
+  }, [])
+);
 
   const handleFromDateChange = (event, date) => {
     setShowFromDatePicker(false);
@@ -100,7 +104,7 @@ const Expensescreen = ({ navigation }) => {
       <Text style={styles.text}>Category: {item.category}</Text>
       <Text style={styles.text}>Comments: {item.comments}</Text>
       <Text style={styles.text}>Date: {item.exp_date}</Text>
-      <Text style={styles.text}>Amount: ${item.amount}</Text>
+      <Text style={styles.text}>Amount: ₹{item.amount}</Text>
     </View>
   );
 

@@ -23,6 +23,7 @@ import {
 import moment from 'moment';
 import { Calendar } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Allleads = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState('');
@@ -89,7 +90,6 @@ const Allleads = ({ navigation }) => {
   const getuser = async () => {
     try {
       const response = await Get_user();
-      console.log('user', response)
       if (response.msg === 'Load successfully.') {
         setuserData(response.data);
       }
@@ -105,36 +105,35 @@ const Allleads = ({ navigation }) => {
   ) => {
     try {
       const response = await Get_Lead();
-      console.log(response)
       if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-    } 
-    else
-      if (response.msg === 'Load successfully') {
-        let filteredData = response.data;
-
-        if (statusFilter) {
-          filteredData = filteredData.filter(
-            lead => lead.status === statusFilter,
-          );
-        }
-
-        if (startDateFilter && endDateFilter) {
-          filteredData = filteredData.filter(lead => {
-            const leadDate = moment(lead.lead_date);
-            return leadDate.isBetween(
-              startDateFilter,
-              endDateFilter,
-              'days',
-              '[]',
-            );
-          });
-        }
-
-        setLeadData(filteredData);
-      } else {
-        setLeadData([]);
       }
+      else
+        if (response.msg === 'Load successfully') {
+          let filteredData = response.data;
+
+          if (statusFilter) {
+            filteredData = filteredData.filter(
+              lead => lead.status === statusFilter,
+            );
+          }
+
+          if (startDateFilter && endDateFilter) {
+            filteredData = filteredData.filter(lead => {
+              const leadDate = moment(lead.lead_date);
+              return leadDate.isBetween(
+                startDateFilter,
+                endDateFilter,
+                'days',
+                '[]',
+              );
+            });
+          }
+
+          setLeadData(filteredData);
+        } else {
+          setLeadData([]);
+        }
     } catch (error) {
       console.log(error);
       setLeadData([]);
@@ -168,15 +167,11 @@ const Allleads = ({ navigation }) => {
     getlead(status, startDate, date);
   };
 
-  const leadedit = item => {
-    console.log('Edit lead:', item);
-  };
 
   const openModal = async item => {
     setModalVisible(true);
     try {
       const response = await Get_Lead_Data(item.id);
-      console.log('hiiiiiiiii',response.data.lead_comment)
       if (response.msg === 'Load successfully') {
         setSelectedItem(response.data);
       }
@@ -195,7 +190,6 @@ const Allleads = ({ navigation }) => {
     Linking.openURL(phoneUrl)
       .then((supported) => {
         if (!supported) {
-          console.log(`Phone dialing not supported for number: ${phoneNumber}`);
         } else {
           return Linking.openURL(phoneUrl);
         }
@@ -249,7 +243,7 @@ const Allleads = ({ navigation }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.leadInfo1}>Phone Number: {item.phone}</Text>
                 <TouchableOpacity onPress={() => handlePhonePress(item.phone)}>
-                  <View style={{marginLeft:10}}>
+                  <View style={{ marginLeft: 10 }}>
                     <AntDesign name="phone" size={20} color="green" />
                   </View>
                 </TouchableOpacity>
@@ -279,14 +273,17 @@ const Allleads = ({ navigation }) => {
     </Pressable>
   );
 
-  useEffect(() => {
-    const getRole = async () => {
-      const storedRole = await AsyncStorage.getItem('role');
-      console.log('hhhhhhhhhhhh',storedRole)
-      setRole(storedRole);
-    };
-    getRole();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getRole();
+    }, []),
+  );
+
+  const getRole = async () => {
+    const storedRole = await AsyncStorage.getItem('role');
+    console.log('hhhhhhhhhhhh', storedRole)
+    setRole(storedRole);
+  };
 
   const LeadModal = ({ item }) => {
     if (!item) return null;
@@ -386,7 +383,7 @@ const Allleads = ({ navigation }) => {
                           Remind Date: {comment.remind_date || 'N/A'}
                         </Text>
                         <Text style={styles.modalText}>
-                        Remind Time: {comment.remind_time || 'N/A'}
+                          Remind Time: {comment.remind_time || 'N/A'}
                         </Text>
 
                         {index !== leadComments.length - 1 && (
@@ -415,25 +412,24 @@ const Allleads = ({ navigation }) => {
             justifyContent: 'space-between',
             width: '100%',
           }}>
-      {['team_manager'].includes(role) && (
-          <View style={{ width: '49%' }}>
-            <View style={styles.dropdowncontainer1}>
-              <Picker
-                selectedValue={user}
-                onValueChange={itemValue => setuser(itemValue)}>
-                <Picker.Item label="Select User" value="" />
-                {userData.map(userItem => (
-                  <Picker.Item
-                    key={userItem.id}
-                    label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                    value={userItem.name}
-                  />
-                ))}
-              </Picker>
+          {['team_manager'].includes(role) && (
+            <View style={{ width: '49%' }}>
+              <View style={styles.dropdowncontainer1}>
+                <Picker
+                  selectedValue={user}
+                  onValueChange={itemValue => setuser(itemValue)}>
+                  <Picker.Item label="Select User" value="" />
+                  {userData.map(userItem => (
+                    <Picker.Item
+                      key={userItem.id}
+                      label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                      value={userItem.name}
+                    />
+                  ))}
+                </Picker>
+              </View>
             </View>
-          </View>
-      )}
-
+          )}
           <View style={{ width: '49%' }}>
             <View style={styles.dropdowncontainer1}>
               <Picker
@@ -526,8 +522,8 @@ const Allleads = ({ navigation }) => {
         renderItem={({ item }) => <Item item={item} />}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20, paddingTop: 10  }}
-              ListFooterComponent={<View style={{ height: 100 }} />}
+        contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+        ListFooterComponent={<View style={{ height: 100 }} />}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
