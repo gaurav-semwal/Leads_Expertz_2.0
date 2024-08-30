@@ -114,7 +114,7 @@ const Homescreentable = () => {
       {['team_manager', 'salesman', 'telecaller'].includes(role) && (
 <>
     
-          {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+          {['team_manager', 'salesman'].includes(role) && (
             <View style={styles.body}>
               <Pressable
                 style={[styles.button, activeButton === 'Upcoming Birthday' && { backgroundColor: '#ddf' }]}
@@ -134,7 +134,7 @@ const Homescreentable = () => {
           <ScrollView horizontal  refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-            {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+            {['team_manager', 'salesman'].includes(role) && (
               <View>
                 <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
                   <Row

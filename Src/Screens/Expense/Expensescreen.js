@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { Get_Expense, Get_user } from '../../../Api/authApi';
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Expensescreen = ({ navigation }) => {
   const [fromDate, setFromDate] = useState(new Date());
@@ -16,14 +17,14 @@ const Expensescreen = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [role, setRole] = useState('');
 
-  
   useFocusEffect(
     useCallback(() => {
       getUser();
       getexpense();
-  }, [])
-);
+    }, [])
+  );
 
   const handleFromDateChange = (event, date) => {
     setShowFromDatePicker(false);
@@ -97,6 +98,14 @@ const Expensescreen = ({ navigation }) => {
     console.log('Filtered Expenses:', filtered);
   };
 
+  useEffect(() => {
+    const getRole = async () => {
+      const storedRole = await AsyncStorage.getItem('role');
+      setRole(storedRole);
+    };
+    getRole();
+  }, []);
+
   const renderExpenseItem = ({ item }) => (
     <View style={styles.expenseItem}>
       <Text style={styles.text}>Users: {item.users}</Text>
@@ -133,22 +142,25 @@ const Expensescreen = ({ navigation }) => {
         </View>
 
         <View style={styles.row}>
-          <View style={styles.inputContainer}>
-            <Picker
-              selectedValue={selectedUser}
-              onValueChange={itemValue => setSelectedUser(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select User" value="" />
-              {userData.map(userItem => (
-                <Picker.Item
-                  key={userItem.id}
-                  label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                  value={userItem.name} // Change to match the display value
-                />
-              ))}
-            </Picker>
-          </View>
+          {['team_manager'].includes(role) && (
+
+            <View style={styles.inputContainer}>
+              <Picker
+                selectedValue={selectedUser}
+                onValueChange={itemValue => setSelectedUser(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Select User" value="" />
+                {userData.map(userItem => (
+                  <Picker.Item
+                    key={userItem.id}
+                    label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
+                    value={userItem.name} // Change to match the display value
+                  />
+                ))}
+              </Picker>
+            </View>
+          )}
           <View style={styles.inputContainer}>
             <Picker
               selectedValue={selectedCategory}

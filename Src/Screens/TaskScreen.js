@@ -203,7 +203,7 @@ const Taskscreen = () => {
               activeButton === 'All' && styles.activeFilterButton,
             ]}
             onPress={() => setActiveButton('All')}>
-            <Text style={styles.filterText}>All</Text>
+            <Text style={[styles.filterText, activeButton === 'All' && styles.activetext]}>All</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -212,7 +212,7 @@ const Taskscreen = () => {
               activeButton === 'Pending' && styles.activeFilterButton,
             ]}
             onPress={() => setActiveButton('Pending')}>
-            <Text style={styles.filterText}>Pending</Text>
+            <Text style={[styles.filterText, activeButton === 'Pending' && styles.activetext]}>Pending</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -221,7 +221,7 @@ const Taskscreen = () => {
               activeButton === 'Completed' && styles.activeFilterButton,
             ]}
             onPress={() => setActiveButton('Completed')}>
-            <Text style={styles.filterText}>Completed</Text>
+            <Text style={[styles.filterText, activeButton === 'Completed' && styles.activetext]}>Completed</Text>
           </TouchableOpacity>
         </View>
 
@@ -450,6 +450,10 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
+  activetext:{
+    color:'white',
+    fontWeight:'bold'
+  }
 });
 
 export default Taskscreen;

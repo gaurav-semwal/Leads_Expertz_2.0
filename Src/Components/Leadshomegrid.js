@@ -25,7 +25,7 @@ const Leadshomegrid = () => {
   useFocusEffect(
     useCallback(() => {
       getDashboard();
-    }, []),
+    }, [role]),
   );
 
   useEffect(() => {
@@ -60,9 +60,9 @@ const Leadshomegrid = () => {
               key =>
                 key === 'new_leads' ||
                 key === 'pending_leads' ||
+                key === 'call_scheduled'||
                 key === 'processing_leads' ||
                 key === 'interested_leads' ||
-                key === 'call_scheduled'||
                 key === 'others'
             )
             .map(key => ({
@@ -136,7 +136,6 @@ const Leadshomegrid = () => {
   const renderItem = ({ item }) => {
     const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
     const leadCount = leads[item.key] || '0';
-
 
     return (
       <TouchableOpacity
