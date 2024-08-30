@@ -45,6 +45,7 @@ import AddInventory from '../Screens/Inventory/AddInventory';
 import Updatelead from '../Screens/UpdateLead';
 import Updateuser from '../Screens/Staff Managment/UpdateUser';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { Modal, StyleSheet } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import { Colors } from '../Comman/Styles';
@@ -70,7 +71,7 @@ const BottomTabNavigation = ({ navigation }) => {
   const [lastLocation, setLastLocation] = useState(null);
   const [locationInterval, setLocationInterval] = useState(null);
   const [role, setRole] = useState('');
-  
+
   useEffect(() => {
     const loadToggleState = async () => {
       try {
@@ -329,7 +330,7 @@ const BottomTabNavigation = ({ navigation }) => {
       });
     }
   };
-  
+
   useEffect(() => {
     const getRole = async () => {
       const storedRole = await AsyncStorage.getItem('role');
@@ -358,6 +359,9 @@ const BottomTabNavigation = ({ navigation }) => {
               case 'User List':
                 iconName = 'users';
                 break;
+                case 'Task':
+                  iconName = 'tasks';
+                  break;
               default:
                 iconName = 'question';
             }
@@ -390,73 +394,98 @@ const BottomTabNavigation = ({ navigation }) => {
             ),
             headerRight: () => (
               <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                <ToggleSwitch
-                  isOn={isToggled}
-                  onColor="#fff"
-                  offColor="#a3a2a0"
-                  size="small"
-                  onToggle={onTogglePress}
-                  circleColor="#625bc5"
-                  style={styles.toggleContainer}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                  <ToggleSwitch
+                    isOn={isToggled}
+                    onColor="#fff"
+                    offColor="#a3a2a0"
+                    size="small"
+                    onToggle={onTogglePress}
+                    circleColor="#625bc5"
+                    style={styles.toggleContainer}
+                  />
+                </View>
+                {/* <Button title="Reset Toggle" onPress={resetToggle} style={{ marginLeft: 10 }} /> */}
+              </>
+            ),
+          }}
+        />
+        {['team_manager', 'salesman', 'telecaller'].includes(role) && (
+          <Tab.Screen
+            name="All Leads"
+            component={Allleads}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="menu"
+                  size={30}
+                  color="#fff"
+                  style={{ marginLeft: 10, top: 2 }}
+                  onPress={() => navigation.openDrawer()}
                 />
-              </View>
-              {/* <Button title="Reset Toggle" onPress={resetToggle} style={{ marginLeft: 10 }} /> */}
-                </>
-            ),
-          }}
-        />
-      {['team_manager', 'salesman','telecaller'].includes(role) && (
-        <Tab.Screen
-          name="All Leads"
-          component={Allleads}
-          options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="menu"
-                size={30}
-                color="#fff"
-                style={{ marginLeft: 10, top: 2 }}
-                onPress={() => navigation.openDrawer()}
-              />
-            ),
-          }}
-        />
-      )}
-      {['team_manager'].includes(role) && (
-        <Tab.Screen
-          name="User List"
-          component={Userlist}
-          options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: '#625bc5',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="menu"
-                size={30}
-                color="#fff"
-                style={{ marginLeft: 10, top: 2 }}
-                onPress={() => navigation.openDrawer()}
-              />
-            ),
-          }}
-        />
-        
-)}
+              ),
+            }}
+          />
+        )}
+        {['salesman', 'telecaller'].includes(role) && (
+          <Tab.Screen
+            name="Task"
+            component={Taskscreen}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="menu"
+                  size={30}
+                  color="#fff"
+                  style={{ marginLeft: 10, top: 2 }}
+                  onPress={() => navigation.openDrawer()}
+                />
+              ),
+            }}
+          />
+        )}
+        {['team_manager'].includes(role) && (
+          <Tab.Screen
+            name="User List"
+            component={Userlist}
+            options={{
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: '#625bc5',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="menu"
+                  size={30}
+                  color="#fff"
+                  style={{ marginLeft: 10, top: 2 }}
+                  onPress={() => navigation.openDrawer()}
+                />
+              ),
+            }}
+          />
+
+        )}
         <Tab.Screen
           name="Settings"
           component={Settingsscreen}
@@ -596,7 +625,7 @@ const Stacknavigation = () => {
               },
             }}
           />
-           <Stack.Screen
+          <Stack.Screen
             name="Post Sale"
             component={PostSale}
             options={{

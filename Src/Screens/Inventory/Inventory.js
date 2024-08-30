@@ -50,6 +50,7 @@ const Inventory = ({ navigation }) => {
   };
 
   const handleShare = async (imageUri) => {
+    console.log(imageUri)
     try {
       const shareOptions = {
         title: 'Share via',

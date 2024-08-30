@@ -94,17 +94,24 @@ const Homescreen = ({ navigation }) => {
     }
   };
 
+  const navigatescreeen =()=>{
+    navigation.navigate('Search Leads')
+  }
+
   return (
     <View style={styles.container}>
 
       {['team_manager', 'salesman','telecaller'].includes(role) && (
         <View>
           <View style={styles.button}>
+          <Pressable style={styles.buttoncontainer} onPress={navigatescreeen}>
+              <Text style={styles.text}>Quick Search</Text>
+            </Pressable>
             <Pressable style={styles.buttoncontainer1} onPress={openModal}>
               <Text style={styles.text}>Add Quick Lead</Text>
             </Pressable>
           </View>
-          {['team_manager', 'salesman'].includes(role) && (
+          {['team_manager'].includes(role) && (
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={selectedValue}
@@ -194,6 +201,15 @@ const styles = StyleSheet.create({
     width: '35%',
     borderRadius: 10,
     backgroundColor: '#625bc5',
+    alignItems: 'center',
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  buttoncontainer: {
+    height: 38,
+    width: '35%',
+    borderRadius: 10,
+    backgroundColor: '#21d952',
     alignItems: 'center',
     marginLeft: 10,
     justifyContent: 'center',
