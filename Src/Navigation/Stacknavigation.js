@@ -435,7 +435,7 @@ const BottomTabNavigation = ({ navigation }) => {
             }}
           />
         )}
-        {['salesman', 'telecaller'].includes(role) && (
+        {['salesman', 'telecaller','staff','postsale'].includes(role) && (
           <Tab.Screen
             name="Task"
             component={Taskscreen}
