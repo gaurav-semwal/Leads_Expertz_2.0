@@ -57,6 +57,7 @@ const Expensescreen = ({ navigation }) => {
 
     try {
       const response = await Get_Expense(fromDateISO, toDateISO);
+      console.log(response)
       if (response.msg === 'Load Successfully') {
         setExpenses(response.data);
         setFilteredExpenses(response.data);
@@ -108,12 +109,19 @@ const Expensescreen = ({ navigation }) => {
 
   const renderExpenseItem = ({ item }) => (
     <View style={styles.expenseItem}>
-      <Text style={styles.text}>Users: {item.users}</Text>
-      <Text style={styles.text}>Title: {item.title}</Text>
-      <Text style={styles.text}>Category: {item.category}</Text>
-      <Text style={styles.text}>Comments: {item.comments}</Text>
-      <Text style={styles.text}>Date: {item.exp_date}</Text>
-      <Text style={styles.text}>Amount: ₹{item.amount}</Text>
+      <View>
+        {['team_manager'].includes(role) && (
+          <Text style={styles.text}>Users: {item.users}</Text>
+        )}
+        <Text style={styles.text}>Title: {item.title}</Text>
+        <Text style={styles.text}>Category: {item.category}</Text>
+        <Text style={styles.text}>Comments: {item.comments}</Text>
+      </View>
+      <View>
+        <Text style={styles.text}>Date: {item.exp_date}</Text>
+        <Text style={styles.text}>Amount: ₹{item.amount}</Text>
+        <Text style={styles.text1}>Status: {item.status}</Text>
+      </View>
     </View>
   );
 
@@ -252,10 +260,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   datePicker: {
-    backgroundColor: '#fff',
     borderRadius: 5,
     padding: 10,
     marginVertical: 5,
+    borderWidth: 1
   },
   dateText: {
     fontSize: 16,
@@ -285,16 +293,25 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   expenseItem: {
-    padding: 10,
-    borderRadius: 6,
-    borderColor: '#ede8e8',
-    borderWidth: 1,
-    backgroundColor: '#ede8e8',
-    marginBottom: 10,
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#e0dad3',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   text: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  text1: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'red'
   },
 });
 

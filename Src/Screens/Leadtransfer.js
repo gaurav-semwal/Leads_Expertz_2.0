@@ -41,6 +41,7 @@ const Leadtransfer = () => {
   const getStatus = async () => {
     try {
       const response = await Get_Status();
+      console.log('user', response)
       if (response.msg === '') {
         setStatusData(response.data);
       }
@@ -78,15 +79,15 @@ const Leadtransfer = () => {
       const response = await Search_lead(selectedUserId, status);
       if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-    } 
-    else
-      if (response.msg === 'Load Successfully') {
-        setLeadData(response.data);
-        setShowTransferFields(true);
-      } else {
-        setLeadData([]);
-        setShowTransferFields(false);
       }
+      else
+        if (response.msg === 'Load Successfully') {
+          setLeadData(response.data);
+          setShowTransferFields(true);
+        } else {
+          setLeadData([]);
+          setShowTransferFields(false);
+        }
     } catch (error) {
       console.log('Error fetching leads:', error);
       setLeadData([]);
@@ -112,21 +113,21 @@ const Leadtransfer = () => {
       console.log(response);
       if (response.msg === "Unauthorized request") {
         navigation.navigate('Login');
-    } 
-    else
-      if (response.msg === 'Save Successfully') {
-        Toast.show({
-          text1: 'Save Successfully',
-          type: 'success',
-        });
-        // setSelectedLeads([]);
-        // setTransferUserId('');
-        // setTransferStatus('');
-
-        // getLead();
-        handleSearch()
-      } else {
       }
+      else
+        if (response.msg === 'Save Successfully') {
+          Toast.show({
+            text1: 'Save Successfully',
+            type: 'success',
+          });
+          // setSelectedLeads([]);
+          // setTransferUserId('');
+          // setTransferStatus('');
+
+          // getLead();
+          handleSearch()
+        } else {
+        }
     } catch (error) {
       Toast.show({
         text1: response.msg,
@@ -184,7 +185,7 @@ const Leadtransfer = () => {
           rowData.email ?? '',
           rowData.phone ?? '',
         ]}
-        widthArr={[40, ...widthArr]} 
+        widthArr={[40, ...widthArr]}
         style={[styles.row, { backgroundColor: index % 2 === 0 ? '#F7F6E7' : '#E7E6E1' }]}
         textStyle={styles.text}
       />
@@ -192,12 +193,12 @@ const Leadtransfer = () => {
   };
 
   const handleuser = (itemValue) => {
-    console.log('user',itemValue)
+    console.log('user', itemValue)
     setSelectedUserId(itemValue);
   };
 
   const handletransferuser = (itemValue) => {
-    console.log('transferuser',itemValue)
+    console.log('transferuser', itemValue)
     setTransferUserId(itemValue);
   };
 
@@ -221,7 +222,7 @@ const Leadtransfer = () => {
                   <Picker.Item
                     key={userItem.id}
                     label={`${userItem.name} (${userItem.role.replace('_', ' ')})`}
-                    value={userItem.id} 
+                    value={userItem.id}
                   />
                 ))}
               </Picker>
@@ -258,7 +259,7 @@ const Leadtransfer = () => {
           <View style={styles.dropdowncontainer1}>
             <Picker
               selectedValue={transferUserId}
-                onValueChange={handletransferuser}>
+              onValueChange={handletransferuser}>
               <Picker.Item label="Select User" value="" />
               {userData.map(userItem => (
                 <Picker.Item
@@ -276,13 +277,15 @@ const Leadtransfer = () => {
               selectedValue={transferStatus}
               onValueChange={itemValue => setTransferStatus(itemValue)}>
               <Picker.Item label="Select Status" value="" />
-              {statusData.map(statusItem => (
-                <Picker.Item
-                  key={statusItem.id}
-                  label={statusItem.name}
-                  value={statusItem.name}
-                />
-              ))}
+              {statusData
+                .filter(statusItem => statusItem.name !== 'CONVERTED')
+                .map(statusItem => (
+                  <Picker.Item
+                    key={statusItem.id}
+                    label={statusItem.name}
+                    value={statusItem.name}
+                  />
+                ))}
             </Picker>
           </View>
 
@@ -292,7 +295,7 @@ const Leadtransfer = () => {
         </View>
       )}
 
-      <View style={{ top: 10,height:'48%'}}>
+      <View style={{ top: 10, height: '48%' }}>
         <ScrollView horizontal>
           <View>
             <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>

@@ -60,7 +60,7 @@ const Leadshomegrid = () => {
               key =>
                 key === 'new_leads' ||
                 key === 'pending_leads' ||
-                key === 'call_scheduled'||
+                key === 'call_scheduled' ||
                 key === 'processing_leads' ||
                 key === 'interested_leads' ||
                 key === 'others'
@@ -71,9 +71,8 @@ const Leadshomegrid = () => {
               key: key,
             }));
         } else {
-          // Show all categories for other roles
           categoriesList = Object.keys(leadData)
-            .filter(key => key !== 'converted_leads' && key !== 'others')
+            .filter(key => key !== 'converted_leads')
             .map(key => ({
               id: key,
               title: formatTitle(key),
@@ -162,19 +161,40 @@ const Leadshomegrid = () => {
     );
   }
 
+  const totalLeadsCategory = categories.find(item => item.key === 'total_leads');
+  const otherCategories = categories.filter(item => item.key !== 'total_leads');
+
   return (
     <View style={styles.container}>
       {['team_manager', 'salesman', 'telecaller'].includes(role) && (
-        <View style={{ height: '58%' }}>
-          <FlatList
-            data={categories}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-          />
+        <View>
+          {totalLeadsCategory && (
+            <TouchableOpacity
+              style={styles.fullWidthItem}
+              onPress={() => handlePress(totalLeadsCategory.key)}>
+              <View style={styles.content}>
+                <View style={[styles.icon, { backgroundColor: '#4287f5' }]}>
+                  <FontAwesome5 name="funnel-dollar" size={20} color="white" />
+                </View>
+                <View style={styles.textContainer}>
+                  <Text style={styles.title}>{totalLeadsCategory.title}</Text>
+                  <Text style={styles.title1}>{leads[totalLeadsCategory.key] || '0'}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+
+          <View style={{ height: 308 }}>
+            <FlatList
+              data={otherCategories}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+              numColumns={2}
+              showsVerticalScrollIndicator={false}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
+            />
+          </View>
         </View>
       )}
       <ScrollView>
@@ -190,6 +210,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  fullWidthItem: {
+    margin: 8,
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: '#e0dad3',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 6,
   },
   item: {
     flex: 1,

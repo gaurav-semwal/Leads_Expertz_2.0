@@ -296,6 +296,8 @@ const Searchleads = ({ navigation }) => {
           onChangeText={(text) => setSearch(text)}
           style={[styles.textinput, { paddingLeft: 20 }]}
           mode="outlined"
+          keyboardType='numeric'
+          maxLength={10}
         />
       </View>
 
