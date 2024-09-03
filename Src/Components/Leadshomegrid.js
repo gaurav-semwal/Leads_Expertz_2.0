@@ -184,7 +184,7 @@ const Leadshomegrid = () => {
             </TouchableOpacity>
           )}
 
-          <View style={{ height: 308 }}>
+          <View>
             <FlatList
               data={otherCategories}
               renderItem={renderItem}

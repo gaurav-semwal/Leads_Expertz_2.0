@@ -68,6 +68,13 @@ const Inventory = ({ navigation }) => {
     setModalVisible(true);
   };
 
+  const generateShareLink = (rowData) => {
+    console.log('ccccccc',rowData)
+    const token = rowData.token;
+    const shareLink = `${baseUrl}/view-inventory?token=${token}`;
+    return shareLink;
+  };
+
   const renderTableRows = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -168,7 +175,7 @@ const Inventory = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => handleShare(`${baseUrl}${rowData.img1}`)}>
+            onPress={() => handleShare(generateShareLink(rowData))}>
             <FontAwesome name="share-alt" color="#625bc5" size={25} />
           </TouchableOpacity>,
         ]}
