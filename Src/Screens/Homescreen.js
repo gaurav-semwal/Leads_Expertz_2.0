@@ -6,7 +6,8 @@ import {
   Pressable,
   Modal,
   BackHandler,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Leadshomegrid from '../Components/Leadshomegrid';
@@ -124,7 +125,9 @@ const Homescreen = ({ navigation }) => {
           )}
         </View>
       )}
+      <ScrollView>
       <Leadshomegrid />
+      </ScrollView>
       {['team_manager', 'salesman','telecaller'].includes(role) && (
       <View style={styles.plusButtonContainer}>
         <Pressable style={styles.plusButton} onPress={onPressPlusButton}>
