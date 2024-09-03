@@ -134,8 +134,11 @@ const Leadshomegrid = () => {
 
   const renderItem = ({ item }) => {
     const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-    const leadCount = leads[item.key] || '0';
-
+    const leadCount = parseInt(leads[item.key], 10) || 0;
+    const totalLeads = parseInt(leads.total_leads, 10) || 0; 
+    
+    const percentage = totalLeads !== 0 ? ((leadCount / totalLeads) * 100).toFixed(2) : 0;
+  
     return (
       <TouchableOpacity
         style={styles.item}
@@ -146,12 +149,17 @@ const Leadshomegrid = () => {
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.title1}>{leadCount}</Text>
+            {/* Display lead count and percentage */}
+            <Text style={styles.title1}>
+              {leadCount} 
+              {totalLeads !== 0 && ` (${percentage}%)`}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+  
 
   if (loading) {
     return (
